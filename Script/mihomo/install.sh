@@ -46,8 +46,6 @@ get_url() {
 install_update() {
     apt update && apt upgrade -y
     apt install -y curl git gzip wget nano iptables tzdata
-    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-    echo "Asia/Shanghai" | tee /etc/timezone > /dev/null
 }
 
 check_ip_forward() {

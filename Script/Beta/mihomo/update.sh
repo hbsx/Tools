@@ -88,10 +88,11 @@ download_mihomo() {
 
 update_mihomo() {
     local folders="/root/mihomo"
-    local file="/root/mihomo/mihomo"
+    local file="$folders/mihomo"
     if [ ! -f "$file" ]; then
         echo -e "${red}请先安装 mihomo${reset}"
         start_main
+        return
     fi
     echo -e "${green}开始检查 mihomo 是否有更新${reset}"
     cd "$folders" || exit
@@ -103,29 +104,27 @@ update_mihomo() {
         echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_main
+        return
     fi
-    echo -e "${green}已检查到 mihomo 已有新版本${reset}"
-    echo -e "当前版本：[ ${green}${current_version}${reset} ]"
-    echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
-    while true; do
-        read -p "是否升级到最新版本？(y/n): " confirm
-        case $confirm in
-            [Yy]* )
-                download_mihomo
-                sleep 2s
-                systemctl restart mihomo
-                echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
-                start_main
-                ;;
-            [Nn]* )
-                echo -e "${red}更新已取消${reset}"
-                start_main
-                ;;
-            * )
-                echo -e "${red}无效的输入，请输入 y 或 n${reset}"
-                ;;
-        esac
-    done
+    echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}"
+    read -p "" confirm
+    case $confirm in
+        [Yy]* )
+            download_mihomo
+            sleep 2s
+            systemctl restart mihomo
+            echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
+            start_main
+            ;;
+        [Nn]* )
+            echo -e "${red}更新已取消${reset}"
+            start_main
+            ;;
+        * )
+            echo -e "${red}无效的输入，请输入 y 或 n${reset}"
+            update_mihomo
+            ;;
+    esac
 }
 
 update_mihomo

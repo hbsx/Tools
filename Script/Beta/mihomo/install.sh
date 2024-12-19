@@ -107,7 +107,6 @@ download_shell() {
 
 config_mihomo() {
     bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh")")
-    start_main
 }
 
 install_mihomo() {

@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.3"
+sh_ver="0.1.5"
 
 use_cdn=false
 
@@ -184,10 +184,9 @@ update_shell() {
         start_main
         return
     fi
-    read -p "$(echo -e "${green}检查到新版本，是否升级到最新版本？(y/n): ${reset}")" confirm
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}")" confirm
     case $confirm in
         [Yy]* )
-            echo -e "开始更新到版本 [ ${green}${sh_new_ver}${reset} ]"
             [ -f "$shell_file" ] && rm "$shell_file"
             wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
             chmod +x "$shell_file"

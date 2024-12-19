@@ -106,8 +106,7 @@ update_mihomo() {
         start_main
         return
     fi
-    echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}"
-    read -p "" confirm
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}")" confirm
     case $confirm in
         [Yy]* )
             download_mihomo

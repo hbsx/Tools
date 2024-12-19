@@ -207,45 +207,6 @@ update_shell() {
     esac
 }
 
-update_shell() {
-    local shell_file="/usr/bin/mihomo"
-    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
-    local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
-    echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
-    echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
-    if [ "$sh_ver" == "$sh_new_ver" ]; then
-        echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_main
-        return
-    fi
-    echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}"
-    while true; do
-        read -p "" confirm
-        case $confirm in
-            [Yy]* )
-                echo -e "开始更新到版本 [ ${green}${sh_new_ver}${reset} ]"
-                [ -f "$shell_file" ] && rm "$shell_file"
-                wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
-                chmod +x "$shell_file"
-                hash -r
-                echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
-                echo -e "3 秒后执行新脚本"
-                sleep 3s
-                "$shell_file"
-                break
-                ;;
-            [Nn]* )
-                echo -e "${red}更新已取消${reset}"
-                start_main
-                return
-                ;;
-            * )
-                echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
-                ;;
-        esac
-    done
-}
-
 update_mihomo() {
     get_install
     bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh")")

@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理
-#!date = 2024-12-19 11:50
+#!date = 2024-12-19 18:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.3"
+sh_ver="0.0.8"
 
 use_cdn=false
 
@@ -24,19 +24,11 @@ fi
 
 get_url() {
     local url=$1
-    local final_url
-    if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/$url"
-        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-            echo "代理站点不可用，请稍后重试" >&2
-            exit 1
-        fi
-    else
-        final_url="$url"
-        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
-            exit 1
-        fi
+    local final_url=""
+    final_url=$([ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url")
+    if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+        echo -e "${red}连接失败，可能是网络或者代理站点不可用，请检查网络并稍后重试${reset}" >&2
+        exit 1
     fi
     echo "$final_url"
 }
@@ -54,28 +46,18 @@ get_install() {
     fi
 }
 
-get_status() {
-    local file="/root/mihomo/mihomo"
-    if pgrep -f "$file" > /dev/null; then
-        status="running"
-    else
-        status="stopped"
-    fi
-}
-
 show_status() {
     local file="/root/mihomo/mihomo"
+    local status install_status run_status auto_start
     if [ ! -f "$file" ]; then
-        status="${red}未安装${reset}"
+        install_status="${red}未安装${reset}"
         run_status="${red}未运行${reset}"
         auto_start="${red}未设置${reset}"
     else
-        get_status
-        if [ "$status" == "running" ]; then
-            status="${green}已安装${reset}"
+        install_status="${green}已安装${reset}"
+        if pgrep -f "$file" > /dev/null; then
             run_status="${green}已运行${reset}"
         else
-            status="${green}已安装${reset}"
             run_status="${red}未运行${reset}"
         fi
         if systemctl is-enabled mihomo.service &>/dev/null; then
@@ -84,7 +66,7 @@ show_status() {
             auto_start="${red}未设置${reset}"
         fi
     fi
-    echo -e "安装状态：${status}"
+    echo -e "安装状态：${install_status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
     echo -e "脚本版本：${green}${sh_ver}${reset}"
@@ -130,7 +112,7 @@ service_mihomo() {
     systemctl "$action" mihomo
     sleep 2s
     echo -e "${green}mihomo ${action_text}命令已发出${reset}"
-    sleep 3s
+    sleep 2s
     if [ "$action" = "stop" ]; then
         if systemctl is-active --quiet mihomo; then
             echo -e "${red}mihomo ${action_text}失败${reset}"
@@ -185,98 +167,63 @@ uninstall_mihomo() {
 
 update_shell() {
     local shell_file="/usr/bin/mihomo"
-    echo -e "${green}开始检查管理脚本是否有更新${reset}"
-    sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/mihomo.sh"
-    sh_new_ver=$(wget --no-check-certificate -qO- "$sh_ver_url" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
-    if [ "$sh_ver" == "$sh_new_ver" ]; then
-        echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
-        echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
-        echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_main
-    fi
-    echo -e "${green}检查到管理脚本已有新版本${reset}"
+    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
+    local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    echo -e "${green}开始检查脚本是否有更新${reset}"
     echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
     echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
-    while true; do
-        read -p "$(echo -e "${green}是否升级到最新版本？${reset}(y/n): ")" confirm
-        case $confirm in
-            [Yy]* )
-                echo -e "开始下载最新版本 [ ${green}${sh_new_ver}${reset} ]"
-                if [ -f "$shell_file" ]; then
-                    rm $shell_file
-                fi
-                wget -O $shell_file --no-check-certificate "$sh_ver_url"
-                chmod +x $shell_file
-                if [[ ":$PATH:" != *":/usr/bin:"* ]]; then
-                    export PATH=$PATH:/usr/bin
-                fi
-                hash -r
-                echo -e "更新完成，当前版本已更新为 ${green}[ v${sh_new_ver} ]${reset}"
-                echo -e "5 秒后执行新脚本"
-                sleep 5s
-                /usr/bin/mihomo
-                break
-                ;;
-            [Nn]* )
-                echo -e "${red}更新已取消 ${reset}"
-                start_main
-                ;;
-            * )
-                echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
-                ;;
-        esac
-    done
-    start_main
+    if [ "$sh_ver" == "$sh_new_ver" ]; then
+        echo -e "${green}当前已是最新版本，无需更新${reset}"
+        start_main
+        return
+    fi
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
+        echo "更新已取消"
+        start_main
+        return
+    fi
+    [ -f "$shell_file" ] && rm "$shell_file"
+    wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
+    chmod +x "$shell_file"
+    hash -r
+    echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
+    echo -e "${yellow}3 秒后执行新脚本${reset}"
+    sleep 3s
+    "$shell_file"
 }
 
 update_mihomo() {
     get_install
-    local update_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/update.sh"
-    update_url=$(get_url "$update_url")
-    bash <(curl -Ls "$update_url")
-    systemctl restart mihomo
+    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh")")
     start_main
 }
 
 config_mihomo() {
     get_install
-    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
-    config_url=$(get_url "$config_url")
-    bash <(curl -Ls "$config_url")
+    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh")")
     start_main
 }
 
 install_mihomo() {
     local folders="/root/mihomo"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
         case "$confirm" in
-            [Yy]* )
-                echo -e "${green}开始删除现有安装并重新安装${reset}"
-                rm -rf "$folders"
-                ;;
-            [Nn]* )
-                echo -e "${green}跳过重新安装，保持现有安装${reset}"
-                start_main
-                return 0
-                ;;
-            * )
-                echo -e "${red}无效选择，跳过重新安装${reset}"
-                start_main
-                return 0
-                ;;
+            [Yy]* ) echo -e "${green}开始删除，重新安装中${reset}";;
+            [Nn]* ) echo -e "${green}取消安装，保持现有安装${reset}"; start_main; return;;
+            * ) echo -e "${red}无效选择，跳过重新安装${reset}"; start_main; return;;
         esac
     fi
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/install.sh"
-    install_url=$(get_url "$install_url")
-    bash <(curl -Ls "$install_url")
+    bash <(curl -Ls "$(get_url "$install_url")")
 }
 
 main() {
     clear
     echo "================================="
-    echo -e "${green}欢迎使用 mihomo 一键脚本${reset}"
+    echo -e "${green}欢迎使用 mihomo 一键脚本版${reset}"
     echo -e "${green}作者：${yellow}ChatGPT JK789${reset}"
     echo -e "${red}更换订阅说明：${reset}"
     echo -e "${red} 1. 更换订阅不能保存原有机场订阅"
@@ -299,8 +246,8 @@ main() {
     echo "================================="
     show_status
     echo "================================="
-    read -p "请输入选项[0-10]：" num
-    case "$num" in
+    read -p "请输入选项：" confirm
+    case "$confirm" in
         1) install_mihomo ;;
         2) update_mihomo ;;
         3) uninstall_mihomo ;;

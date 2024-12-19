@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#!name = mihomo 一键更新脚本
+#!name = mihomo 一键安装脚本
 #!desc = 更新
-#!date = 2024-12-19 10:35
+#!date = 2024-12-19 18:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -24,19 +24,11 @@ fi
 
 get_url() {
     local url=$1
-    local final_url
-    if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/$url"
-        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-            echo "代理站点不可用，请稍后重试" >&2
-            exit 1
-        fi
-    else
-        final_url="$url"
-        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
-            exit 1
-        fi
+    local final_url=""
+    final_url=$([ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url")
+    if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+        echo -e "${red}连接失败，可能是网络或者代理站点不可用，请检查网络并稍后重试${reset}" >&2
+        exit 1
     fi
     echo "$final_url"
 }
@@ -57,26 +49,6 @@ get_version() {
     fi
 }
 
-get_install() {
-    local file="/root/mihomo/mihomo"
-    if [ ! -f "$file" ]; then
-        echo -e "${red}请先安装 mihomo${reset}"
-        start_main
-    fi
-}
-
-get_schema() {
-    arch_raw=$(uname -m)
-    case "${arch_raw}" in
-        'x86_64') arch='amd64';;
-        'x86' | 'i686' | 'i386') arch='386';;
-        'aarch64' | 'arm64') arch='arm64';;
-        'armv7l') arch='armv7';;
-        's390x') arch='s390x';;
-        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
-    esac
-}
-
 download_version() {
     local version_url
     version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
@@ -86,7 +58,15 @@ download_version() {
 download_mihomo() {
     local version_file="/root/mihomo/version.txt"
     local filename
-    get_schema
+    arch_raw=$(uname -m)
+    case "${arch_raw}" in
+        'x86_64') arch='amd64';;
+        'x86' | 'i686' | 'i386') arch='386';;
+        'aarch64' | 'arm64') arch='arm64';;
+        'armv7l') arch='armv7';;
+        's390x') arch='s390x';;
+        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
+    esac
     download_version
     [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
@@ -100,40 +80,35 @@ download_mihomo() {
 
 update_mihomo() {
     local folders="/root/mihomo"
-    get_install
+    local file="$folders/mihomo"
+    if [ ! -f "$file" ]; then
+        echo -e "${red}请先安装 mihomo${reset}"
+        start_main
+        return
+    fi
     echo -e "${green}开始检查 mihomo 是否有更新${reset}"
     cd "$folders" || exit
     download_version
     current_version=$(get_version)
     latest_version="$version"
-    if [ "$current_version" == "$latest_version" ]; then
-        echo -e "当前版本：[ ${green}${current_version}${reset} ]"
-        echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
-        echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_main
-    fi
-    echo -e "${green}已检查到 mihomo 已有新版本${reset}"
     echo -e "当前版本：[ ${green}${current_version}${reset} ]"
     echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
-    while true; do
-        read -p "是否升级到最新版本？(y/n): " confirm
-        case $confirm in
-            [Yy]* )
-                download_mihomo
-                sleep 2s
-                systemctl restart mihomo
-                echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
-                start_main
-                ;;
-            [Nn]* )
-                echo -e "${red}更新已取消${reset}"
-                start_main
-                ;;
-            * )
-                echo -e "${red}无效的输入，请输入 y 或 n${reset}"
-                ;;
-        esac
-    done
+    if [ "$current_version" == "$latest_version" ]; then
+        echo -e "${green}当前已是最新版本，无需更新${reset}"
+        start_main
+        return
+    fi
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
+        echo "更新已取消"
+        start_main
+        return
+    fi
+    download_mihomo
+    sleep 2s
+    echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
+    systemctl restart mihomo
+    start_main
 }
 
 update_mihomo

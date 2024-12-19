@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本
 #!desc = 安装
-#!date = 2024-12-19 11:05
+#!date = 2024-12-19 18:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -24,39 +24,13 @@ fi
 
 get_url() {
     local url=$1
-    local final_url
-    if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/$url"
-        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-            echo "代理站点不可用，请稍后重试" >&2
-            exit 1
-        fi
-    else
-        final_url="$url"
-        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
-            exit 1
-        fi
+    local final_url=""
+    final_url=$([ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url")
+    if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+        echo -e "${red}连接失败，可能是网络或者代理站点不可用，请检查网络并稍后重试${reset}" >&2
+        exit 1
     fi
     echo "$final_url"
-}
-
-install_update() {
-    apt update && apt upgrade -y
-    apt install -y curl git gzip wget nano iptables tzdata
-}
-
-check_ip_forward() {
-    local sysctl_file="/etc/sysctl.conf"
-    if ! sysctl net.ipv4.ip_forward | grep -q "1"; then
-        sysctl -w net.ipv4.ip_forward=1
-        echo "net.ipv4.ip_forward=1" | tee -a "$sysctl_file" > /dev/null
-    fi
-    if ! sysctl net.ipv6.conf.all.forwarding | grep -q "1"; then
-        sysctl -w net.ipv6.conf.all.forwarding=1
-        echo "net.ipv6.conf.all.forwarding=1" | tee -a "$sysctl_file" > /dev/null
-    fi
-    sysctl -p > /dev/null
 }
 
 get_schema() {
@@ -69,6 +43,24 @@ get_schema() {
         's390x') arch='s390x';;
         *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
     esac
+}
+
+update_system() {
+    apt update && apt upgrade -y
+    apt install -y curl git gzip wget nano iptables tzdata
+}
+
+check_ip_forward() {
+    local sysctl_file="/etc/sysctl.conf"
+    sysctl net.ipv4.ip_forward | grep -q "1" || {
+        sysctl -w net.ipv4.ip_forward=1
+        echo "net.ipv4.ip_forward=1" | tee -a "$sysctl_file" > /dev/null
+    }
+    sysctl net.ipv6.conf.all.forwarding | grep -q "1" || {
+        sysctl -w net.ipv6.conf.all.forwarding=1
+        echo "net.ipv6.conf.all.forwarding=1" | tee -a "$sysctl_file" > /dev/null
+    }
+    sysctl -p > /dev/null
 }
 
 download_version() {
@@ -106,18 +98,15 @@ download_service() {
 
 download_shell() {
     local shell_file="/usr/bin/mihomo"
-    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh")
+    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { echo -e "${red}mihomo 管理脚本下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     chmod +x "$shell_file"
-    [[ ":$PATH:" != *":/usr/bin:"* ]] && export PATH="$PATH:/usr/bin"
     hash -r
 }
 
-download_config() {
-    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
-    config_url=$(get_url "$config_url")
-    bash <(curl -Ls "$config_url")
+config_mihomo() {
+    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh")")
 }
 
 install_mihomo() {
@@ -132,15 +121,15 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" confirm
+    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${green}是否继续${reset}(y/n): ")" confirm
     case "$confirm" in
-        [Yy]* ) download_config ;;
+        [Yy]* ) config_mihomo ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
     esac
     rm -f /root/install.sh
 }
 
-install_update
+update_system
 check_ip_forward
 install_mihomo

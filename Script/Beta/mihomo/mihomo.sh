@@ -181,6 +181,7 @@ update_shell() {
     if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
         echo "更新已取消"
         start_main
+        return
     fi
     [ -f "$shell_file" ] && rm "$shell_file"
     wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"

@@ -111,8 +111,8 @@ update_mihomo() {
         [Yy]* )
             download_mihomo
             sleep 2s
-            systemctl restart mihomo
             echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
+            systemctl restart mihomo
             start_main
             ;;
         [Nn]* )
@@ -121,7 +121,7 @@ update_mihomo() {
             ;;
         * )
             echo -e "${red}无效的输入，请输入 y 或 n${reset}"
-            update_mihomo
+            exit 1
             ;;
     esac
 }

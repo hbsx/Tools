@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.5"
+sh_ver="0.1.6"
 
 use_cdn=false
 
@@ -210,7 +210,6 @@ update_shell() {
 update_mihomo() {
     get_install
     bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh")")
-    systemctl restart mihomo
     start_main
 }
 

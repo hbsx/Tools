@@ -221,16 +221,14 @@ update_shell() {
 
 update_mihomo() {
     get_install
-    local update_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh"
-    bash <(curl -Ls "$(get_url "$update_url")")
+    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh")")
     systemctl restart mihomo
     start_main
 }
 
 config_mihomo() {
     get_install
-    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh"
-    bash <(curl -Ls "$(get_url "$config_url")")
+    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh")")
     start_main
 }
 

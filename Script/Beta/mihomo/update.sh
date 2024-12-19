@@ -99,9 +99,9 @@ update_mihomo() {
     download_version
     current_version=$(get_version)
     latest_version="$version"
+    echo -e "当前版本：[ ${green}${current_version}${reset} ]"
+    echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
     if [ "$current_version" == "$latest_version" ]; then
-        echo -e "当前版本：[ ${green}${current_version}${reset} ]"
-        echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_main
         return
@@ -120,7 +120,7 @@ update_mihomo() {
             start_main
             ;;
         * )
-            echo -e "${red}无效的输入，请输入 y 或 n${reset}"
+            echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
             exit 1
             ;;
     esac

@@ -177,27 +177,19 @@ update_shell() {
         start_main
         return
     fi
-    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}")" confirm
-    case $confirm in
-        [Yy]* )
-            [ -f "$shell_file" ] && rm "$shell_file"
-            wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
-            chmod +x "$shell_file"
-            hash -r
-            echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
-            echo -e "3 秒后执行新脚本"
-            sleep 3s
-            "$shell_file"
-            ;;
-        [Nn]* )
-            echo -e "${red}更新已取消${reset}"
-            start_main
-            ;;
-        * )
-            echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
-            exit 1
-            ;;
-    esac
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
+        echo "更新已取消"
+        start_main
+    fi
+    [ -f "$shell_file" ] && rm "$shell_file"
+    wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
+    chmod +x "$shell_file"
+    hash -r
+    echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
+    echo -e "3 秒后执行新脚本"
+    sleep 3s
+    "$shell_file"
 }
 
 update_mihomo() {

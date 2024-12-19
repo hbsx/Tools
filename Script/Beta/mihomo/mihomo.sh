@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.6"
+sh_ver="0.1.3"
 
 use_cdn=false
 
@@ -184,33 +184,28 @@ update_shell() {
         start_main
         return
     fi
-    echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}"
-    while true; do
-        read -p "" confirm
-        case $confirm in
-            [Yy]* )
-                echo -e "开始更新到版本 [ ${green}${sh_new_ver}${reset} ]"
-                [ -f "$shell_file" ] && rm "$shell_file"
-                wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
-                chmod +x "$shell_file"
-                hash -r
-                echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
-                echo -e "3 秒后执行新脚本"
-                sleep 3s
-                "$shell_file"
-                break
-                ;;
-            [Nn]* )
-                echo -e "${red}更新已取消${reset}"
-                start_main
-                return
-                ;;
-            * )
-                echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
-                update_shell
-                ;;
-        esac
-    done
+    read -p "$(echo -e "${green}检查到新版本，是否升级到最新版本？(y/n): ${reset}")" confirm
+    case $confirm in
+        [Yy]* )
+            echo -e "开始更新到版本 [ ${green}${sh_new_ver}${reset} ]"
+            [ -f "$shell_file" ] && rm "$shell_file"
+            wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
+            chmod +x "$shell_file"
+            hash -r
+            echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
+            echo -e "3 秒后执行新脚本"
+            sleep 3s
+            "$shell_file"
+            ;;
+        [Nn]* )
+            echo -e "${red}更新已取消${reset}"
+            start_main
+            ;;
+        * )
+            echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
+            exit 1
+            ;;
+    esac
 }
 
 update_shell() {

@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.0.8"
+sh_ver="0.0.9"
 
 use_cdn=false
 
@@ -136,7 +136,7 @@ service_mihomo() {
             return 0
             ;;
     esac
-    
+
     echo -e "${green}mihomo 准备${action_text}中${reset}"
     systemctl "$action" mihomo
     sleep 1s
@@ -278,6 +278,8 @@ main() {
     echo -e "${red} 2. 需要全部重新添加机场订阅${reset}"
     echo "================================="
     echo -e "${green} 0${reset}. 更新脚本"
+    echo -e "${green}10${reset}. 退出脚本"
+    echo -e "${green}20${reset}. 更换订阅"
     echo "---------------------------------"
     echo -e "${green} 1${reset}. 安装 mihomo"
     echo -e "${green} 2${reset}. 更新 mihomo"
@@ -289,8 +291,6 @@ main() {
     echo "---------------------------------"
     echo -e "${green} 7${reset}. 添加开机自启"
     echo -e "${green} 8${reset}. 关闭开机自启"
-    echo -e "${green} 9${reset}. 更换订阅"
-    echo -e "${green}10${reset}. 退出脚本"
     echo "================================="
     show_status
     echo "================================="
@@ -304,7 +304,7 @@ main() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
-        9) download_config ;;
+        20) download_config ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${Red}无效选项，请重新选择${reset}" 

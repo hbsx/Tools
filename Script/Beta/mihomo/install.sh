@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装
-#!date = 2024-12-19 11:05
+#!date = 2024-12-19 17:30
 #!author = ChatGPT
 
 set -e -o pipefail

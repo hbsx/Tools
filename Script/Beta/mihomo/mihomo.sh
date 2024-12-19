@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理
-#!date = 2024-12-19 15:20
+#!date = 2024-12-19 17:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.6"
+sh_ver="0.1.8"
 
 use_cdn=false
 

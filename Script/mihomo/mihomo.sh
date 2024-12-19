@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理
-#!date = 2024-12-19 10:35
+#!date = 2024-12-19 11:05
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.0"
+sh_ver="0.1.1"
 
 use_cdn=false
 
@@ -44,15 +44,6 @@ get_url() {
 start_main() {
     echo && echo -n -e "${red}* 按回车返回主菜单 *${reset}" && read temp
     main
-}
-
-get_version() {
-    local version_file="/root/mihomo/version.txt"
-    if [ -f "$version_file" ]; then
-        cat "$version_file"
-    else
-        echo -e "${red}请先安装 mihomo${reset}"
-    fi
 }
 
 get_install() {
@@ -93,12 +84,10 @@ show_status() {
             auto_start="${red}未设置${reset}"
         fi
     fi
-    mihomo_version=$(get_version 2>/dev/null || echo "${red}未知${reset}")
     echo -e "安装状态：${status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
     echo -e "脚本版本：${green}${sh_ver}${reset}"
-    echo -e "软件版本：${green}${mihomo_version}${reset}"
 }
 
 service_mihomo() {
@@ -249,7 +238,7 @@ update_mihomo() {
     start_main
 }
 
-download_config() {
+config_mihomo() {
     get_install
     local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
     config_url=$(get_url "$config_url")
@@ -257,7 +246,7 @@ download_config() {
     start_main
 }
 
-download_mihomo() {
+install_mihomo() {
     local file="/root/mihomo/mihomo"
     if [ -f "$file" ]; then
         echo -e "${red}mihomo 已安装，请勿重复安装！${reset}"
@@ -296,7 +285,7 @@ main() {
     echo "================================="
     read -p "请输入选项[0-10]：" num
     case "$num" in
-        1) download_mihomo ;;
+        1) install_mihomo ;;
         2) update_mihomo ;;
         3) uninstall_mihomo ;;
         4) start_mihomo ;;
@@ -304,7 +293,7 @@ main() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
-        20) download_config ;;
+        20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${Red}无效选项，请重新选择${reset}" 

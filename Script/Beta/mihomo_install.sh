@@ -156,9 +156,28 @@ download_shell() {
 
 install_mihomo() {
     local folders="/root/mihomo"
+    if [ -d "$folders" ]; then
+        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
+        read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" choice
+        case "$choice" in
+            [Yy]* )
+                echo -e "${green}开始删除现有安装并重新安装${reset}"
+                rm -rf "$folders"
+                ;;
+            [Nn]* )
+                echo -e "${green}跳过重新安装，保持现有安装${reset}"
+                start_main
+                return 0
+                ;;
+            * )
+                echo -e "${red}无效选择，跳过重新安装${reset}"
+                start_main
+                return 0
+                ;;
+        esac
+    fi
     install_update
     check_ip_forward
-    [ -d "$folders" ] && rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders" 
     get_schema
     echo -e "当前系统架构：[ ${green}${arch_raw}${reset} ]" 
@@ -170,7 +189,7 @@ install_mihomo() {
     download_shell
     read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" choice
     case "$choice" in
-        [Yy]* ) download_config ;;
+        [Yy]* ) config_mihomo ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
     esac
@@ -215,7 +234,7 @@ update_mihomo() {
     done
 }
 
-download_config() {
+config_mihomo() {
     local folders="/root/mihomo"
     local config_file="${folders}/config.yaml"
     echo -e "${cyan}-------------------------${reset}"
@@ -293,12 +312,10 @@ show_status() {
             auto_start="${red}未设置${reset}"
         fi
     fi
-    mihomo_version=$(get_version 2>/dev/null || echo "${red}未知${reset}")
     echo -e "安装状态：${status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
     echo -e "脚本版本：${green}${sh_ver}${reset}"
-    echo -e "软件版本：${green}${mihomo_version}${reset}"
 }
 
 service_mihomo() {
@@ -468,7 +485,7 @@ main() {
     echo "================================="
     read -p "请输入选项[0-10]：" num
     case "$num" in
-        1) download_mihomo ;;
+        1) install_mihomo ;;
         2) update_mihomo ;;
         3) uninstall_mihomo ;;
         4) start_mihomo ;;
@@ -476,7 +493,7 @@ main() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
-        20) download_config ;;
+        20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${Red}无效选项，请重新选择${reset}" 

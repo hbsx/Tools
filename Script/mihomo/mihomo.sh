@@ -175,7 +175,7 @@ uninstall_mihomo() {
         start_main
     fi
     echo -e "${green}mihomo 开始卸载${reset}"
-    sleep 1s
+    sleep 2s
     echo -e "${green}mihomo 卸载命令已发出${reset}"
     systemctl stop mihomo.service 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
     systemctl disable mihomo.service 2>/dev/null || { echo -e "${red}禁用 mihomo 服务失败${reset}"; exit 1; }

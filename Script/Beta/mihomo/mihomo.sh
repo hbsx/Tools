@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理
-#!date = 2024-12-19 11:05
+#!date = 2024-12-19 14:10
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.3"
+sh_ver="0.1.4"
 
 use_cdn=false
 
@@ -54,28 +54,18 @@ get_install() {
     fi
 }
 
-get_status() {
-    local file="/root/mihomo/mihomo"
-    if pgrep -f "$file" > /dev/null; then
-        status="running"
-    else
-        status="stopped"
-    fi
-}
-
 show_status() {
     local file="/root/mihomo/mihomo"
+    local status install_status run_status auto_start
     if [ ! -f "$file" ]; then
-        status="${red}未安装${reset}"
+        install_status="${red}未安装${reset}"
         run_status="${red}未运行${reset}"
         auto_start="${red}未设置${reset}"
     else
-        get_status
-        if [ "$status" == "running" ]; then
-            status="${green}已安装${reset}"
+        install_status="${green}已安装${reset}"
+        if pgrep -f "$file" > /dev/null; then
             run_status="${green}已运行${reset}"
         else
-            status="${green}已安装${reset}"
             run_status="${red}未运行${reset}"
         fi
         if systemctl is-enabled mihomo.service &>/dev/null; then
@@ -84,7 +74,7 @@ show_status() {
             auto_start="${red}未设置${reset}"
         fi
     fi
-    echo -e "安装状态：${status}"
+    echo -e "安装状态：${install_status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
     echo -e "脚本版本：${green}${sh_ver}${reset}"

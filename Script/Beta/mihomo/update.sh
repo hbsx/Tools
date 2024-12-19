@@ -57,26 +57,6 @@ get_version() {
     fi
 }
 
-get_install() {
-    local file="/root/mihomo/mihomo"
-    if [ ! -f "$file" ]; then
-        echo -e "${red}请先安装 mihomo${reset}"
-        start_main
-    fi
-}
-
-get_schema() {
-    arch_raw=$(uname -m)
-    case "${arch_raw}" in
-        'x86_64') arch='amd64';;
-        'x86' | 'i686' | 'i386') arch='386';;
-        'aarch64' | 'arm64') arch='arm64';;
-        'armv7l') arch='armv7';;
-        's390x') arch='s390x';;
-        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
-    esac
-}
-
 download_version() {
     local version_url
     version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
@@ -86,7 +66,15 @@ download_version() {
 download_mihomo() {
     local version_file="/root/mihomo/version.txt"
     local filename
-    get_schema
+    arch_raw=$(uname -m)
+    case "${arch_raw}" in
+        'x86_64') arch='amd64';;
+        'x86' | 'i686' | 'i386') arch='386';;
+        'aarch64' | 'arm64') arch='arm64';;
+        'armv7l') arch='armv7';;
+        's390x') arch='s390x';;
+        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
+    esac
     download_version
     [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
@@ -100,7 +88,11 @@ download_mihomo() {
 
 update_mihomo() {
     local folders="/root/mihomo"
-    get_install
+    local file="/root/mihomo/mihomo"
+    if [ ! -f "$file" ]; then
+        echo -e "${red}请先安装 mihomo${reset}"
+        start_main
+    fi
     echo -e "${green}开始检查 mihomo 是否有更新${reset}"
     cd "$folders" || exit
     download_version

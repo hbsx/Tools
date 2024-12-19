@@ -41,7 +41,19 @@ get_url() {
     echo "$final_url"
 }
 
-install_update() {
+get_schema() {
+    arch_raw=$(uname -m)
+    case "${arch_raw}" in
+        'x86_64') arch='amd64';;
+        'x86' | 'i686' | 'i386') arch='386';;
+        'aarch64' | 'arm64') arch='arm64';;
+        'armv7l') arch='armv7';;
+        's390x') arch='s390x';;
+        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
+    esac
+}
+
+update_system() {
     apt update && apt upgrade -y
     apt install -y curl git gzip wget nano iptables tzdata
 }
@@ -57,18 +69,6 @@ check_ip_forward() {
         echo "net.ipv6.conf.all.forwarding=1" | tee -a "$sysctl_file" > /dev/null
     fi
     sysctl -p > /dev/null
-}
-
-get_schema() {
-    arch_raw=$(uname -m)
-    case "${arch_raw}" in
-        'x86_64') arch='amd64';;
-        'x86' | 'i686' | 'i386') arch='386';;
-        'aarch64' | 'arm64') arch='arm64';;
-        'armv7l') arch='armv7';;
-        's390x') arch='s390x';;
-        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
-    esac
 }
 
 download_version() {
@@ -114,7 +114,7 @@ download_shell() {
     hash -r
 }
 
-download_config() {
+config_mihomo() {
     local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
     config_url=$(get_url "$config_url")
     bash <(curl -Ls "$config_url")
@@ -134,13 +134,13 @@ install_mihomo() {
     download_shell
     read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" confirm
     case "$confirm" in
-        [Yy]* ) download_config ;;
+        [Yy]* ) config_mihomo ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
     esac
     rm -f /root/install.sh
 }
 
-install_update
+update_system
 check_ip_forward
 install_mihomo

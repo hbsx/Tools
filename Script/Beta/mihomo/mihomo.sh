@@ -188,7 +188,7 @@ update_shell() {
     chmod +x "$shell_file"
     hash -r
     echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
-    echo -e "3 秒后执行新脚本"
+    echo -e "${yellow}3 秒后执行新脚本${reset}"
     sleep 3s
     "$shell_file"
 }

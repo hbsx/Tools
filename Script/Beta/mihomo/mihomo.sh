@@ -169,6 +169,7 @@ update_shell() {
     local shell_file="/usr/bin/mihomo"
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
     local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    echo -e "${green}开始检查脚本是否有更新${reset}"
     echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
     echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
     if [ "$sh_ver" == "$sh_new_ver" ]; then

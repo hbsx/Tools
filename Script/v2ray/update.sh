@@ -63,7 +63,7 @@ get_schema(){
     esac
 }
 
-get_version() {
+download_version() {
     local version_url="https://api.github.com/repos/v2fly/v2ray-core/releases/latest"
     version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
         echo -e "${red}获取 v2ray 远程版本失败${reset}";
@@ -75,7 +75,7 @@ download_v2ray() {
     local version_file="/root/v2ray/version.txt"
     local filename
     get_schema
-    get_version
+    download_version
     case "$arch" in
         '64' | '32' | 'arm64-v8a' | 'arm32-v7a' | 's390x') 
             filename="v2ray-linux-${arch}.zip";;
@@ -95,7 +95,7 @@ update_v2ray() {
     get_install
     echo -e "${green}开始检查 v2ray 是否有更新${reset}"
     cd "$folders" || exit
-    get_version
+    download_version
     current_version=$(get_version)
     latest_version="$version"
     if [ "$current_version" == "$latest_version" ]; then

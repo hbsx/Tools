@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键更新脚本
 #!desc = 更新
-#!date = 2024-11-03 22:30
+#!date = 2024-12-19 10:35
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -24,7 +24,21 @@ fi
 
 get_url() {
     local url=$1
-    [ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url"
+    local final_url
+    if [ "$use_cdn" = true ]; then
+        final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "代理站点不可用，请稍后重试" >&2
+            exit 1
+        fi
+    else
+        final_url="$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
+            exit 1
+        fi
+    fi
+    echo "$final_url"
 }
 
 start_main() {
@@ -74,12 +88,12 @@ download_mihomo() {
     local filename
     get_schema
     download_version
-    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-go120-${version}.gz" ||
+    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
-    mv "mihomo-linux-${arch}-compatible-go120-${version}" mihomo 2>/dev/null || mv "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    mv "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || mv "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
     chmod +x mihomo
     echo "$version" > "$version_file"
 }
@@ -98,7 +112,7 @@ update_mihomo() {
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_main
     fi
-    echo -e "${green}检查到 mihomo 已有新版本${reset}"
+    echo -e "${green}已检查到 mihomo 已有新版本${reset}"
     echo -e "当前版本：[ ${green}${current_version}${reset} ]"
     echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
     while true; do

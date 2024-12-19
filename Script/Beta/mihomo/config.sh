@@ -2,7 +2,7 @@
 
 #!name = mihomo 配置文件脚本
 #!desc = 配置文件
-#!date = 2024-11-03 22:30
+#!date = 2024-12-19 10:35
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -24,7 +24,21 @@ fi
 
 get_url() {
     local url=$1
-    [ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url"
+    local final_url
+    if [ "$use_cdn" = true ]; then
+        final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "代理站点不可用，请稍后重试" >&2
+            exit 1
+        fi
+    else
+        final_url="$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
+            exit 1
+        fi
+    fi
+    echo "$final_url"
 }
 
 get_local_ip() {
@@ -40,9 +54,9 @@ download_config() {
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" choice
-    choice=${choice:-1}
-    case "$choice" in
+    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
+    confirm=${confirm:-1}
+    case "$confirm" in
         1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
         2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
@@ -67,7 +81,7 @@ download_config() {
     url: \"$airport_url\"
     type: http
     interval: 86400
-    health-check: {enable: true, url: \"https://www.gstatic.com/generate_204\", interval: 300}
+    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
     override:
       additional-prefix: \"[$airport_name]\""
     done

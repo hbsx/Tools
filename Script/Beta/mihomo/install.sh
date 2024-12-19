@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本
 #!desc = 安装
-#!date = 2024-11-26 17:30
+#!date = 2024-12-19 11:05
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -24,30 +24,26 @@ fi
 
 get_url() {
     local url=$1
+    local final_url
     if [ "$use_cdn" = true ]; then
-        for proxy in "https://gh-proxy.com" "https://ghp.ci"; do
-            if curl --silent --head --fail --max-time 3 "$proxy/$url" > /dev/null; then
-                echo "$proxy/$url"
-                return
-            fi
-        done
-        echo "代理站点不可用，请稍后重试" >&2
-        exit 1
+        final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "代理站点不可用，请稍后重试" >&2
+            exit 1
+        fi
     else
-        if curl --silent --head --fail --max-time 3 "$url" > /dev/null; then
-            echo "$url"
-            return
+        final_url="$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
+            exit 1
         fi
     fi
-    echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
-    exit 1
+    echo "$final_url"
 }
 
 install_update() {
     apt update && apt upgrade -y
     apt install -y curl git gzip wget nano iptables tzdata
-    cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-    echo "Asia/Shanghai" | tee /etc/timezone > /dev/null
 }
 
 check_ip_forward() {
@@ -61,12 +57,6 @@ check_ip_forward() {
         echo "net.ipv6.conf.all.forwarding=1" | tee -a "$sysctl_file" > /dev/null
     fi
     sysctl -p > /dev/null
-}
-
-get_local_ip() {
-    local iface=$(ip route | awk '/default/ {print $5}')
-    ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
-    ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
 }
 
 get_schema() {
@@ -90,19 +80,19 @@ download_mihomo() {
     local version_file="/root/mihomo/version.txt"
     local filename
     download_version
-    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-go120-${version}.gz" ||
+    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
-    mv "mihomo-linux-${arch}-compatible-go120-${version}" mihomo 2>/dev/null || mv "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    mv "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || mv "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
     chmod +x mihomo
     echo "$version" > "$version_file"
 }
 
 download_wbeui() {
     local wbe_file="/root/mihomo/ui"
-    local wbe_url=$(get_url "https://github.com/metacubex/metacubexd.git")
+    local wbe_url="https://github.com/metacubex/metacubexd.git"
     git clone "$wbe_url" -b gh-pages "$wbe_file" || { echo -e "${red}管理面板下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
 }
 
@@ -116,7 +106,7 @@ download_service() {
 
 download_shell() {
     local shell_file="/usr/bin/mihomo"
-    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh")
+    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { echo -e "${red}mihomo 管理脚本下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     chmod +x "$shell_file"
@@ -125,60 +115,9 @@ download_shell() {
 }
 
 download_config() {
-    local folders="/root/mihomo"
-    local config_file="${folders}/config.yaml"
-    echo -e "${cyan}-------------------------${reset}"
-    echo -e "${yellow}1. TUN 模式${reset}"
-    echo -e "${yellow}2. TProxy 模式${reset}"
-    echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" choice
-    choice=${choice:-1}
-    case "$choice" in
-        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
-        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
-        *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
-    esac
+    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
     config_url=$(get_url "$config_url")
-    wget -q -O "${config_file}" "$config_url" || { echo -e "${red}配置文件下载失败${reset}"; exit 1; }
-    while true; do
-        read -p "请输入需要配置的机场数量（默认 1 个，最多 5 个）：" airport_count
-        airport_count=${airport_count:-1}
-        if [[ "$airport_count" =~ ^[1-5]$ ]]; then
-            break
-        else
-            echo -e "${red}无效的数量，请输入 1 到 5 之间的正整数${reset}"
-        fi
-    done
-    proxy_providers="proxy-providers:"
-    for ((i=1; i<=airport_count; i++)); do
-        read -p "请输入第 $i 个机场的订阅连接：" airport_url
-        read -p "请输入第 $i 个机场的名称：" airport_name
-        proxy_providers="$proxy_providers
-  provider_0$i:
-    url: \"$airport_url\"
-    type: http
-    interval: 86400
-    health-check: {enable: true, url: \"https://www.gstatic.com/generate_204\", interval: 300}
-    override:
-      additional-prefix: \"[$airport_name]\""
-    done
-    awk -v providers="$proxy_providers" '
-    /^# 机场配置/ {
-        print
-        print providers
-        next
-    }
-    { print }
-    ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
-    systemctl daemon-reload
-    systemctl start mihomo
-    get_local_ip
-    echo -e "${green}恭喜你，你的 mihomo 已经配置完成并保存到 ${yellow}${config_file}${reset}"
-    echo -e "下面是 mihomo 管理面板地址和进入管理菜单命令"
-    echo -e "${cyan}=========================${reset}"
-    echo -e "${green}http://$ipv4:9090/ui ${reset}"
-    echo -e "${green}mihomo          进入菜单 ${reset}"
-    echo -e "${cyan}=========================${reset}"
+    bash <(curl -Ls "$config_url")
 }
 
 install_mihomo() {
@@ -193,8 +132,8 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" choice
-    case "$choice" in
+    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" confirm
+    case "$confirm" in
         [Yy]* ) download_config ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;

@@ -24,23 +24,21 @@ fi
 
 get_url() {
     local url=$1
+    local final_url
     if [ "$use_cdn" = true ]; then
-        for proxy in "https://gh-proxy.com" "https://ghp.ci"; do
-            if curl --silent --head --fail --max-time 3 "$proxy/$url" > /dev/null; then
-                echo "$proxy/$url"
-                return
-            fi
-        done
-        echo "代理站点不可用，请稍后重试" >&2
-        exit 1
+        final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "代理站点不可用，请稍后重试" >&2
+            exit 1
+        fi
     else
-        if curl --silent --head --fail --max-time 3 "$url" > /dev/null; then
-            echo "$url"
-            return
+        final_url="$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
+            exit 1
         fi
     fi
-    echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
-    exit 1
+    echo "$final_url"
 }
 
 install_update() {

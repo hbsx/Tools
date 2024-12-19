@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理
-#!date = 2024-11-22 11:35
+#!date = 2024-12-19 10:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.0.7"
+sh_ver="0.0.8"
 
 use_cdn=false
 
@@ -24,23 +24,21 @@ fi
 
 get_url() {
     local url=$1
+    local final_url
     if [ "$use_cdn" = true ]; then
-        for proxy in "https://gh-proxy.com" "https://ghp.ci"; do
-            if curl --silent --head --fail --max-time 3 "$proxy/$url" > /dev/null; then
-                echo "$proxy/$url"
-                return
-            fi
-        done
-        echo "代理站点不可用，请稍后重试。" >&2
-        exit 1
+        final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "代理站点不可用，请稍后重试" >&2
+            exit 1
+        fi
     else
-        if curl --silent --head --fail --max-time 3 "$url" > /dev/null; then
-            echo "$url"
-            return
+        final_url="$url"
+        if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+            echo "连接失败，可能是网络问题，请检查网络并稍后重试" >&2
+            exit 1
         fi
     fi
-    echo "连接失败，可能是网络问题，请检查网络并稍后重试。" >&2
-    exit 1
+    echo "$final_url"
 }
 
 start_main() {
@@ -103,27 +101,42 @@ show_status() {
     echo -e "软件版本：${green}${mihomo_version}${reset}"
 }
 
-manage_mihomo() {
+service_mihomo() {
     local action="$1"
     check_install
+    action_text=""
     case "$action" in
         start) 
             action_text="启动" 
             if systemctl is-active --quiet mihomo; then
                 echo -e "${yellow}mihomo 已经在运行，无需重复启动${reset}"
-                start_main
+                return 0
             fi
             ;;
         stop)
             action_text="停止" 
             if ! systemctl is-active --quiet mihomo; then
                 echo -e "${yellow}mihomo 已经停止，无需重复操作${reset}"
-                start_main
                 return 0
             fi
             ;;
-        restart) action_text="重启" ;;
+        restart) 
+            action_text="重启"
+            ;;
+        enable)
+            action_text="设置开机自启"
+            systemctl enable mihomo
+            echo -e "${green}mihomo 开机自启已启用${reset}"
+            return 0
+            ;;
+        disable)
+            action_text="取消开机自启"
+            systemctl disable mihomo
+            echo -e "${green}mihomo 开机自启已禁用${reset}"
+            return 0
+            ;;
     esac
+    
     echo -e "${green}mihomo 准备${action_text}中${reset}"
     systemctl "$action" mihomo
     sleep 1s
@@ -145,9 +158,11 @@ manage_mihomo() {
     start_main
 }
 
-start_mihomo() { manage_mihomo start; }
-stop_mihomo() { manage_mihomo stop; }
-restart_mihomo() { manage_mihomo restart; }
+start_mihomo() { service_mihomo start; }
+stop_mihomo() { service_mihomo stop; }
+restart_mihomo() { service_mihomo restart; }
+enable_mihomo() { service_mihomo enable; }
+disable_mihomo() { service_mihomo disable; }
 
 uninstall_mihomo() {
     local folders="/root/mihomo"
@@ -272,7 +287,9 @@ main() {
     echo -e "${green} 5${reset}. 停止 mihomo"
     echo -e "${green} 6${reset}. 重启 mihomo"
     echo "---------------------------------"
-    echo -e "${green} 7${reset}. 更换订阅"
+    echo -e "${green} 7${reset}. 添加开机自启"
+    echo -e "${green} 8${reset}. 关闭开机自启"
+    echo -e "${green} 9${reset}. 更换订阅"
     echo -e "${green}10${reset}. 退出脚本"
     echo "================================="
     show_status
@@ -285,7 +302,9 @@ main() {
         4) start_mihomo ;;
         5) stop_mihomo ;;
         6) restart_mihomo ;;
-        7) download_config ;;
+        7) enable_mihomo ;;
+        8) disable_mihomo ;;
+        9) download_config ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${Red}无效选项，请重新选择${reset}" 

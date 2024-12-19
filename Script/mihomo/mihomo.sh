@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理
-#!date = 2024-12-19 10:00
+#!date = 2024-12-19 10:35
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.0.9"
+sh_ver="0.1.0"
 
 use_cdn=false
 
@@ -55,7 +55,7 @@ get_version() {
     fi
 }
 
-check_install() {
+get_install() {
     local file="/root/mihomo/mihomo"
     if [ ! -f "$file" ]; then
         echo -e "${red}请先安装 mihomo${reset}"
@@ -63,7 +63,7 @@ check_install() {
     fi
 }
 
-check_status() {
+get_status() {
     local file="/root/mihomo/mihomo"
     if pgrep -f "$file" > /dev/null; then
         status="running"
@@ -79,7 +79,7 @@ show_status() {
         run_status="${red}未运行${reset}"
         auto_start="${red}未设置${reset}"
     else
-        check_status
+        get_status
         if [ "$status" == "running" ]; then
             status="${green}已安装${reset}"
             run_status="${green}已运行${reset}"
@@ -103,7 +103,7 @@ show_status() {
 
 service_mihomo() {
     local action="$1"
-    check_install
+    get_install
     action_text=""
     case "$action" in
         start) 
@@ -139,7 +139,7 @@ service_mihomo() {
 
     echo -e "${green}mihomo 准备${action_text}中${reset}"
     systemctl "$action" mihomo
-    sleep 1s
+    sleep 2s
     echo -e "${green}mihomo ${action_text}命令已发出${reset}"
     sleep 3s
     if [ "$action" = "stop" ]; then
@@ -168,7 +168,7 @@ uninstall_mihomo() {
     local folders="/root/mihomo"
     local shell_file="/usr/bin/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
-    check_install
+    get_install
     read -rp "确认卸载 mihomo 吗？(y/n): " confirm
     if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
         echo "卸载已取消。"
@@ -241,7 +241,7 @@ update_shell() {
 }
 
 update_mihomo() {
-    check_install
+    get_install
     local update_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/update.sh"
     update_url=$(get_url "$update_url")
     bash <(curl -Ls "$update_url")
@@ -250,7 +250,7 @@ update_mihomo() {
 }
 
 download_config() {
-    check_install
+    get_install
     local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
     config_url=$(get_url "$config_url")
     bash <(curl -Ls "$config_url")

@@ -2,7 +2,7 @@
 
 #!name = mihomo 配置文件脚本
 #!desc = 配置文件
-#!date = 2024-12-19 10:00
+#!date = 2024-12-19 10:35
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -81,7 +81,7 @@ download_config() {
     url: \"$airport_url\"
     type: http
     interval: 86400
-    health-check: {enable: true, url: \"https://www.gstatic.com/generate_204\", interval: 300}
+    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
     override:
       additional-prefix: \"[$airport_name]\""
     done

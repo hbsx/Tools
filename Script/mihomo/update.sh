@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键更新脚本
 #!desc = 更新
-#!date = 2024-12-19 10:00
+#!date = 2024-12-19 10:35
 #!author = ChatGPT
 
 set -e -o pipefail

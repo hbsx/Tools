@@ -54,9 +54,9 @@ download_config() {
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" choice
-    choice=${choice:-1}
-    case "$choice" in
+    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
+    confirm=${confirm:-1}
+    case "$confirm" in
         1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
         2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;

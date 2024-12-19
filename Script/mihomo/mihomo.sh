@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.1"
+sh_ver="0.1.2"
 
 use_cdn=false
 
@@ -158,7 +158,7 @@ uninstall_mihomo() {
     local shell_file="/usr/bin/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
     get_install
-    read -rp "确认卸载 mihomo 吗？(y/n): " confirm
+    read -p "$(echo -e "${green}确认卸载 mihomo 吗？\n${yellow}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" confirm
     if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
         echo "卸载已取消。"
         start_main
@@ -198,7 +198,7 @@ update_shell() {
     echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
     echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
     while true; do
-        read -p "是否升级到最新版本？(y/n)：" confirm
+        read -p "$(echo -e "${green}是否升级到最新版本？${reset}(y/n): ")" confirm
         case $confirm in
             [Yy]* )
                 echo -e "开始下载最新版本 [ ${green}${sh_new_ver}${reset} ]"

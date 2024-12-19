@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="1.0.2"
+sh_ver="1.0.3"
 
 use_cdn=false
 
@@ -158,8 +158,8 @@ install_mihomo() {
     local folders="/root/mihomo"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
-        read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" choice
-        case "$choice" in
+        read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
+        case "$confirm" in
             [Yy]* )
                 echo -e "${green}开始删除现有安装并重新安装${reset}"
                 rm -rf "$folders"
@@ -187,8 +187,8 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" choice
-    case "$choice" in
+    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" confirm
+    case "$confirm" in
         [Yy]* ) config_mihomo ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
@@ -214,7 +214,7 @@ update_mihomo() {
     echo -e "当前版本：[ ${green}${current_version}${reset} ]"
     echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
     while true; do
-        read -p "是否升级到最新版本？(y/n): " confirm
+        read -p "$(echo -e "${green}是否升级到最新版本？${reset}(y/n): ")" confirm
         case $confirm in
             [Yy]* )
                 download_mihomo
@@ -241,9 +241,9 @@ config_mihomo() {
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" choice
-    choice=${choice:-1}
-    case "$choice" in
+    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
+    confirm=${confirm:-1}
+    case "$confirm" in
         1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
         2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
@@ -386,7 +386,7 @@ uninstall_mihomo() {
     local shell_file="/usr/bin/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
     get_install
-    read -rp "确认卸载 mihomo 吗？(y/n): " confirm
+    read -p "$(echo -e "${green}确认卸载 mihomo 吗？\n${yellow}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" confirm
     if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
         echo "卸载已取消。"
         start_main
@@ -426,7 +426,7 @@ update_shell() {
     echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
     echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
     while true; do
-        read -p "是否升级到最新版本？(y/n)：" confirm
+        read -p "$(echo -e "${green}是否升级到最新版本？${reset}(y/n): ")" confirm
         case $confirm in
             [Yy]* )
                 echo -e "开始下载最新版本 [ ${green}${sh_new_ver}${reset} ]"

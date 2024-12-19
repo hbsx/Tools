@@ -98,24 +98,17 @@ update_mihomo() {
         start_main
         return
     fi
-    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？(y/n): ${reset}")" confirm
-    case $confirm in
-        [Yy]* )
-            download_mihomo
-            sleep 2s
-            echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
-            systemctl restart mihomo
-            start_main
-            ;;
-        [Nn]* )
-            echo -e "${red}更新已取消${reset}"
-            start_main
-            ;;
-        * )
-            echo -e "${red}无效的输入，请输入 y 或 n ${reset}"
-            exit 1
-            ;;
-    esac
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
+        echo "更新已取消"
+        start_main
+        return
+    fi
+    download_mihomo
+    sleep 2s
+    echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
+    systemctl restart mihomo
+    start_main
 }
 
 update_mihomo

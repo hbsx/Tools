@@ -52,14 +52,14 @@ update_system() {
 
 check_ip_forward() {
     local sysctl_file="/etc/sysctl.conf"
-    if ! sysctl net.ipv4.ip_forward | grep -q "1"; then
+    sysctl net.ipv4.ip_forward | grep -q "1" || {
         sysctl -w net.ipv4.ip_forward=1
         echo "net.ipv4.ip_forward=1" | tee -a "$sysctl_file" > /dev/null
-    fi
-    if ! sysctl net.ipv6.conf.all.forwarding | grep -q "1"; then
+    }
+    sysctl net.ipv6.conf.all.forwarding | grep -q "1" || {
         sysctl -w net.ipv6.conf.all.forwarding=1
         echo "net.ipv6.conf.all.forwarding=1" | tee -a "$sysctl_file" > /dev/null
-    fi
+    }
     sysctl -p > /dev/null
 }
 
@@ -102,7 +102,6 @@ download_shell() {
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { echo -e "${red}mihomo 管理脚本下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     chmod +x "$shell_file"
-    [[ ":$PATH:" != *":/usr/bin:"* ]] && export PATH="$PATH:/usr/bin"
     hash -r
 }
 

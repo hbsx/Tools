@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.5"
+sh_ver="0.1.6"
 
 use_cdn=false
 
@@ -222,8 +222,7 @@ update_shell() {
 update_mihomo() {
     get_install
     local update_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh"
-    update_url=$(get_url "$update_url")
-    bash <(curl -Ls "$update_url")
+    bash <(curl -Ls "$(get_url "$update_url")")
     systemctl restart mihomo
     start_main
 }
@@ -231,8 +230,7 @@ update_mihomo() {
 config_mihomo() {
     get_install
     local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh"
-    config_url=$(get_url "$config_url")
-    bash <(curl -Ls "$config_url")
+    bash <(curl -Ls "$(get_url "$config_url")")
     start_main
 }
 
@@ -243,24 +241,12 @@ install_mihomo() {
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
         case "$confirm" in
-            [Yy]* )
-                echo -e "${green}开始删除现有安装并重新安装${reset}"
-                install_url=$(get_url "$install_url")
-                bash <(curl -Ls "$install_url")
-                ;;
-            [Nn]* )
-                echo -e "${green}取消安装，保持现有安装${reset}"
-                start_main
-                ;;
-            * )
-                echo -e "${red}无效选择，跳过重新安装${reset}"
-                start_main
-                ;;
+            [Yy]* ) echo -e "${green}开始删除，重新安装中${reset}";;
+            [Nn]* ) echo -e "${green}取消安装，保持现有安装${reset}"; start_main; return;;
+            * ) echo -e "${red}无效选择，跳过重新安装${reset}"; start_main; return;;
         esac
-    else
-        install_url=$(get_url "$install_url")
-        bash <(curl -Ls "$install_url")
     fi
+    bash <(curl -Ls "$(get_url "$install_url")")
 }
 
 main() {
@@ -289,8 +275,8 @@ main() {
     echo "================================="
     show_status
     echo "================================="
-    read -p "请输入选项[0-10]：" num
-    case "$num" in
+    read -p "请输入选项：" confirm
+    case "$confirm" in
         1) install_mihomo ;;
         2) update_mihomo ;;
         3) uninstall_mihomo ;;

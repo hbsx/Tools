@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理
-#!date = 2024-12-19 11:05
+#!date = 2024-12-19 11:50
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.2"
+sh_ver="0.1.3"
 
 use_cdn=false
 
@@ -247,10 +247,26 @@ config_mihomo() {
 }
 
 install_mihomo() {
-    local file="/root/mihomo/mihomo"
-    if [ -f "$file" ]; then
-        echo -e "${red}mihomo 已安装，请勿重复安装！${reset}"
-        start_main
+    local folders="/root/mihomo"
+    if [ -d "$folders" ]; then
+        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
+        read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
+        case "$confirm" in
+            [Yy]* )
+                echo -e "${green}开始删除现有安装并重新安装${reset}"
+                rm -rf "$folders"
+                ;;
+            [Nn]* )
+                echo -e "${green}跳过重新安装，保持现有安装${reset}"
+                start_main
+                return 0
+                ;;
+            * )
+                echo -e "${red}无效选择，跳过重新安装${reset}"
+                start_main
+                return 0
+                ;;
+        esac
     fi
     local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/install.sh"
     install_url=$(get_url "$install_url")

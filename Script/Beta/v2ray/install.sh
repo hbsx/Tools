@@ -39,7 +39,7 @@ get_schema(){
     esac
 }
 
-get_version() {
+download_version() {
     local version_url="https://api.github.com/repos/v2fly/v2ray-core/releases/latest"
     version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
         echo -e "${red}获取 v2ray 远程版本失败${reset}";
@@ -57,7 +57,7 @@ install_update() {
 download_v2ray() {
     local version_file="/root/v2ray/version.txt"
     local filename
-    get_version
+    download_version
     case "$arch" in
         '64' | '32' | 'arm64-v8a' | 'arm32-v7a' | 's390x') 
             filename="v2ray-linux-${arch}.zip";;
@@ -90,7 +90,7 @@ download_shell() {
     hash -r
 }
 
-download_config() {
+config_v2ray() {
     local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/v2ray/config.sh"
     config_url=$(get_url "$config_url")
     bash <(curl -Ls "$config_url")
@@ -102,14 +102,14 @@ install_v2ray() {
     mkdir -p "$folders" && cd "$folders" 
     get_schema
     echo -e "当前系统架构：[ ${green}${arch_raw}${reset} ]" 
-    get_version
+    download_version
     echo -e "当前软件版本：[ ${green}${version}${reset} ]"
     download_v2ray
     download_service
     download_shell
     read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" choice
     case "$choice" in
-        [Yy]* ) download_config ;;
+        [Yy]* ) config_v2ray ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
     esac

@@ -276,7 +276,7 @@ install_mihomo() {
 main() {
     clear
     echo "================================="
-    echo -e "${green}欢迎使用 mihomo 一键脚本 Beta 版${reset}"
+    echo -e "${green}欢迎使用 mihomo 一键脚本${reset}"
     echo -e "${green}作者：${yellow}ChatGPT JK789${reset}"
     echo -e "${red}更换订阅说明：${reset}"
     echo -e "${red} 1. 更换订阅不能保存原有机场订阅"

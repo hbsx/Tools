@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#!name = mihomo 配置文件脚本
+#!name = mihomo 一键安装脚本 Beta
 #!desc = 配置文件
 #!date = 2024-12-19 10:35
 #!author = ChatGPT
@@ -93,7 +93,7 @@ config_mihomo() {
     systemctl daemon-reload
     systemctl start mihomo
     echo -e "${green}恭喜你，你的 mihomo 已经配置完成并保存到 ${yellow}${config_file}${reset}"
-    echo -e "下面是 mihomo 管理面板地址和进入管理菜单命令"
+    echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
     echo -e "${cyan}=========================${reset}"
     echo -e "${green}http://$ipv4:9090/ui ${reset}"
     echo -e "${green}mihomo          进入菜单 ${reset}"

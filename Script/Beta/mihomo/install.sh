@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#!name = mihomo 一键安装脚本
+#!name = mihomo 一键安装脚本 Beta
 #!desc = 安装
 #!date = 2024-12-19 11:05
 #!author = ChatGPT
@@ -106,7 +106,7 @@ download_service() {
 
 download_shell() {
     local shell_file="/usr/bin/mihomo"
-    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh")
+    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { echo -e "${red}mihomo 管理脚本下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     chmod +x "$shell_file"
@@ -115,7 +115,7 @@ download_shell() {
 }
 
 config_mihomo() {
-    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
+    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh"
     config_url=$(get_url "$config_url")
     bash <(curl -Ls "$config_url")
 }
@@ -132,7 +132,7 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" confirm
+    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${green}是否继续${reset}(y/n): ")" confirm
     case "$confirm" in
         [Yy]* ) config_mihomo ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;

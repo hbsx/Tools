@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#!name = mihomo 一键更新脚本
+#!name = mihomo 一键安装脚本 Beta
 #!desc = 更新
 #!date = 2024-12-19 10:35
 #!author = ChatGPT

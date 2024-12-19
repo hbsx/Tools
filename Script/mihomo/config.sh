@@ -41,15 +41,12 @@ get_url() {
     echo "$final_url"
 }
 
-get_local_ip() {
+config_mihomo() {
+    local folders="/root/mihomo"
+    local config_file="${folders}/config.yaml"
     local iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
-}
-
-download_config() {
-    local folders="/root/mihomo"
-    local config_file="${folders}/config.yaml"
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
@@ -95,13 +92,12 @@ download_config() {
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
     systemctl daemon-reload
     systemctl start mihomo
-    get_local_ip
     echo -e "${green}恭喜你，你的 mihomo 已经配置完成并保存到 ${yellow}${config_file}${reset}"
-    echo -e "下面是 mihomo 管理面板地址和进入管理菜单命令"
+    echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
     echo -e "${cyan}=========================${reset}"
     echo -e "${green}http://$ipv4:9090/ui ${reset}"
     echo -e "${green}mihomo          进入菜单 ${reset}"
     echo -e "${cyan}=========================${reset}"
 }
 
-download_config
+config_mihomo

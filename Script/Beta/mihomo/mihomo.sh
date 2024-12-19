@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#!name = mihomo 一键管理脚本
+#!name = mihomo 一键管理脚本 Beta
 #!desc = 管理
-#!date = 2024-12-19 14:10
+#!date = 2024-12-19 15:20
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.4"
+sh_ver="0.1.5"
 
 use_cdn=false
 
@@ -176,7 +176,7 @@ uninstall_mihomo() {
 update_shell() {
     local shell_file="/usr/bin/mihomo"
     echo -e "${green}开始检查管理脚本是否有更新${reset}"
-    sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/mihomo.sh"
+    sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
     sh_new_ver=$(wget --no-check-certificate -qO- "$sh_ver_url" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
@@ -221,7 +221,7 @@ update_shell() {
 
 update_mihomo() {
     get_install
-    local update_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/update.sh"
+    local update_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh"
     update_url=$(get_url "$update_url")
     bash <(curl -Ls "$update_url")
     systemctl restart mihomo
@@ -230,7 +230,7 @@ update_mihomo() {
 
 config_mihomo() {
     get_install
-    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/config.sh"
+    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh"
     config_url=$(get_url "$config_url")
     bash <(curl -Ls "$config_url")
     start_main
@@ -238,29 +238,29 @@ config_mihomo() {
 
 install_mihomo() {
     local folders="/root/mihomo"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${green}是否删除并重新安装？\n${yellow}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
         case "$confirm" in
             [Yy]* )
                 echo -e "${green}开始删除现有安装并重新安装${reset}"
-                rm -rf "$folders"
+                install_url=$(get_url "$install_url")
+                bash <(curl -Ls "$install_url")
                 ;;
             [Nn]* )
-                echo -e "${green}跳过重新安装，保持现有安装${reset}"
+                echo -e "${green}取消安装，保持现有安装${reset}"
                 start_main
-                return 0
                 ;;
             * )
                 echo -e "${red}无效选择，跳过重新安装${reset}"
                 start_main
-                return 0
                 ;;
         esac
+    else
+        install_url=$(get_url "$install_url")
+        bash <(curl -Ls "$install_url")
     fi
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/install.sh"
-    install_url=$(get_url "$install_url")
-    bash <(curl -Ls "$install_url")
 }
 
 main() {

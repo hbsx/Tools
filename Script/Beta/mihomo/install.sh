@@ -18,9 +18,11 @@ sh_ver="1.0.1"
 
 use_cdn=false
 
-if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
-    use_cdn=true
-fi
+check_network() {
+    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+        use_cdn=true
+    fi
+}
 
 get_url() {
     local url=$1
@@ -130,6 +132,7 @@ install_mihomo() {
     rm -f /root/install.sh
 }
 
+check_network
 update_system
 check_ip_forward
 install_mihomo

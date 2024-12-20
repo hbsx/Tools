@@ -18,9 +18,11 @@ sh_ver="0.1.1"
 
 use_cdn=false
 
-if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
-    use_cdn=true
-fi
+check_network() {
+    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+        use_cdn=true
+    fi
+}
 
 get_url() {
     local url=$1
@@ -142,7 +144,7 @@ uninstall_mihomo() {
     get_install
     read -p "$(echo -e "${yellow}确认卸载 mihomo 吗？\n${red}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" confirm
     case "$confirm" in
-        [Yy]* ) echo -e "${red}mihomo 卸载中请等待${reset}";;
+        [Yy]* ) echo -e "${green}mihomo 卸载中请等待${reset}";;
         [Nn]* ) echo -e "${yellow}mihomo 卸载已取消${reset}"; start_main; return;;
         * ) echo -e "${red}无效选择，卸载已取消${reset}"; start_main; return;;
     esac
@@ -184,7 +186,7 @@ install_mihomo() {
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${yellow}是否删除并重新安装？\n${red}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
         case "$confirm" in
-            [Yy]* ) echo -e "${red}开始删除，重新安装中请等待${reset}";;
+            [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
             [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_main; return;;
             * ) echo -e "${red}无效选择，安装已取消${reset}"; start_main; return;;
         esac
@@ -197,8 +199,8 @@ update_shell() {
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
     local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
-    echo -e "${yellow}当前版本：[ ${green}${sh_ver}${reset} ]"
-    echo -e "${red}最新版本：[ ${green}${sh_new_ver}${reset} ]"
+    echo -e "${green}当前版本${reset}：【 ${green}${sh_ver}${reset} 】"
+    echo -e "${yellow}最新版本${reset}：【 ${yellow}${sh_new_ver}${reset} 】"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_main
@@ -206,7 +208,7 @@ update_shell() {
     fi
     read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
     case "$confirm" in
-        [Yy]* ) echo -e "${red}开始升级，升级中请等待${reset}";;
+        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
         [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_main; return;;
         * ) echo -e "${red}无效选择，升级已取消${reset}"; start_main; return;;
     esac
@@ -264,4 +266,5 @@ main() {
     esac
 }
 
+check_network
 main

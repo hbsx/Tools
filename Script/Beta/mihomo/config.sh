@@ -18,9 +18,11 @@ sh_ver="1.0.1"
 
 use_cdn=false
 
-if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
-    use_cdn=true
-fi
+check_network() {
+    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+        use_cdn=true
+    fi
+}
 
 get_url() {
     local url=$1
@@ -92,4 +94,5 @@ config_mihomo() {
     echo -e "${cyan}=========================${reset}"
 }
 
+check_network
 config_mihomo

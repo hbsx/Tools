@@ -18,16 +18,18 @@ sh_ver="1.0.1"
 
 use_cdn=false
 
-if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
-    use_cdn=true
-fi
+check_network() {
+    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+        use_cdn=true
+    fi
+}
 
 get_url() {
     local url=$1
     local final_url=""
     final_url=$([ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url")
     if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-        echo -e "${red}连接失败，可能是网络或者代理站点不可用，请检查网络并稍后重试${reset}" >&2
+        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查网络并稍后重试${reset}" >&2
         exit 1
     fi
     echo "$final_url"
@@ -91,19 +93,19 @@ update_mihomo() {
     download_version
     current_version=$(get_version)
     latest_version="$version"
-    echo -e "当前版本：[ ${green}${current_version}${reset} ]"
-    echo -e "最新版本：[ ${green}${latest_version}${reset} ]"
+    echo -e "${green}当前版本${reset}：【 ${green}${current_version}${reset} 】"
+    echo -e "${yellow}最新版本${reset}：【 ${yellow}${latest_version}${reset} 】"
     if [ "$current_version" == "$latest_version" ]; then
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_main
         return
     fi
-    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
-    if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
-        echo "更新已取消"
-        start_main
-        return
-    fi
+    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    case "$confirm" in
+        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
+        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_main; return;;
+        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_main; return;;
+    esac
     download_mihomo
     sleep 2s
     echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
@@ -111,4 +113,5 @@ update_mihomo() {
     start_main
 }
 
+check_network
 update_mihomo

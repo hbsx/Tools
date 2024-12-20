@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.5"
+sh_ver="0.1.6"
 
 use_cdn=false
 
@@ -356,6 +356,16 @@ update_shell() {
     "$shell_file"
 }
 
+clear_logs() {
+    if [ -f "$log_file" ]; then
+        echo -e "${yellow}正在清空日志文件$log_file${reset}"
+        > "$log_file"
+        echo -e "${green}日志文件已清空${reset}"
+    else
+        echo -e "${red}日志文件不存在！${reset}"
+    fi
+}
+
 main() {
     clear
     echo "================================="
@@ -379,6 +389,7 @@ main() {
     echo "---------------------------------"
     echo -e "${green} 7${reset}. 添加开机自启"
     echo -e "${green} 8${reset}. 关闭开机自启"
+    echo -e "${green} 9${reset}. 清空日志记录"
     echo "================================="
     show_status
     echo "================================="
@@ -392,6 +403,7 @@ main() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
+        9) clear_logs ;;
         20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;

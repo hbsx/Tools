@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #!name = mihomo 一键管理脚本 Beta
-#!desc = 管理
-#!date = 2024-12-19 17:30
+#!desc = 管理 & 面板
+#!date = 2024-12-20 10:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.2"
+sh_ver="0.1.5"
 
 use_cdn=false
 
@@ -38,6 +38,16 @@ get_url() {
 get_install() {
     local file="/root/mihomo/mihomo"
     if [ ! -f "$file" ]; then
+        echo -e "${red}请先安装 mihomo${reset}"
+        start_main
+    fi
+}
+
+get_version() {
+    local version_file="/root/mihomo/version.txt"
+    if [ -f "$version_file" ]; then
+        cat "$version_file"
+    else
         echo -e "${red}请先安装 mihomo${reset}"
         start_main
     fi
@@ -167,15 +177,125 @@ uninstall_mihomo() {
     start_main
 }
 
+download_version() {
+    local version_url
+    version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
+    version=$(curl -sSL "$version_url") || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; }
+}
+
+download_mihomo() {
+    local version_file="/root/mihomo/version.txt"
+    local filename
+    arch_raw=$(uname -m)
+    case "${arch_raw}" in
+        'x86_64') arch='amd64';;
+        'x86' | 'i686' | 'i386') arch='386';;
+        'aarch64' | 'arm64') arch='arm64';;
+        'armv7l') arch='armv7';;
+        's390x') arch='s390x';;
+        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
+    esac
+    download_version
+    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
+    filename="mihomo-linux-${arch}-${version}.gz"
+    local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
+    wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
+    gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
+    mv "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || mv "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    chmod +x mihomo
+    echo "$version" > "$version_file"
+}
+
 update_mihomo() {
-    get_install
-    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/update.sh")")
+    local folders="/root/mihomo"
+    local file="$folders/mihomo"
+    if [ ! -f "$file" ]; then
+        echo -e "${red}请先安装 mihomo${reset}"
+        start_main
+        return
+    fi
+    echo -e "${green}开始检查 mihomo 是否有更新${reset}"
+    cd "$folders" || exit
+    download_version
+    current_version=$(get_version)
+    latest_version="$version"
+    echo -e "${green}当前版本${reset}：【 ${green}${current_version}${reset} 】"
+    echo -e "${yellow}最新版本${reset}：【 ${yellow}${latest_version}${reset} 】"
+    if [ "$current_version" == "$latest_version" ]; then
+        echo -e "${green}当前已是最新版本，无需更新${reset}"
+        start_main
+        return
+    fi
+    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    case "$confirm" in
+        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
+        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_main; return;;
+        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_main; return;;
+    esac
+    download_mihomo
+    sleep 2s
+    echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
+    systemctl restart mihomo
     start_main
 }
 
 config_mihomo() {
-    get_install
-    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh")")
+    local folders="/root/mihomo"
+    local config_file="${folders}/config.yaml"
+    local iface=$(ip route | awk '/default/ {print $5}')
+    ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
+    ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+    echo -e "${cyan}-------------------------${reset}"
+    echo -e "${yellow}1. TUN 模式${reset}"
+    echo -e "${yellow}2. TProxy 模式${reset}"
+    echo -e "${cyan}-------------------------${reset}"
+    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
+    confirm=${confirm:-1}
+    case "$confirm" in
+        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
+        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
+        *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
+    esac
+    config_url=$(get_url "$config_url")
+    wget -q -O "${config_file}" "$config_url" || { echo -e "${red}配置文件下载失败${reset}"; exit 1; }
+    while true; do
+        read -p "请输入需要配置的机场数量（默认 1 个，最多 5 个）：" airport_count
+        airport_count=${airport_count:-1}
+        if [[ "$airport_count" =~ ^[1-5]$ ]]; then
+            break
+        else
+            echo -e "${red}无效的数量，请输入 1 到 5 之间的正整数${reset}"
+        fi
+    done
+    proxy_providers="proxy-providers:"
+    for ((i=1; i<=airport_count; i++)); do
+        read -p "请输入第 $i 个机场的订阅连接：" airport_url
+        read -p "请输入第 $i 个机场的名称：" airport_name
+        proxy_providers="$proxy_providers
+  provider_0$i:
+    url: \"$airport_url\"
+    type: http
+    interval: 86400
+    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
+    override:
+      additional-prefix: \"[$airport_name]\""
+    done
+    awk -v providers="$proxy_providers" '
+    /^# 机场配置/ {
+        print
+        print providers
+        next
+    }
+    { print }
+    ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
+    systemctl daemon-reload
+    systemctl start mihomo
+    echo -e "${green}恭喜你，你的 mihomo 已经配置完成并保存到 ${yellow}${config_file}${reset}"
+    echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}http://$ipv4:9090/ui ${reset}"
+    echo -e "${green}mihomo          进入菜单 ${reset}"
+    echo -e "${cyan}=========================${reset}"
     start_main
 }
 

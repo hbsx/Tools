@@ -33,17 +33,17 @@ get_url() {
     echo "$final_url"
 }
 
-start_main() {
-    echo && echo -n -e "${red}* 按回车返回主菜单 *${reset}" && read temp
-    main
-}
-
 get_install() {
     local file="/root/mihomo/mihomo"
     if [ ! -f "$file" ]; then
         echo -e "${red}请先安装 mihomo${reset}"
         start_main
     fi
+}
+
+start_main() {
+    echo && echo -n -e "${red}* 按回车返回主菜单 *${reset}" && read temp
+    main
 }
 
 show_status() {
@@ -98,13 +98,13 @@ service_mihomo() {
             action_text="设置开机自启"
             systemctl enable mihomo
             echo -e "${green}mihomo 开机自启已启用${reset}"
-            return 0
+            return
             ;;
         disable)
             action_text="取消开机自启"
             systemctl disable mihomo
             echo -e "${green}mihomo 开机自启已禁用${reset}"
-            return 0
+            return
             ;;
     esac
 
@@ -142,8 +142,9 @@ uninstall_mihomo() {
     get_install
     read -p "$(echo -e "${green}确认卸载 mihomo 吗？\n${yellow}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" confirm
     if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
-        echo "卸载已取消。"
+        echo "无效选择，卸载已取消。"
         start_main
+        return
     fi
     echo -e "${green}mihomo 开始卸载${reset}"
     sleep 2s
@@ -163,34 +164,6 @@ uninstall_mihomo() {
         echo -e "${red}卸载过程中出现问题，请手动检查${reset}"
     fi
     start_main
-}
-
-update_shell() {
-    local shell_file="/usr/bin/mihomo"
-    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
-    local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
-    echo -e "${green}开始检查脚本是否有更新${reset}"
-    echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
-    echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
-    if [ "$sh_ver" == "$sh_new_ver" ]; then
-        echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_main
-        return
-    fi
-    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
-    if [[ -z $confirm || $confirm =~ ^[Nn]$ ]]; then
-        echo "更新已取消"
-        start_main
-        return
-    fi
-    [ -f "$shell_file" ] && rm "$shell_file"
-    wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
-    chmod +x "$shell_file"
-    hash -r
-    echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
-    echo -e "${yellow}3 秒后执行新脚本${reset}"
-    sleep 3s
-    "$shell_file"
 }
 
 update_mihomo() {
@@ -214,10 +187,39 @@ install_mihomo() {
         case "$confirm" in
             [Yy]* ) echo -e "${green}开始删除，重新安装中${reset}";;
             [Nn]* ) echo -e "${green}取消安装，保持现有安装${reset}"; start_main; return;;
-            * ) echo -e "${red}无效选择，跳过重新安装${reset}"; start_main; return;;
+            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_main; return;;
         esac
     fi
     bash <(curl -Ls "$(get_url "$install_url")")
+}
+
+update_shell() {
+    local shell_file="/usr/bin/mihomo"
+    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
+    local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    echo -e "${green}开始检查脚本是否有更新${reset}"
+    echo -e "当前版本：[ ${green}${sh_ver}${reset} ]"
+    echo -e "最新版本：[ ${green}${sh_new_ver}${reset} ]"
+    if [ "$sh_ver" == "$sh_new_ver" ]; then
+        echo -e "${green}当前已是最新版本，无需更新${reset}"
+        start_main
+        return
+    fi
+    read -p "$(echo -e "${green}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
+    case "$confirm" in
+        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
+        [Nn]* ) echo -e "${green}取消升级，保持现有版本${reset}"; start_main; return;;
+        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_main; return;;
+    esac
+
+    [ -f "$shell_file" ] && rm "$shell_file"
+    wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
+    chmod +x "$shell_file"
+    hash -r
+    echo -e "更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
+    echo -e "${yellow}3 秒后执行新脚本${reset}"
+    sleep 3s
+    "$shell_file"
 }
 
 main() {

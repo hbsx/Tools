@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #!name = mihomo 一键安装脚本
-#!desc = 安装
-#!date = 2024-12-19 18:00
+#!desc = 安装 & 配置
+#!date = 2024-12-20 11:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,13 +14,15 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="1.0.1"
+sh_ver="1.0.0"
 
 use_cdn=false
 
-if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
-    use_cdn=true
-fi
+check_network() {
+    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+        use_cdn=true
+    fi
+}
 
 get_url() {
     local url=$1
@@ -82,18 +84,18 @@ download_mihomo() {
     echo "$version" > "$version_file"
 }
 
-download_wbeui() {
-    local wbe_file="/root/mihomo/ui"
-    local wbe_url="https://github.com/metacubex/metacubexd.git"
-    git clone "$wbe_url" -b gh-pages "$wbe_file" || { echo -e "${red}管理面板下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
-}
-
 download_service() {
     local system_file="/etc/systemd/system/mihomo.service"
     local service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service")
     curl -s -o "$system_file" "$service_url" || { echo -e "${red}系统服务下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     chmod +x "$system_file"
     systemctl enable mihomo
+}
+
+download_wbeui() {
+    local wbe_file="/root/mihomo/ui"
+    local wbe_url="https://github.com/metacubex/metacubexd.git"
+    git clone "$wbe_url" -b gh-pages "$wbe_file" || { echo -e "${red}管理面板下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
 }
 
 download_shell() {
@@ -105,18 +107,14 @@ download_shell() {
     hash -r
 }
 
-config_mihomo() {
-    bash <(curl -Ls "$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/config.sh")")
-}
-
 install_mihomo() {
     local folders="/root/mihomo"
     [ -d "$folders" ] && rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders" 
     get_schema
-    echo -e "当前系统架构：[ ${green}${arch_raw}${reset} ]" 
+    echo -e "${yellow}当前系统架构${reset}：【 ${green}${arch_raw}${reset} 】"
     download_version
-    echo -e "当前软件版本：[ ${green}${version}${reset} ]"
+    echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
     download_mihomo
     download_service
     download_wbeui
@@ -130,6 +128,66 @@ install_mihomo() {
     rm -f /root/install.sh
 }
 
+config_mihomo() {
+    local folders="/root/mihomo"
+    local config_file="${folders}/config.yaml"
+    local iface=$(ip route | awk '/default/ {print $5}')
+    ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
+    ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+    echo -e "${cyan}-------------------------${reset}"
+    echo -e "${yellow}1. TUN 模式${reset}"
+    echo -e "${yellow}2. TProxy 模式${reset}"
+    echo -e "${cyan}-------------------------${reset}"
+    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
+    confirm=${confirm:-1}
+    case "$confirm" in
+        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
+        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
+        *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
+    esac
+    config_url=$(get_url "$config_url")
+    wget -q -O "${config_file}" "$config_url" || { echo -e "${red}配置文件下载失败${reset}"; exit 1; }
+    while true; do
+        read -p "请输入需要配置的机场数量（默认 1 个，最多 5 个）：" airport_count
+        airport_count=${airport_count:-1}
+        if [[ "$airport_count" =~ ^[1-5]$ ]]; then
+            break
+        else
+            echo -e "${red}无效的数量，请输入 1 到 5 之间的正整数${reset}"
+        fi
+    done
+    proxy_providers="proxy-providers:"
+    for ((i=1; i<=airport_count; i++)); do
+        read -p "请输入第 $i 个机场的订阅连接：" airport_url
+        read -p "请输入第 $i 个机场的名称：" airport_name
+        proxy_providers="$proxy_providers
+  provider_0$i:
+    url: \"$airport_url\"
+    type: http
+    interval: 86400
+    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
+    override:
+      additional-prefix: \"[$airport_name]\""
+    done
+    awk -v providers="$proxy_providers" '
+    /^# 机场配置/ {
+        print
+        print providers
+        next
+    }
+    { print }
+    ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
+    systemctl daemon-reload
+    systemctl start mihomo
+    echo -e "${green}恭喜你，你的 mihomo 已经配置完成并保存到 ${yellow}${config_file}${reset}"
+    echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}http://$ipv4:9090/ui ${reset}"
+    echo -e "${green}mihomo          进入菜单 ${reset}"
+    echo -e "${cyan}=========================${reset}"
+}
+
+check_network
 update_system
 check_ip_forward
 install_mihomo

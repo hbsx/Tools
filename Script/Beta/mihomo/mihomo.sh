@@ -306,7 +306,8 @@ config_mihomo() {
     echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
     echo -e "${cyan}=========================${reset}"
     echo -e "${green}http://$ipv4:9090/ui ${reset}"
-    echo -e "${green}mihomo          进入菜单 ${reset}"
+    echo -e ""
+    echo -e "${yellow}mihomo          进入菜单 ${reset}"
     echo -e "${cyan}=========================${reset}"
     start_main
 }

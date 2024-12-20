@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2024-12-20 10:30
+#!date = 2024-12-20 11:50
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -112,9 +112,9 @@ install_mihomo() {
     [ -d "$folders" ] && rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders" 
     get_schema
-    echo -e "当前系统架构：[ ${green}${arch_raw}${reset} ]" 
+    echo -e "${yellow}当前系统架构${reset}：【 ${green}${arch_raw}${reset} 】"
     download_version
-    echo -e "当前软件版本：[ ${green}${version}${reset} ]"
+    echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
     download_mihomo
     download_service
     download_wbeui

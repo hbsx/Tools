@@ -187,12 +187,14 @@ uninstall_mihomo() {
 }
 
 download_version() {
+    check_network
     local version_url
     version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
     version=$(curl -sSL "$version_url") || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; }
 }
 
 download_mihomo() {
+    check_network
     local version_file="/root/mihomo/version.txt"
     local filename
     arch_raw=$(uname -m)
@@ -249,6 +251,7 @@ update_mihomo() {
 }
 
 config_mihomo() {
+    check_network
     local folders="/root/mihomo"
     local config_file="${folders}/config.yaml"
     local iface=$(ip route | awk '/default/ {print $5}')
@@ -309,6 +312,7 @@ config_mihomo() {
 }
 
 install_mihomo() {
+    check_network
     local folders="/root/mihomo"
     local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
@@ -324,6 +328,7 @@ install_mihomo() {
 }
 
 update_shell() {
+    check_network
     local shell_file="/usr/bin/mihomo"
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
     local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
@@ -395,5 +400,4 @@ main() {
     esac
 }
 
-check_network
 main

@@ -18,9 +18,18 @@ sh_ver="0.1.5"
 
 use_cdn=false
 
+log() {
+    local log_file="/root/mihomo/mihomo_install.log"
+    local msg=$1
+    echo -e "$(date "+%Y-%m-%d %H:%M:%S") - $msg" >> "$log_file"
+}
+
 check_network() {
     if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
         use_cdn=true
+        log "检测到网络不可达，启用CDN代理"
+    else
+        log "网络正常，无需启用CDN"
     fi
 }
 

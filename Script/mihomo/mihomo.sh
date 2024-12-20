@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.0"
+sh_ver="0.1.1"
 
 use_cdn=false
 
@@ -315,7 +315,7 @@ config_mihomo() {
 install_mihomo() {
     check_network
     local folders="/root/mihomo"
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${yellow}是否删除并重新安装？\n${red}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
@@ -331,7 +331,7 @@ install_mihomo() {
 update_shell() {
     check_network
     local shell_file="/usr/bin/mihomo"
-    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
+    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/mihomo.sh"
     local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
     echo -e "${green}当前版本${reset}：【 ${green}${sh_ver}${reset} 】"

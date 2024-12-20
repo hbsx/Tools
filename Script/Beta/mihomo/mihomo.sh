@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.5"
+sh_ver="0.1.6"
 
 use_cdn=false
 
@@ -365,6 +365,7 @@ clear_logs() {
     else
         echo -e "${red}日志文件不存在！${reset}"
     fi
+    start_main
 }
 
 main() {

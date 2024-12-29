@@ -14,7 +14,7 @@ blue="\033[34m"  # 蓝色
 cyan="\033[36m"  # 青色
 reset="\033[0m"  # 重置
 
-sh_ver="1.0.6"
+sh_ver="1.0.7"
 
 use_cdn=false
 
@@ -171,7 +171,7 @@ uninstall_mihomo() {
     local shell_file="/usr/bin/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
     check_installation || { start_menu; return; }
-    read -p "$(echo -e "${yellow}确认卸载 mihomo 吗？\n${red}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" input
+    read -p "$(echo -e "${red}警告：卸载后将删除当前配置和文件！\n${yellow}确认卸载 mihomo 吗？${reset} (y/n): ")" input
     case "$input" in
         [Yy]* ) echo -e "${green}mihomo 卸载中请等待${reset}";;
         [Nn]* ) echo -e "${yellow}mihomo 卸载已取消${reset}"; start_menu; return;;
@@ -324,7 +324,7 @@ install_mihomo() {
     local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/menu/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
-        read -p "$(echo -e "${yellow}是否删除并重新安装？\n${red}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" input
+        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
         case "$input" in
             [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
             [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return;;

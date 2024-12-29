@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2024-12-20 11:50
+#!date = 2024-12-29 16:35
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="1.0.5"
+sh_ver="1.0.6"
 
 use_cdn=false
 
@@ -48,7 +48,7 @@ get_install() {
     local file="/root/mihomo/mihomo"
     if [ ! -f "$file" ]; then
         echo -e "${red}请先安装 mihomo${reset}"
-        start_main
+        start_menu
     fi
 }
 
@@ -58,13 +58,13 @@ get_version() {
         cat "$version_file"
     else
         echo -e "${red}请先安装 mihomo${reset}"
-        start_main
+        start_menu
     fi
 }
 
-start_main() {
-    echo && echo -n -e "${red}* 按回车返回主菜单 *${reset}" && read temp
-    main
+start_menu() {
+    echo && echo -n -e "${yellow}* 按回车返回主菜单 *${reset}" && read temp
+    menu
 }
 
 show_status() {
@@ -147,7 +147,7 @@ service_mihomo() {
             echo -e "${red}mihomo ${action_text}失败${reset}"
         fi
     fi
-    start_main
+    start_menu
 }
 
 start_mihomo() { service_mihomo start; }
@@ -161,11 +161,11 @@ uninstall_mihomo() {
     local shell_file="/usr/bin/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
     get_install
-    read -p "$(echo -e "${yellow}确认卸载 mihomo 吗？\n${red}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" confirm
-    case "$confirm" in
+    read -p "$(echo -e "${yellow}确认卸载 mihomo 吗？\n${red}警告：卸载后将删除当前配置和文件！${reset} (y/n): ")" input
+    case "$input" in
         [Yy]* ) echo -e "${green}mihomo 卸载中请等待${reset}";;
-        [Nn]* ) echo -e "${yellow}mihomo 卸载已取消${reset}"; start_main; return;;
-        * ) echo -e "${red}无效选择，卸载已取消${reset}"; start_main; return;;
+        [Nn]* ) echo -e "${yellow}mihomo 卸载已取消${reset}"; start_menu; return;;
+        * ) echo -e "${red}无效选择，卸载已取消${reset}"; start_menu; return;;
     esac
     sleep 2s
     echo -e "${green}mihomo 卸载命令已发出${reset}"
@@ -183,7 +183,7 @@ uninstall_mihomo() {
     else
         echo -e "${red}卸载过程中出现问题，请手动检查${reset}"
     fi
-    start_main
+    start_menu
 }
 
 download_version() {
@@ -222,7 +222,7 @@ update_mihomo() {
     local file="$folders/mihomo"
     if [ ! -f "$file" ]; then
         echo -e "${red}请先安装 mihomo${reset}"
-        start_main
+        start_menu
         return
     fi
     echo -e "${green}开始检查 mihomo 是否有更新${reset}"
@@ -234,20 +234,20 @@ update_mihomo() {
     echo -e "${yellow}最新版本${reset}：【 ${yellow}${latest_version}${reset} 】"
     if [ "$current_version" == "$latest_version" ]; then
         echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_main
+        start_menu
         return
     fi
-    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
-    case "$confirm" in
+    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" input
+    case "$input" in
         [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
-        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_main; return;;
-        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_main; return;;
+        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return;;
+        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return;;
     esac
     download_mihomo
     sleep 2s
     echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
     systemctl restart mihomo
-    start_main
+    start_menu
 }
 
 config_mihomo() {
@@ -261,11 +261,11 @@ config_mihomo() {
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
-    confirm=${confirm:-1}
-    case "$confirm" in
-        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
-        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
+    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" input
+    input=${input:-1}
+    case "$input" in
+        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/menu/Config/mihomo.yaml" ;;
+        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/menu/Config/mihomotp.yaml" ;;
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
     esac
     config_url=$(get_url "$config_url")
@@ -309,20 +309,20 @@ config_mihomo() {
     echo -e ""
     echo -e "${yellow}mihomo          进入菜单 ${reset}"
     echo -e "${cyan}=========================${reset}"
-    start_main
+    start_menu
 }
 
 install_mihomo() {
     check_network
     local folders="/root/mihomo"
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/menu/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
-        read -p "$(echo -e "${yellow}是否删除并重新安装？\n${red}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" confirm
-        case "$confirm" in
+        read -p "$(echo -e "${yellow}是否删除并重新安装？\n${red}警告：重新安装将删除当前配置和文件！${reset} (y/n): ")" input
+        case "$input" in
             [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
-            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_main; return;;
-            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_main; return;;
+            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return;;
+            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_menu; return;;
         esac
     fi
     bash <(curl -Ls "$(get_url "$install_url")")
@@ -331,21 +331,21 @@ install_mihomo() {
 update_shell() {
     check_network
     local shell_file="/usr/bin/mihomo"
-    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
+    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/menu/Script/Beta/mihomo/mihomo.sh"
     local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
     echo -e "${green}当前版本${reset}：【 ${green}${sh_ver}${reset} 】"
     echo -e "${yellow}最新版本${reset}：【 ${yellow}${sh_new_ver}${reset} 】"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_main
+        start_menu
         return
     fi
-    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" confirm
-    case "$confirm" in
+    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" input
+    case "$input" in
         [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
-        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_main; return;;
-        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_main; return;;
+        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return;;
+        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return;;
     esac
     [ -f "$shell_file" ] && rm "$shell_file"
     wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
@@ -366,10 +366,10 @@ clear_logs() {
     else
         echo -e "${red}日志文件不存在！${reset}"
     fi
-    start_main
+    start_menu
 }
 
-main() {
+menu() {
     clear
     echo "================================="
     echo -e "${green}欢迎使用 mihomo 一键脚本 Beta 版${reset}"
@@ -396,8 +396,8 @@ main() {
     echo "================================="
     show_status
     echo "================================="
-    read -p "请输入选项：" confirm
-    case "$confirm" in
+    read -p "请输入选项：" input
+    case "$input" in
         1) install_mihomo ;;
         2) update_mihomo ;;
         3) uninstall_mihomo ;;
@@ -415,4 +415,4 @@ main() {
     esac
 }
 
-main
+menu

@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2024-12-31 10:30
+#!date = 2024-12-31 10:50
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -18,30 +18,9 @@ sh_ver="0.1.2"
 
 use_cdn=false
 
-log() {
-    local log_file="/root/mihomo/mihomo_install.log"
-    local msg=$1
-    echo -e "$(date "+%Y-%m-%d %H:%M:%S") - $msg" >> "$log_file"
-}
-
-clear_logs() {
-    local log_file="/root/mihomo/mihomo_install.log"
-    if [ -f "$log_file" ]; then
-        echo -e "${yellow}正在清空日志文件$log_file${reset}"
-        > "$log_file"
-        echo -e "${green}日志文件已清空${reset}"
-    else
-        echo -e "${red}日志文件不存在！${reset}"
-    fi
-    start_menu
-}
-
 check_network() {
     if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
         use_cdn=true
-        log "检测到网络不可达，启用CDN代理"
-    else
-        log "网络正常，无需启用CDN"
     fi
 }
 
@@ -378,7 +357,6 @@ menu() {
     echo "---------------------------------"
     echo -e "${green} 7${reset}. 添加开机自启"
     echo -e "${green} 8${reset}. 关闭开机自启"
-    echo -e "${green} 9${reset}. 清空日志记录"
     echo "================================="
     show_status
     echo "================================="
@@ -392,7 +370,6 @@ menu() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
-        9) clear_logs ;;
         20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;

@@ -295,7 +295,7 @@ update_shell() {
 config_mihomo() {
     check_network
     local folders="/root/mihomo"
-    local config_file="${folders}/config.yaml"
+    local config_file="/root/mihomo/config.yaml"
     local iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)

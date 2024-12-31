@@ -184,6 +184,22 @@ uninstall_mihomo() {
     start_menu
 }
 
+install_mihomo() {
+    check_network
+    local folders="/root/mihomo"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
+    if [ -d "$folders" ]; then
+        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
+        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
+        case "$input" in
+            [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
+            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return;;
+            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_menu; return;;
+        esac
+    fi
+    bash <(curl -Ls "$(get_url "$install_url")")
+}
+
 download_version() {
     check_network
     local version_url
@@ -244,25 +260,9 @@ update_mihomo() {
     esac
     download_mihomo
     sleep 2s
-    echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
+    echo -e "${yellow}更新完成，当前版本已更新为【 ${green}${latest_version} 】${reset}"
     systemctl restart mihomo
     start_menu
-}
-
-install_mihomo() {
-    check_network
-    local folders="/root/mihomo"
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
-    if [ -d "$folders" ]; then
-        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
-        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
-        case "$input" in
-            [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
-            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return;;
-            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_menu; return;;
-        esac
-    fi
-    bash <(curl -Ls "$(get_url "$install_url")")
 }
 
 update_shell() {
@@ -286,7 +286,7 @@ update_shell() {
     wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
     chmod +x "$shell_file"
     hash -r
-    echo -e "${yellow}更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
+    echo -e "${yellow}更新完成，当前版本已更新为【 ${green}${sh_new_ver} 】${reset}"
     echo -e "${yellow}3 秒后执行新脚本${reset}"
     sleep 3s
     "$shell_file"

@@ -155,10 +155,10 @@ enable_mihomo() { service_mihomo enable; }
 disable_mihomo() { service_mihomo disable; }
 
 uninstall_mihomo() {
+    check_installation || { start_menu; return; }
     local folders="/root/mihomo"
     local shell_file="/usr/bin/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
-    check_installation || { start_menu; return; }
     read -p "$(echo -e "${red}警告：卸载后将删除当前配置和文件！\n${yellow}确认卸载 mihomo 吗？${reset} (y/n): ")" input
     case "$input" in
         [Yy]* ) echo -e "${green}mihomo 卸载中请等待${reset}";;
@@ -232,12 +232,12 @@ download_mihomo() {
 }
 
 update_mihomo() {
-    local folders="/root/mihomo"
     check_installation || { start_menu; return; }
+    local folders="/root/mihomo"
+    local version_file="/root/mihomo/version.txt"
     echo -e "${green}开始检查软件是否有更新${reset}"
     cd "$folders" || exit
     download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
-    local version_file="/root/mihomo/version.txt"
     local current_version
     if [ -f "$version_file" ]; then
         current_version=$(cat "$version_file")

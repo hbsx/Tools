@@ -121,13 +121,13 @@ service_mihomo() {
 
     if [[ "$action" == "start" ]]; then
         if [[ "$service_status" == "active" ]]; then
-            echo -e "${yellow}mihomo 已经在运行，无需重复启动${reset}"
+            echo -e "${yellow}mihomo 已运行，无需重复启动${reset}"
             start_menu
             return
         fi
     elif [[ "$action" == "stop" ]]; then
         if [[ "$service_status" == "inactive" ]]; then
-            echo -e "${yellow}mihomo 已经停止，无需重复操作${reset}"
+            echo -e "${yellow}mihomo 已停止，无需重复操作${reset}"
             start_menu
             return
         fi

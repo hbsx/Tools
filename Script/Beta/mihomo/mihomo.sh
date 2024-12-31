@@ -381,7 +381,7 @@ menu() {
     echo "================================="
     show_status
     echo "================================="
-    read -p "请输入选项：" input
+    read -p "请输入上面选项：" input
     case "$input" in
         1) install_mihomo ;;
         2) update_mihomo ;;

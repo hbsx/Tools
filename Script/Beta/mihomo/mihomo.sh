@@ -260,7 +260,7 @@ update_mihomo() {
     esac
     download_mihomo
     sleep 2s
-    echo -e "${yellow}更新完成，当前版本已更新为【 ${green}${latest_version} 】${reset}"
+    echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${latest_version}${reset} 】"
     systemctl restart mihomo
     start_menu
 }
@@ -286,7 +286,7 @@ update_shell() {
     wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
     chmod +x "$shell_file"
     hash -r
-    echo -e "${yellow}更新完成，当前版本已更新为【 ${green}${sh_new_ver} 】${reset}"
+    echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${sh_new_ver}${reset} 】"
     echo -e "${yellow}3 秒后执行新脚本${reset}"
     sleep 3s
     "$shell_file"

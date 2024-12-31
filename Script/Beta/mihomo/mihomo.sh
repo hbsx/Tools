@@ -106,8 +106,8 @@ show_status() {
 }
 
 service_mihomo() {
-    local action="$1"
     check_installation || { start_menu; return; }
+    local action="$1"
     action_text=""
     case "$action" in
         start) action_text="启动" ;;

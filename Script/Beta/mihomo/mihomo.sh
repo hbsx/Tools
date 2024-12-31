@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2024-12-29 17:20
+#!date = 2024-12-31 17:20
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -100,15 +100,9 @@ service_mihomo() {
     check_installation || { start_menu; return; }
     action_text=""
     case "$action" in
-        start) 
-            action_text="启动"
-            ;;
-        stop) 
-            action_text="停止"
-            ;;
-        restart) 
-            action_text="重启"
-            ;;
+        start) action_text="启动" ;;
+        stop) action_text="停止" ;;
+        restart) action_text="重启" ;;
         enable) 
             action_text="设置开机自启"
             systemctl enable mihomo && echo -e "${green}mihomo 开机自启已启用${reset}" || echo -e "${red}设置开机自启失败${reset}"
@@ -122,7 +116,6 @@ service_mihomo() {
             return
             ;;
     esac
-
     local service_status
     service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
 
@@ -139,23 +132,11 @@ service_mihomo() {
             return
         fi
     fi
-
     echo -e "${green}正在 ${action_text} mihomo...${reset}"
-    systemctl "$action" mihomo
-    sleep 1s
-
-    if systemctl is-active --quiet mihomo; then
-        if [[ "$action" == "start" || "$action" == "restart" ]]; then
-            echo -e "${green}mihomo ${action_text}成功${reset}"
-        else
-            echo -e "${green}mihomo 已成功停止${reset}"
-        fi
+    if systemctl "$action" mihomo; then
+        echo -e "${green}mihomo ${action_text}成功${reset}"
     else
-        if [[ "$action" == "stop" || "$action" == "restart" ]]; then
-            echo -e "${green}mihomo ${action_text}成功${reset}"
-        else
-            echo -e "${red}mihomo ${action_text}失败${reset}"
-        fi
+        echo -e "${red}mihomo ${action_text}失败${reset}"
     fi
     start_menu
 }

@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2024-12-20 11:50
+#!date = 2024-12-31 11:50
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="1.0.1"
+sh_ver="1.0.0"
 
 use_cdn=false
 

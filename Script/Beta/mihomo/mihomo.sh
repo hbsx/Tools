@@ -14,7 +14,7 @@ blue="\033[34m"  # 蓝色
 cyan="\033[36m"  # 青色
 reset="\033[0m"  # 重置
 
-sh_ver="1.0.5"
+sh_ver="1.0.5.1"
 
 use_cdn=false
 
@@ -103,40 +103,37 @@ service_mihomo() {
         start) action_text="启动" ;;
         stop) action_text="停止" ;;
         restart) action_text="重启" ;;
-        enable) 
-            action_text="设置开机自启"
-            systemctl enable mihomo && echo -e "${green}mihomo 开机自启已启用${reset}" || echo -e "${red}设置开机自启失败${reset}"
-            start_menu
-            return
-            ;;
-        disable) 
-            action_text="取消开机自启"
-            systemctl disable mihomo && echo -e "${green}mihomo 开机自启已禁用${reset}" || echo -e "${red}取消开机自启失败${reset}"
-            start_menu
-            return
-            ;;
+        enable) action_text="设置开机自启" ;;
+        disable) action_text="取消开机自启" ;;
     esac
-    local service_status
-    service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
-
-    if [[ "$action" == "start" ]]; then
-        if [[ "$service_status" == "active" ]]; then
-            echo -e "${yellow}mihomo 已运行，无需重复启动${reset}"
-            start_menu
-            return
+    if [[ "$action" == "enable" || "$action" == "disable" ]]; then
+        local is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
+        if [[ "$action" == "enable" && "$is_enabled" == "enabled" ]] || 
+           [[ "$action" == "disable" && "$is_enabled" == "disabled" ]]; then
+            echo -e "${yellow}已${action_text}，无需重复操作${reset}"
+        else
+            echo -e "${green}正在 ${action_text} mihomo...${reset}"
+            if systemctl "$action" mihomo; then
+                echo -e "${green}${action_text}成功${reset}"
+            else
+                echo -e "${red}${action_text}失败${reset}"
+            fi
         fi
-    elif [[ "$action" == "stop" ]]; then
-        if [[ "$service_status" == "inactive" ]]; then
-            echo -e "${yellow}mihomo 已停止，无需重复操作${reset}"
-            start_menu
-            return
-        fi
+        start_menu
+        return
+    fi
+    local service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
+    if [[ "$action" == "start" && "$service_status" == "active" ]] || 
+       [[ "$action" == "stop" && "$service_status" == "inactive" ]]; then
+        echo -e "${yellow}已${action_text}，无需重复操作${reset}"
+        start_menu
+        return
     fi
     echo -e "${green}正在 ${action_text} mihomo...${reset}"
     if systemctl "$action" mihomo; then
-        echo -e "${green}mihomo ${action_text}成功${reset}"
+        echo -e "${green}${action_text}成功${reset}"
     else
-        echo -e "${red}mihomo ${action_text}失败${reset}"
+        echo -e "${red}${action_text}失败${reset}"
     fi
     start_menu
 }

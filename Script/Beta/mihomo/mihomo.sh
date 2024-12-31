@@ -293,6 +293,7 @@ update_shell() {
 }
 
 config_mihomo() {
+    check_installation || { start_menu; return; }
     check_network
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"

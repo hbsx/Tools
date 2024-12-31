@@ -373,7 +373,7 @@ menu() {
         20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;
-        *) echo -e "${Red}无效选项，请重新选择${reset}" 
+        *) echo -e "${red}无效选项，请重新选择${reset}" 
            exit 1 ;;
     esac
 }

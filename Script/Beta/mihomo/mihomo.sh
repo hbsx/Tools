@@ -14,7 +14,7 @@ blue="\033[34m"  # 蓝色
 cyan="\033[36m"  # 青色
 reset="\033[0m"  # 重置
 
-sh_ver="1.0.5.1"
+sh_ver="1.0.5"
 
 use_cdn=false
 
@@ -22,6 +22,18 @@ log() {
     local log_file="/root/mihomo/mihomo_install.log"
     local msg=$1
     echo -e "$(date "+%Y-%m-%d %H:%M:%S") - $msg" >> "$log_file"
+}
+
+clear_logs() {
+    local log_file="/root/mihomo/mihomo_install.log"
+    if [ -f "$log_file" ]; then
+        echo -e "${yellow}正在清空日志文件$log_file${reset}"
+        > "$log_file"
+        echo -e "${green}日志文件已清空${reset}"
+    else
+        echo -e "${red}日志文件不存在！${reset}"
+    fi
+    start_menu
 }
 
 check_network() {
@@ -54,16 +66,6 @@ check_installation() {
     return 0
 }
 
-get_version() {
-    local version_file="/root/mihomo/version.txt"
-    if [ -f "$version_file" ]; then
-        cat "$version_file"
-    else
-        echo -e "${red}请先安装 mihomo${reset}"
-        start_menu
-    fi
-}
-
 start_menu() {
     echo && echo -n -e "${yellow}* 按回车返回主菜单 *${reset}" && read temp
     menu
@@ -71,11 +73,13 @@ start_menu() {
 
 show_status() {
     local file="/root/mihomo/mihomo"
-    local status install_status run_status auto_start
+    local version_file="/root/mihomo/version.txt"
+    local install_status run_status auto_start software_version
     if [ ! -f "$file" ]; then
         install_status="${red}未安装${reset}"
         run_status="${red}未运行${reset}"
         auto_start="${red}未设置${reset}"
+        software_version="${red}未安装${reset}"
     else
         install_status="${green}已安装${reset}"
         if pgrep -f "$file" > /dev/null; then
@@ -88,11 +92,17 @@ show_status() {
         else
             auto_start="${red}未设置${reset}"
         fi
+        if [ -f "$version_file" ]; then
+            software_version=$(cat "$version_file")
+        else
+            software_version="${red}未安装${reset}"
+        fi
     fi
     echo -e "安装状态：${install_status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
     echo -e "脚本版本：${green}${sh_ver}${reset}"
+    echo -e "软件版本：${green}${software_version}${reset}"
 }
 
 service_mihomo() {
@@ -207,29 +217,79 @@ download_mihomo() {
 
 update_mihomo() {
     local folders="/root/mihomo"
-    local file="$folders/mihomo"
     check_installation || { start_menu; return; }
-    echo -e "${green}开始检查 mihomo 是否有更新${reset}"
+    echo -e "${green}开始检查软件是否有更新${reset}"
     cd "$folders" || exit
     download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
-    current_version=$(get_version) || { echo -e "${red}获取当前版本失败${reset}"; start_menu; return; }
-    latest_version="$version"
-    if [ "$current_version" == "$latest_version" ]; then
-        echo -e "${green}当前已是最新版本，无需更新${reset}"
+    local version_file="/root/mihomo/version.txt"
+    local current_version
+    if [ -f "$version_file" ]; then
+        current_version=$(cat "$version_file")
+    else
+        echo -e "${red}请先安装 mihomo${reset}"
         start_menu
         return
     fi
-    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" input
+    local latest_version="$version"
+    if [ "$current_version" == "$latest_version" ]; then
+        echo -e "${green}当前已是最新，无需更新${reset}"
+        start_menu
+        return
+    fi
+    read -p "$(echo -e "${yellow}检查到有更新，是否升级到最新版本？${reset} (y/n): ")" input
     case "$input" in
-        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
-        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return;;
-        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return;;
+        [Yy]*) echo -e "${green}开始升级，升级中请等待${reset}" ;;
+        [Nn]*) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
+        *) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
     esac
     download_mihomo
     sleep 2s
     echo -e "${green}更新完成，当前版本已更新为：[ ${latest_version} ]${reset}"
     systemctl restart mihomo
     start_menu
+}
+
+install_mihomo() {
+    check_network
+    local folders="/root/mihomo"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
+    if [ -d "$folders" ]; then
+        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
+        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
+        case "$input" in
+            [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
+            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return;;
+            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_menu; return;;
+        esac
+    fi
+    bash <(curl -Ls "$(get_url "$install_url")")
+}
+
+update_shell() {
+    check_network
+    local shell_file="/usr/bin/mihomo"
+    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
+    local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    echo -e "${green}开始检查脚本是否有更新${reset}"
+    if [ "$sh_ver" == "$sh_new_ver" ]; then
+        echo -e "${green}当前已是最新，无需更新${reset}"
+        start_menu
+        return
+    fi
+    read -p "$(echo -e "${yellow}检查到有更新，是否升级到最新版本？${reset} (y/n): ")" input
+    case "$input" in
+        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
+        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return;;
+        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return;;
+    esac
+    [ -f "$shell_file" ] && rm "$shell_file"
+    wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
+    chmod +x "$shell_file"
+    hash -r
+    echo -e "${yellow}更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
+    echo -e "${yellow}3 秒后执行新脚本${reset}"
+    sleep 3s
+    "$shell_file"
 }
 
 config_mihomo() {
@@ -291,61 +351,6 @@ config_mihomo() {
     echo -e ""
     echo -e "${yellow}mihomo          进入菜单 ${reset}"
     echo -e "${cyan}=========================${reset}"
-    start_menu
-}
-
-install_mihomo() {
-    check_network
-    local folders="/root/mihomo"
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/install.sh"
-    if [ -d "$folders" ]; then
-        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
-        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
-        case "$input" in
-            [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}";;
-            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return;;
-            * ) echo -e "${red}无效选择，安装已取消${reset}"; start_menu; return;;
-        esac
-    fi
-    bash <(curl -Ls "$(get_url "$install_url")")
-}
-
-update_shell() {
-    check_network
-    local shell_file="/usr/bin/mihomo"
-    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
-    local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
-    echo -e "${green}开始检查脚本是否有更新${reset}"
-    if [ "$sh_ver" == "$sh_new_ver" ]; then
-        echo -e "${green}当前已是最新版本，无需更新${reset}"
-        start_menu
-        return
-    fi
-    read -p "$(echo -e "${yellow}已检查到新版本，是否升级到最新版本？${reset} (y/n): ")" input
-    case "$input" in
-        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}";;
-        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return;;
-        * ) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return;;
-    esac
-    [ -f "$shell_file" ] && rm "$shell_file"
-    wget -O "$shell_file" --no-check-certificate "$(get_url "$sh_ver_url")"
-    chmod +x "$shell_file"
-    hash -r
-    echo -e "${yellow}更新完成，当前版本已更新为 [ ${green}${sh_new_ver} ]${reset}"
-    echo -e "${yellow}3 秒后执行新脚本${reset}"
-    sleep 3s
-    "$shell_file"
-}
-
-clear_logs() {
-    local log_file="/root/mihomo/mihomo_install.log"
-    if [ -f "$log_file" ]; then
-        echo -e "${yellow}正在清空日志文件$log_file${reset}"
-        > "$log_file"
-        echo -e "${green}日志文件已清空${reset}"
-    else
-        echo -e "${red}日志文件不存在！${reset}"
-    fi
     start_menu
 }
 

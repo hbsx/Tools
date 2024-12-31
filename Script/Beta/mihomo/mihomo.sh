@@ -214,8 +214,6 @@ update_mihomo() {
     download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
     current_version=$(get_version) || { echo -e "${red}获取当前版本失败${reset}"; start_menu; return; }
     latest_version="$version"
-    echo -e "${green}当前版本${reset}：【 ${green}${current_version}${reset} 】"
-    echo -e "${yellow}最新版本${reset}：【 ${yellow}${latest_version}${reset} 】"
     if [ "$current_version" == "$latest_version" ]; then
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_menu
@@ -318,8 +316,6 @@ update_shell() {
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/Beta/mihomo/mihomo.sh"
     local sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
-    echo -e "${green}当前版本${reset}：【 ${green}${sh_ver}${reset} 】"
-    echo -e "${yellow}最新版本${reset}：【 ${yellow}${sh_new_ver}${reset} 】"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新版本，无需更新${reset}"
         start_menu

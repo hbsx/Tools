@@ -1,6 +1,6 @@
 #!name = mihomo TUN 配置文件
 #!desc = 说明：理论上适用于所有的 Meta 内核，使用最新的 mrs 规则
-#!date = 2024-11-09 11:20
+#!date = 2025-01-04 17:00
 #!source = https://wiki.metacubex.one/example/conf/#__tabbed_1_2
 #!author = MetaCubeX
 
@@ -24,7 +24,6 @@ external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-
 find-process-mode: strict
 global-client-fingerprint: chrome
 
-#
 profile:
   store-selected: true
   store-fake-ip: true
@@ -91,10 +90,6 @@ proxy-groups:
     type: select
     proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
 
-  - name: Openai
-    type: select
-    proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
-
   - name: Twitter
     type: select
     proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
@@ -103,7 +98,7 @@ proxy-groups:
     type: select
     proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
 
-  - name: TikTok
+  - name: 巴哈姆特
     type: select
     proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
 
@@ -123,6 +118,14 @@ proxy-groups:
     type: select
     proxies:  [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
 
+  - name: TikTok
+    type: select
+    proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
+
+  - name: Openai
+    type: select
+    proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
+
   - name: 国内
     type: select
     proxies:  [直连,默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择]
@@ -135,40 +138,48 @@ proxy-groups:
   - name: 香港
     type: select
     include-all: true
+    exclude-type: direct
     filter: "(?i)港|hk|hongkong|hong kong"
 
   - name: 台湾
     type: select
     include-all: true
+    exclude-type: direct
     filter: "(?i)台|tw|taiwan"
 
   - name: 日本
     type: select
     include-all: true
+    exclude-type: direct
     filter: "(?i)日|jp|japan"
 
   - name: 美国
     type: select
     include-all: true
+    exclude-type: direct
     filter: "(?i)美|us|unitedstates|united states"
 
   - name: 新加坡
     type: select
     include-all: true
-    filter: "(?i)(新加坡|sg|狮|singapore)"
+    exclude-type: direct
+    filter: "(?i)(新|sg|singapore)"
 
   - name: 其它地区
     type: select
     include-all: true
-    filter: "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|新|狮|sg|singapore|美|us|unitedstates)).*"
+    exclude-type: direct
+    filter: "(?i)^(?!.*(?:🇭🇰|🇯🇵|🇺🇸|🇸🇬|🇨🇳|港|hk|hongkong|台|tw|taiwan|日|jp|japan|新|sg|singapore|美|us|unitedstates)).*"
 
   - name: 全部节点
     type: select
     include-all: true
+    exclude-type: direct
 
   - name: 自动选择
     type: url-test
     include-all: true
+    exclude-type: direct
     tolerance: 10
 
 rules:
@@ -179,11 +190,12 @@ rules:
   - RULE-SET,youtube_domain,YouTube
   - RULE-SET,google_domain,Google
   - RULE-SET,telegram_domain,Telegram
-  - RULE-SET,openai_domain,Openai
   - RULE-SET,netflix_domain,NETFLIX
   - RULE-SET,bilibili_domain,哔哩哔哩
-  - RULE-SET,tiktok_domain,TikTok
+  - RULE-SET,bahamut_domain,巴哈姆特
   - RULE-SET,spotify_domain,Spotify
+  - RULE-SET,openai_domain,Openai
+  - RULE-SET,tiktok_domain,TikTok
   - RULE-SET,cn_domain,国内
   - RULE-SET,geolocation-!cn,其他
 
@@ -198,9 +210,6 @@ rule-anchor:
   ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
   domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
 rule-providers:
-  ads_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"
   private_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"
@@ -228,18 +237,15 @@ rule-providers:
   telegram_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs"
-  openai_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"
   netflix_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs"
   bilibili_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bilibili.mrs"
-  tiktok_domain:
+  bahamut_domain:
     <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bahamut.mrs"
   spotify_domain:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/spotify.mrs"
@@ -249,6 +255,15 @@ rule-providers:
   geolocation-!cn:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"
+  ads_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"
+  openai_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"
+  tiktok_domain:
+    <<: *domain
+    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"
 
   private_ip:
     <<: *ip

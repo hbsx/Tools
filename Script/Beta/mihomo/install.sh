@@ -73,7 +73,7 @@ download_version() {
 download_mihomo() {
     local version_file="/root/mihomo/version.txt"
     local filename
-    download_version
+    download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; exit 1; }
     [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")

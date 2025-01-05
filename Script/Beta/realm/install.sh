@@ -30,10 +30,7 @@ VERSION_URL="https://api.github.com/repos/zhboner/realm/releases/latest"
 VERSION=$(curl -sSL "$VERSION_URL" | grep tag_name | cut -d ":" -f2 | sed 's/\"//g;s/\,//g;s/\ //g;s/v//' || { echo -e "${Red}获取版本信息失败${Reset}"; exit 1; })
 echo  "获取到的版本: ${VERSION}"
 
-case "$ARCH" in
-    'aarch64' | 'armv7' | 'x86_64') FILENAME="realm-${ARCH}-unknown-linux-gnu.tar.gz";;
-    *)       echo -e "不支持的架构: ${ARCH}${Reset}"; exit 1;;
-esac
+FILENAME="realm-${ARCH}-unknown-linux-gnu.tar.gz"
 
 DOWNLOAD_URL="https://github.com/zhboner/realm/releases/download/v${VERSION}/${FILENAME}"
 wget -t 3 -T 30 "${DOWNLOAD_URL}" -O "${FILENAME}" || { echo -e "${Red}下载失败${Reset}"; exit 1; }

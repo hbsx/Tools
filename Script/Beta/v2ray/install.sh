@@ -79,7 +79,7 @@ download_service() {
 
 download_shell() {
     local shell_file="/usr/bin/v2ray"
-    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/v2ray/v2ray.sh")
+    local sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/v2ray/v2ray.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { echo -e "${red}v2ray 管理脚本下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     chmod +x "$shell_file"
@@ -98,7 +98,7 @@ install_v2ray() {
     download_v2ray
     download_service
     download_shell
-    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" choice
+    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 v2ray.json ${reset}，是否继续(y/n): ")" choice
     case "$choice" in
         [Yy]* ) config_v2ray ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;

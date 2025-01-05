@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-01-05 11:50
+#!date = 2025-01-05 11:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -54,7 +54,7 @@ update_system() {
 
 download_version() {
     local version_url="https://api.github.com/repos/v2fly/v2ray-core/releases/latest"
-    version=$(curl -sSL "$version_url") || { echo -e "${red}获取 v2ray 远程版本失败${reset}"; exit 1; }
+    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || { echo -e "${red}获取 v2ray 远程版本失败${reset}"; exit 1;}
 }
 
 download_v2ray() {

@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-01-05 19:30
+#!date = 2025-01-05 11:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.0.2"
+sh_ver="0.0.5"
 
 use_cdn=false
 
@@ -180,9 +180,8 @@ install_v2ray() {
 }
 
 download_version() {
-    check_network
     local version_url="https://api.github.com/repos/v2fly/v2ray-core/releases/latest"
-    version=$(curl -sSL "$version_url") || { echo -e "${red}获取 v2ray 远程版本失败${reset}"; exit 1; }
+    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || { echo -e "${red}获取 v2ray 远程版本失败${reset}"; exit 1;}
 }
 
 download_v2ray() {

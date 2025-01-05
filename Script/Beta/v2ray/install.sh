@@ -60,8 +60,8 @@ download_version() {
 download_v2ray() {
     local version_file="/root/v2ray/version.txt"
     local filename
-    download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }oad_version
-    [[ "$arch" == '64' | '32' | 'arm64-v8a' | 'arm32-v7a' | 's390x' ]] && filename="v2ray-linux-${arch}.zip" 
+    download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; exit 1; }
+    filename="v2ray-linux-${arch}.zip"
     local download_url=$(get_url "https://github.com/v2fly/v2ray-core/releases/download/v${version}/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}v2ray 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     unzip "$filename" && rm "$filename" || { echo -e "${red}v2ray 解压失败${reset}"; exit 1; }

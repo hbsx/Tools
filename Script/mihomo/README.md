@@ -14,7 +14,7 @@
 
 ### 1.1.在 PVE 虚拟机创建 LXC 容器，创建完成以后不要 启动虚拟机
 
-### 1.2.选择刚刚创建的 LXC 容器，鼠标依次点击，资源 - 添加 - Device Passthrough 如下图
+### 1.2.选择刚刚创建的 LXC 容器，鼠标依次点击，资源 - 添加 - 直通设备（Device Passthrough） 如下图
 
 ![image](https://github.com/user-attachments/assets/f185b446-cc76-4337-817b-0139f688445f)
 

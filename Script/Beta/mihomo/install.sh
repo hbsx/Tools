@@ -131,9 +131,9 @@ download_shell() {
 install_mihomo() {
     local folders="/root/mihomo"
     local choice
-    echo "请选择版本安装："
-    echo "1. 测试版 (Prerelease-Alpha)"
-    echo "2. 正式版 (Latest)"
+    echo -e "${green}请选择版本：${reset}"
+    echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
+    echo -e "${green}2. 正式版 (Latest)${reset}"
     read -rp "请输入选项 (1/2): " choice
     [ -d "$folders" ] && rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders"

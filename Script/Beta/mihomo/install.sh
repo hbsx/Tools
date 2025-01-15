@@ -78,6 +78,7 @@ download_latest_version() {
 download_alpha_mihomo() {
     local version_file="/root/mihomo/version.txt"
     local filename
+    get_schema
     download_alpha_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; exit 1; }
     [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
@@ -92,6 +93,7 @@ download_alpha_mihomo() {
 download_latest_mihomo() {
     local version_file="/root/mihomo/version.txt"
     local filename
+    get_schema
     download_latest_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; exit 1; }
     [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-v${version}.gz" ||
     filename="mihomo-linux-${arch}-v${version}.gz"
@@ -147,7 +149,7 @@ install_mihomo() {
         2)
             echo -e "${yellow}选择安装正式版${reset}"
             download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; }
-            echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}v${version}${reset} 】"
             download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
             ;;
         *)

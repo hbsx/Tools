@@ -372,6 +372,13 @@ config_mihomo() {
     start_menu
 }
 
+switch_version(){
+
+
+    
+}
+
+
 menu() {
     clear
     echo "================================="
@@ -395,6 +402,7 @@ menu() {
     echo "---------------------------------"
     echo -e "${green} 7${reset}. 添加开机自启"
     echo -e "${green} 8${reset}. 关闭开机自启"
+    echo -e "${green} 9${reset}. 切换软件版本"
     echo "================================="
     show_status
     echo "================================="
@@ -408,6 +416,7 @@ menu() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
+        9) switch_version ;;
         20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;

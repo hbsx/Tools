@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-01-15 10:50
+#!date = 2025-01-15 14:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -376,7 +376,7 @@ switch_version() {
     check_installation || { start_menu; return; }
     local folders="/root/mihomo"
     cd "$folders"
-    echo -e "${green}请选择版本：${reset}"
+    echo -e "${yellow}请选择版本：${reset}"
     echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
     echo -e "${green}2. 正式版 (Latest)${reset}"
     read -rp "请输入选项 (1/2): " choice

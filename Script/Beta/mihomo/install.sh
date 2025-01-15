@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-01-15 10:30
+#!date = 2025-01-15 14:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -131,7 +131,7 @@ download_shell() {
 install_mihomo() {
     local folders="/root/mihomo"
     local choice
-    echo -e "${green}请选择版本：${reset}"
+    echo -e "${yellow}请选择版本：${reset}"
     echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
     echo -e "${green}2. 正式版 (Latest)${reset}"
     read -rp "请输入选项 (1/2): " choice

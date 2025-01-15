@@ -372,12 +372,34 @@ config_mihomo() {
     start_menu
 }
 
-switch_version(){
-
-
-    
+switch_version() {
+    echo -e "请选择版本："
+    echo -e "1. 测试版 (Prerelease-Alpha)"
+    echo -e "2. 正式版 (Latest)"
+    read -rp "请输入选项 (1/2): " choice
+    case "$choice" in
+        1)
+            echo -e "${yellow}准备切换到测试版${reset}"
+            download_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
+            download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
+            echo -e "${yellow}已经切换到测试版${reset}"
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
+            start_menu
+            ;;
+        2)
+            echo -e "${yellow}准备切换到正式版${reset}"
+            download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; } 
+            download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
+            echo -e "${yellow}已经切换到正式版${reset}"
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}v${version}${reset} 】"
+            start_menu
+            ;;
+        *)
+            echo -e "${red}无效选项，请输入 1 或 2${reset}"
+            exit 1
+            ;;
+    esac
 }
-
 
 menu() {
     clear

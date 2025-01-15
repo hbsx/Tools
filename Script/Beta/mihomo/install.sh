@@ -134,21 +134,27 @@ install_mihomo() {
     echo "2. 正式版 (Latest)"
     read -rp "请输入选项 (1/2): " choice
     [ -d "$folders" ] && rm -rf "$folders"
-    mkdir -p "$folders" && cd "$folders" 
+    mkdir -p "$folders" && cd "$folders"
     get_schema
     echo -e "${yellow}当前系统架构${reset}：【 ${green}${arch_raw}${reset} 】"
-    if [[ "$choice" == "1" ]]; then
-        echo -e "${yellow}选择安装测试版${reset}"
-        fetch_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
-    elif [[ "$choice" == "2" ]]; then
-        echo -e "${yellow}选择安装正式版${reset}"
-        fetch_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; }
-    else
-        echo -e "${red}无效选项，请输入 1 或 2${reset}"
-        exit 1
-    fi
-    echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
-    download_mihomo
+    case "$choice" in
+        1)
+            echo -e "${yellow}选择安装测试版${reset}"
+            fetch_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
+            download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
+            ;;
+        2)
+            echo -e "${yellow}选择安装正式版${reset}"
+            fetch_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; }
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
+            download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
+            ;;
+        *)
+            echo -e "${red}无效选项，请输入 1 或 2${reset}"
+            exit 1
+            ;;
+    esac
     download_service
     download_wbeui
     download_shell

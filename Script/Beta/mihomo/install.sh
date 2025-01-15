@@ -140,13 +140,13 @@ install_mihomo() {
     case "$choice" in
         1)
             echo -e "${yellow}选择安装测试版${reset}"
-            fetch_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
+            download_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
             echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
             download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
             ;;
         2)
             echo -e "${yellow}选择安装正式版${reset}"
-            fetch_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; }
+            download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; }
             echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
             download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
             ;;

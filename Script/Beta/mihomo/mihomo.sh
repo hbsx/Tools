@@ -214,7 +214,7 @@ download_alpha_mihomo() {
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
-    mv -f "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || mv -f "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    mv -f "/root/mihomo/mihomo-linux-${arch}-compatible-${version}" "/root/mihomo/mihomo" 2>/dev/null || mv -f "/root/mihomo/mihomo-linux-${arch}-${version}" "/root/mihomo/mihomo" || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
     chmod +x mihomo
     echo "$version" > "$version_file"
 }
@@ -230,7 +230,7 @@ download_latest_mihomo() {
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/v${version}/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
-    mv -f "mihomo-linux-${arch}-compatible-v${version}" mihomo 2>/dev/null || mv -f "mihomo-linux-${arch}-v${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    mv -f "/root/mihomo/mihomo-linux-${arch}-compatible-v${version}" "/root/mihomo/mihomo" 2>/dev/null || mv -f "/root/mihomo/mihomo-linux-${arch}-v${version}" "/root/mihomo/mihomo" || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
     chmod +x mihomo
     echo "$version" > "$version_file"
 }

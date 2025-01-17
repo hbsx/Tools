@@ -386,6 +386,9 @@ switch_version() {
             download_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
             download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
             echo -e "${yellow}已经切换到测试版${reset}"
+            echo -e "${yellow}等待 3 秒重启生效${reset}"
+            sleep 3s
+            systemctl restart mihomo
             echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
             start_menu
             ;;
@@ -394,6 +397,9 @@ switch_version() {
             download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; } 
             download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
             echo -e "${yellow}已经切换到正式版${reset}"
+            echo -e "${yellow}等待 3 秒重启生效${reset}"
+            sleep 3s
+            systemctl restart mihomo
             echo -e "${yellow}当前软件版本${reset}：【 ${green}v${version}${reset} 】"
             start_menu
             ;;

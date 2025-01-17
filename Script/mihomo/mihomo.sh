@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2024-12-31 10:50
+#!date = 2025-01-17 19:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.2"
+sh_ver="0.1.3"
 
 use_cdn=false
 
@@ -179,17 +179,7 @@ install_mihomo() {
     bash <(curl -Ls "$(get_url "$install_url")")
 }
 
-download_version() {
-    check_network
-    local version_url
-    version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
-    version=$(curl -sSL "$version_url") || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; }
-}
-
-download_mihomo() {
-    check_network
-    local version_file="/root/mihomo/version.txt"
-    local filename
+get_schema() {
     arch_raw=$(uname -m)
     case "${arch_raw}" in
         'x86_64') arch='amd64';;
@@ -199,13 +189,48 @@ download_mihomo() {
         's390x') arch='s390x';;
         *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1;;
     esac
-    download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
+}
+
+download_alpha_version() {
+    check_network
+    local version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
+    version=$(curl -sSL "$version_url") || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; }
+}
+
+download_latest_version() {
+    check_network
+    local version_url="https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
+    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1;}
+}
+
+download_alpha_mihomo() {
+    check_network
+    local version_file="/root/mihomo/version.txt"
+    local filename
+    get_schema
+    download_alpha_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
     [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
-    mv "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || mv "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    mv -f "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || mv -f "mihomo-linux-${arch}-${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
+    chmod +x mihomo
+    echo "$version" > "$version_file"
+}
+
+download_latest_mihomo() {
+    check_network
+    local version_file="/root/mihomo/version.txt"
+    local filename
+    get_schema
+    download_latest_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
+    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-v${version}.gz" ||
+    filename="mihomo-linux-${arch}-v${version}.gz"
+    local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/v${version}/${filename}")
+    wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
+    gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
+    mv -f "mihomo-linux-${arch}-compatible-v${version}" mihomo 2>/dev/null || mv -f "mihomo-linux-${arch}-v${version}" mihomo || { echo -e "${red}找不到解压后的文件${reset}"; exit 1; }
     chmod +x mihomo
     echo "$version" > "$version_file"
 }
@@ -216,7 +241,6 @@ update_mihomo() {
     local version_file="/root/mihomo/version.txt"
     echo -e "${green}开始检查软件是否有更新${reset}"
     cd "$folders" || exit
-    download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
     local current_version
     if [ -f "$version_file" ]; then
         current_version=$(cat "$version_file")
@@ -224,6 +248,16 @@ update_mihomo() {
         echo -e "${red}请先安装 mihomo${reset}"
         start_menu
         return
+    fi
+    if [[ "$current_version" == *alpha* ]]; then
+        download_version_type="alpha"
+    else
+        download_version_type="latest"
+    fi
+    if [ "$download_version_type" == "alpha" ]; then
+        download_alpha_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
+    else
+        download_latest_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
     fi
     local latest_version="$version"
     if [ "$current_version" == "$latest_version" ]; then
@@ -237,7 +271,11 @@ update_mihomo() {
         [Nn]*) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
         *) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
     esac
-    download_mihomo
+    if [ "$download_version_type" == "alpha" ]; then
+        download_alpha_mihomo || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
+    else
+        download_latest_mihomo || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
+    fi
     sleep 2s
     echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${latest_version}${reset} 】"
     systemctl restart mihomo
@@ -334,6 +372,38 @@ config_mihomo() {
     start_menu
 }
 
+switch_version() {
+    check_installation || { start_menu; return; }
+    local folders="/root/mihomo"
+    cd "$folders"
+    echo -e "${yellow}请选择版本：${reset}"
+    echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
+    echo -e "${green}2. 正式版 (Latest)${reset}"
+    read -rp "请输入选项 (1/2): " choice
+    case "$choice" in
+        1)
+            echo -e "${yellow}准备切换到测试版${reset}"
+            download_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
+            download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
+            echo -e "${yellow}已经切换到测试版${reset}"
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
+            start_menu
+            ;;
+        2)
+            echo -e "${yellow}准备切换到正式版${reset}"
+            download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; } 
+            download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
+            echo -e "${yellow}已经切换到正式版${reset}"
+            echo -e "${yellow}当前软件版本${reset}：【 ${green}v${version}${reset} 】"
+            start_menu
+            ;;
+        *)
+            echo -e "${red}无效选项，请输入 1 或 2${reset}"
+            exit 1
+            ;;
+    esac
+}
+
 menu() {
     clear
     echo "================================="
@@ -357,6 +427,7 @@ menu() {
     echo "---------------------------------"
     echo -e "${green} 7${reset}. 添加开机自启"
     echo -e "${green} 8${reset}. 关闭开机自启"
+    echo -e "${green} 9${reset}. 切换软件版本"
     echo "================================="
     show_status
     echo "================================="
@@ -370,6 +441,7 @@ menu() {
         6) restart_mihomo ;;
         7) enable_mihomo ;;
         8) disable_mihomo ;;
+        9) switch_version ;;
         20) config_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;

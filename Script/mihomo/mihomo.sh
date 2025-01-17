@@ -375,29 +375,55 @@ config_mihomo() {
 switch_version() {
     check_installation || { start_menu; return; }
     local folders="/root/mihomo"
-    cd "$folders"
+    local version_file="/root/mihomo/version.txt"
+    cd "$folders" || exit
+    local current_version
+    local download_version_type
+
+    if [ -f "$version_file" ]; then
+        current_version=$(cat "$version_file")
+        if [[ "$current_version" == *alpha* ]]; then
+            download_version_type="alpha"
+        else
+            download_version_type="latest"
+        fi
+    else
+        echo -e "${red}请先安装 mihomo${reset}"
+        start_menu
+        return
+    fi
     echo -e "${yellow}请选择版本：${reset}"
     echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
     echo -e "${green}2. 正式版 (Latest)${reset}"
     read -rp "请输入选项 (1/2): " choice
     case "$choice" in
         1)
+            if [[ "$download_version_type" == "alpha" ]]; then
+                echo -e "${yellow}当前已经是测试版，无需重复操作${reset}"
+                start_menu
+                return
+            fi
             echo -e "${yellow}准备切换到测试版${reset}"
             download_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
             download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
             echo -e "${yellow}已经切换到测试版${reset}"
-            echo -e "${yellow}等待 3 秒重启生效${reset}"
+            echo -e "${yellow}等待 3 秒后重启生效${reset}"
             sleep 3s
             systemctl restart mihomo
             echo -e "${yellow}当前软件版本${reset}：【 ${green}${version}${reset} 】"
             start_menu
             ;;
         2)
+            if [[ "$download_version_type" == "latest" ]]; then
+                echo -e "${yellow}当前已经是正式版，无需重复操作${reset}"
+                start_menu
+                return
+            fi
             echo -e "${yellow}准备切换到正式版${reset}"
             download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; } 
             download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
             echo -e "${yellow}已经切换到正式版${reset}"
-            echo -e "${yellow}等待 3 秒重启生效${reset}"
+            echo -e "${yellow}等待 3 秒后重启生效${reset}"
             sleep 3s
             systemctl restart mihomo
             echo -e "${yellow}当前软件版本${reset}：【 ${green}v${version}${reset} 】"

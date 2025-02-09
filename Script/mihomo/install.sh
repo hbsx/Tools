@@ -49,7 +49,7 @@ get_schema() {
 
 update_system() {
     apt update && apt upgrade -y
-    apt install -y curl git gzip wget nano iptables tzdata jq
+    apt install -y curl git gzip wget nano iptables tzdata jq unzip
 }
 
 check_ip_forward() {

@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.0.3"
+sh_ver="0.0.2"
 
 use_cdn=false
 
@@ -265,8 +265,8 @@ main() {
         3) uninstall_v2ray ;;
         4) start_v2ray ;;
         5) stop_v2ray ;;
-        6) download_config ;;
-        7) restart_v2ray ;;
+        6) restart_v2ray ;;
+        7) download_config ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${Red}无效选项，请重新选择${reset}" 

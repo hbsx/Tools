@@ -209,8 +209,8 @@ download_alpha_mihomo() {
     local filename
     get_schema
     download_alpha_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
-    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz" ||
     filename="mihomo-linux-${arch}-${version}.gz"
+    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz"
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
@@ -225,8 +225,8 @@ download_latest_mihomo() {
     local filename
     get_schema
     download_latest_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
-    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-v${version}.gz" ||
     filename="mihomo-linux-${arch}-v${version}.gz"
+    [[ "$arch" == 'amd64' ]] && filename="mihomo-linux-${arch}-compatible-v${version}.gz"
     local download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/v${version}/${filename}")
     wget -t 3 -T 30 "${download_url}" -O "${filename}" || { echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }

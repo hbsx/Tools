@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.0.2"
+sh_ver="0.0.3"
 
 use_cdn=false
 
@@ -253,6 +253,7 @@ main() {
     echo -e "${green} 5${reset}. 停止 v2ray"
     echo -e "${green} 6${reset}. 重启 v2ray"
     echo "---------------------------------"
+    echo -e "${green} 7${reset}. 更换配置"
     echo -e "${green}10${reset}. 退出脚本"
     echo "================================="
     show_status
@@ -264,7 +265,8 @@ main() {
         3) uninstall_v2ray ;;
         4) start_v2ray ;;
         5) stop_v2ray ;;
-        6) restart_v2ray ;;
+        6) download_config ;;
+        7) restart_v2ray ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${Red}无效选项，请重新选择${reset}" 

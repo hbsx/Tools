@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-02-09 15:30
+#!date = 2025-02-11 12:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -109,14 +109,14 @@ install_v2ray() {
     download_shell
     read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}你也可以上传自己的配置文件到 $folders 目录下\n${red}配置文件名称必须是 config.yaml ${reset}，是否继续(y/n): ")" choice
     case "$choice" in
-        [Yy]* ) download_config ;;
+        [Yy]* ) config_v2ray ;;
         [Nn]* ) echo -e "${green}跳过配置文件下载${reset}" ;;
         * ) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
     esac
     rm -f /root/install.sh
 }
 
-download_config() {
+config_v2ray() {
     local config_file="/root/v2ray/config.json"
     local config_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/v2ray.json")
     curl -s -o "$config_file" "$config_url"

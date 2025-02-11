@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-01-17 19:00
+#!date = 2025-02-11 12:10
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.3"
+sh_ver="0.1.4"
 
 use_cdn=false
 
@@ -198,7 +198,6 @@ download_alpha_version() {
 }
 
 download_latest_version() {
-    check_network
     local version_url="https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
     version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1;}
 }
@@ -361,8 +360,11 @@ config_mihomo() {
     { print }
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
     systemctl daemon-reload
-    systemctl start mihomo
-    echo -e "${green}恭喜你，你的 mihomo 已经配置完成并保存到 ${yellow}${config_file}${reset}"
+    systemctl restart mihomo
+    echo -e "${green}mihomo 配置完成，准备启动中${reset}"
+    echo -e ""
+    echo -e "${green}恭喜你，你的 mihomo 已成功启动并设置为开机自启，配置文件保存到 ${yellow}${config_file}${reset}"
+    echo -e ""
     echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
     echo -e "${cyan}=========================${reset}"
     echo -e "${green}http://$ipv4:9090/ui ${reset}"

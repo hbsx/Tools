@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-02-09 16:30
+#!date = 2025-02-11 12:10
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.0"
+sh_ver="0.1.1"
 
 use_cdn=false
 
@@ -48,15 +48,6 @@ check_installation() {
 start_menu() {
     echo && echo -n -e "${yellow}* 按回车返回主菜单 *${reset}" && read temp
     menu
-}
-
-check_status() {
-    local file="/root/v2ray/v2ray"
-    if pgrep -f "$file" > /dev/null; then
-        status="running"
-    else
-        status="stopped"
-    fi
 }
 
 show_status() {
@@ -202,10 +193,7 @@ get_schema(){
 
 download_version() {
     local version_url="https://api.github.com/repos/v2fly/v2ray-core/releases/latest"
-    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
-        echo -e "${red}获取 v2ray 远程版本失败${reset}";
-        exit 1;
-    }
+    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || { echo -e "${red}获取 v2ray 远程版本失败${reset}"; exit 1;}
 }
 
 download_v2ray() {
@@ -433,12 +421,16 @@ config_v2ray() {
         echo -e "${red}修改后的配置文件格式无效，请检查文件${reset}"
         exit 1
     fi
-    echo -e "${green}v2ray 配置已完成并保存到 ${config_file} 文件夹${reset}"
-    echo -e "${green}v2ray 配置完成，正在启动中${reset}"
     systemctl daemon-reload
-    systemctl start v2ray
-    systemctl enable v2ray
-    echo -e "${green}v2ray 已成功启动并设置为开机自启${reset}"
+    systemctl restart v2ray
+    echo -e "${green}v2ray 配置完成，准备启动中${reset}"
+    echo -e ""
+    echo -e "${green}恭喜你，你的 v2ray 已成功启动并设置为开机自启，配置文件保存到 ${yellow}${config_file}${reset}"
+    echo -e ""
+    echo -e "${red}下面是 v2ray 进入管理菜单命令${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${yellow}v2ray          进入菜单 ${reset}"
+    echo -e "${cyan}=========================${reset}"
     start_menu
 }
 

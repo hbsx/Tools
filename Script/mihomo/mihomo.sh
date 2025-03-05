@@ -395,7 +395,7 @@ switch_version() {
         return
     fi
     echo -e "${yellow}请选择版本：${reset}"
-    echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
+    echo -e "${green}1. 测试版 (Alpha)${reset}"
     echo -e "${green}2. 正式版 (Latest)${reset}"
     read -rp "请输入选项 (1/2): " choice
     case "$choice" in

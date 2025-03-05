@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-02-11 12:10
+#!date = 2025-03-05 13:30
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.1"
+sh_ver="0.1.2"
 
 use_cdn=false
 
@@ -240,7 +240,7 @@ update_v2ray() {
         [Nn]*) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
         *) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
     esac
-    download_alpha_v2ray|| { echo -e "${red}v2ray 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
+    download_v2ray|| { echo -e "${red}v2ray 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
     sleep 2s
     echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${latest_version}${reset} 】"
     systemctl restart v2ray

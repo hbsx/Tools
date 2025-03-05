@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-02-11 12:10
+#!date = 2025-03-05 15:05
 #!author = ChatGPT
 
 set -e -o pipefail

@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-05 13:30
+#!date = 2025-03-05 14:05
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -222,25 +222,31 @@ update_v2ray() {
     local current_version
     if [ -f "$version_file" ]; then
         current_version=$(cat "$version_file")
+    fi
+    if [ -z "$current_version" ]; then
+        read -p "$(echo -e "${yellow}未检测到版本信息，是否升级到最新版本？${reset} (y/n): ")" input
+        case "$input" in
+            [Yy]*) echo -e "${green}开始升级，升级中请等待${reset}" ;;
+            [Nn]*) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
+            *) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
+        esac
     else
-        echo -e "${red}请先安装 v2ray${reset}"
-        start_menu
-        return
+        download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
+        local latest_version="$version"
+        if [ "$current_version" == "$latest_version" ]; then
+            echo -e "${green}当前已是最新，无需更新${reset}"
+            start_menu
+            return
+        fi
+        read -p "$(echo -e "${yellow}检查到有更新，是否升级到最新版本？${reset} (y/n): ")" input
+        case "$input" in
+            [Yy]*) echo -e "${green}开始升级，升级中请等待${reset}" ;;
+            [Nn]*) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
+            *) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
+        esac
     fi
-    download_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
-    local latest_version="$version"
-    if [ "$current_version" == "$latest_version" ]; then
-        echo -e "${green}当前已是最新，无需更新${reset}"
-        start_menu
-        return
-    fi
-    read -p "$(echo -e "${yellow}检查到有更新，是否升级到最新版本？${reset} (y/n): ")" input
-    case "$input" in
-        [Yy]*) echo -e "${green}开始升级，升级中请等待${reset}" ;;
-        [Nn]*) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
-        *) echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
-    esac
     download_v2ray|| { echo -e "${red}v2ray 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"; exit 1; }
+    local latest_version=$(cat /root/v2ray/version.txt)
     sleep 2s
     echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${latest_version}${reset} 】"
     systemctl restart v2ray

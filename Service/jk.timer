@@ -1,8 +1,8 @@
 [Unit]
-Description=Run jk.sh every 6 hours
+Description=Run Git Auto Sync Script every 6 hours
 
 [Timer]
-OnBootSec=5min
+OnBootSec=10min
 OnUnitActiveSec=6h
 Unit=jk.service
 

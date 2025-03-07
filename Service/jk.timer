@@ -1,0 +1,11 @@
+1
+[Unit]
+Description=Run jk.sh every 6 hours
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=6h
+Unit=jk.service
+
+[Install]
+WantedBy=timers.target

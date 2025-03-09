@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #!name = GitHub 自动同步脚本  # 脚本名称，不参与执行
-#!desc = 自动同步             # 脚本描述
+#!desc = win 仓库管理脚本             # 脚本描述
 #!date = 2025-03-09 19:30     # 脚本创建或修改日期
 #!author = ChatGPT            # 脚本作者
 

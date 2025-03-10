@@ -482,7 +482,7 @@ menu() {
         7) enable_v2ray ;;
         8) disable_v2ray ;;
         20) config_v2ray ;;
-        30) log_v2ray ;;
+        30) logs_v2ray ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${red}无效选项，请重新选择${reset}" 

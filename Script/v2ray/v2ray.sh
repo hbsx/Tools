@@ -2,7 +2,7 @@
 
 #!name = v2ray 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-05 14:05
+#!date = 2025-03-10 16:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.2"
+sh_ver="0.1.3"
 
 use_cdn=false
 
@@ -61,12 +61,12 @@ show_status() {
         software_version="${red}未安装${reset}"
     else
         install_status="${green}已安装${reset}"
-        if pgrep -f "$file" > /dev/null; then
+        if systemctl is-active --quiet v2ray; then
             run_status="${green}已运行${reset}"
         else
             run_status="${red}未运行${reset}"
         fi
-        if systemctl is-enabled v2ray.service &>/dev/null; then
+        if systemctl is-enabled --quiet v2ray; then
             auto_start="${green}已设置${reset}"
         else
             auto_start="${red}未设置${reset}"
@@ -94,6 +94,7 @@ service_v2ray() {
         restart) action_text="重启" ;;
         enable) action_text="设置开机自启" ;;
         disable) action_text="取消开机自启" ;;
+        logs)    action_text="查看日志" ;;
     esac
     if [[ "$action" == "enable" || "$action" == "disable" ]]; then
         local is_enabled=$(systemctl is-enabled --quiet v2ray && echo "enabled" || echo "disabled")
@@ -109,6 +110,11 @@ service_v2ray() {
             fi
         fi
         start_menu
+        return
+    fi
+    if [[ "$action" == "logs" ]]; then
+        echo -e "${green}正在实时查看 v2ray 日志，按 Ctrl+C 退出${reset}"
+        journalctl -u v2ray -o cat -f
         return
     fi
     local service_status=$(systemctl is-active --quiet v2ray && echo "active" || echo "inactive")
@@ -132,6 +138,7 @@ stop_v2ray() { service_v2ray stop; }
 restart_v2ray() { service_v2ray restart; }
 enable_v2ray() { service_v2ray enable; }
 disable_v2ray() { service_v2ray disable; }
+logs_v2ray(){ service_v2ray logs; }
 
 uninstall_v2ray() {
     check_installation || { start_menu; return; }
@@ -449,6 +456,7 @@ menu() {
     echo -e "${green} 0${reset}. 更新脚本"
     echo -e "${green}10${reset}. 退出脚本"
     echo -e "${green}20${reset}. 更换配置"
+    echo -e "${green}30${reset}. 查看日志"
     echo "---------------------------------"
     echo -e "${green} 1${reset}. 安装 v2ray"
     echo -e "${green} 2${reset}. 更新 v2ray"
@@ -474,6 +482,7 @@ menu() {
         7) enable_v2ray ;;
         8) disable_v2ray ;;
         20) config_v2ray ;;
+        30) log_v2ray ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${red}无效选项，请重新选择${reset}" 

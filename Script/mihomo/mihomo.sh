@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-05 15:05
+#!date = 2025-03-10 16:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"  ## 蓝色
 cyan="\033[36m"  ## 青色
 reset="\033[0m"  ## 重置
 
-sh_ver="0.1.4"
+sh_ver="0.1.5"
 
 use_cdn=false
 
@@ -61,12 +61,12 @@ show_status() {
         software_version="${red}未安装${reset}"
     else
         install_status="${green}已安装${reset}"
-        if pgrep -f "$file" > /dev/null; then
+        if systemctl is-active --quiet mihomo; then
             run_status="${green}已运行${reset}"
         else
             run_status="${red}未运行${reset}"
         fi
-        if systemctl is-enabled mihomo.service &>/dev/null; then
+        if systemctl is-enabled --quiet mihomo; then
             auto_start="${green}已设置${reset}"
         else
             auto_start="${red}未设置${reset}"
@@ -94,6 +94,7 @@ service_mihomo() {
         restart) action_text="重启" ;;
         enable) action_text="设置开机自启" ;;
         disable) action_text="取消开机自启" ;;
+        logs)    action_text="查看日志" ;;
     esac
     if [[ "$action" == "enable" || "$action" == "disable" ]]; then
         local is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
@@ -101,7 +102,8 @@ service_mihomo() {
            [[ "$action" == "disable" && "$is_enabled" == "disabled" ]]; then
             echo -e "${yellow}已${action_text}，无需重复操作${reset}"
         else
-            echo -e "${green}正在 ${action_text} mihomo...${reset}"
+            echo -e "${green}正在${action_text}请等待${reset}"
+            sleep 1s
             if systemctl "$action" mihomo; then
                 echo -e "${green}${action_text}成功${reset}"
             else
@@ -111,6 +113,11 @@ service_mihomo() {
         start_menu
         return
     fi
+    if [[ "$action" == "logs" ]]; then
+        echo -e "${green}正在实时查看 mihomo 日志，按 Ctrl+C 退出${reset}"
+        journalctl -u mihomo -o cat -f
+        return
+    fi
     local service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
     if [[ "$action" == "start" && "$service_status" == "active" ]] || 
        [[ "$action" == "stop" && "$service_status" == "inactive" ]]; then
@@ -118,7 +125,8 @@ service_mihomo() {
         start_menu
         return
     fi
-    echo -e "${green}正在 ${action_text} mihomo...${reset}"
+    echo -e "${green}正在${action_text}请等待${reset}"
+    sleep 1s
     if systemctl "$action" mihomo; then
         echo -e "${green}${action_text}成功${reset}"
     else
@@ -132,6 +140,7 @@ stop_mihomo() { service_mihomo stop; }
 restart_mihomo() { service_mihomo restart; }
 enable_mihomo() { service_mihomo enable; }
 disable_mihomo() { service_mihomo disable; }
+logs_mihomo(){ service_mihomo logs; }
 
 uninstall_mihomo() {
     check_installation || { start_menu; return; }
@@ -395,7 +404,7 @@ switch_version() {
         return
     fi
     echo -e "${yellow}请选择版本：${reset}"
-    echo -e "${green}1. 测试版 (Alpha)${reset}"
+    echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
     echo -e "${green}2. 正式版 (Latest)${reset}"
     read -rp "请输入选项 (1/2): " choice
     case "$choice" in
@@ -450,6 +459,7 @@ menu() {
     echo -e "${green} 0${reset}. 更新脚本"
     echo -e "${green}10${reset}. 退出脚本"
     echo -e "${green}20${reset}. 更换订阅"
+    echo -e "${green}30${reset}. 查看日志"
     echo "---------------------------------"
     echo -e "${green} 1${reset}. 安装 mihomo"
     echo -e "${green} 2${reset}. 更新 mihomo"
@@ -477,6 +487,7 @@ menu() {
         8) disable_mihomo ;;
         9) switch_version ;;
         20) config_mihomo ;;
+        30) logs_mihomo ;;
         10) exit 0 ;;
         0) update_shell ;;
         *) echo -e "${red}无效选项，请重新选择${reset}" 

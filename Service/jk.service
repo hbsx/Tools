@@ -1,8 +1,0 @@
-[Unit]
-Description=Git Auto Sync Script
-
-[Service]
-ExecStart=/bin/bash /root/jk.sh
-WorkingDirectory=/root
-User=root
-Restart=no

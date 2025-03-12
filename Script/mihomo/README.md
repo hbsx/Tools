@@ -67,7 +67,7 @@ echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && systemctl restart sshd
 ### 4.更新系统
 
 ```bash
-apt-get update && apt-get full-upgrade -y
+apt update && apt full-upgrade -y
 ```
 
 ### 5.安装必须插件
@@ -82,6 +82,12 @@ apt-get install -y curl git wget nano
 
 ```bash
 wget -O install.sh --no-check-certificate https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/install.sh && chmod +x install.sh && ./install.sh
+```
+
+#### CND 加速版，主要是下载脚本用的，脚本里面的功能和上面一样（有时候 CND 会失效，等待修复就好）
+
+```bash
+wget -O install.sh --no-check-certificate https://github.boki.moe/https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/install.sh && chmod +x install.sh && ./install.sh
 ```
 
 ## 手动检查、排错

@@ -16,7 +16,7 @@ download_file() {
 
 # geosite 文件列表，格式：文件名|下载地址
 geosite_downloads=(
-  "Ads.mrs|https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"
+  "Ads_all.mrs|https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"
   "Local.mrs|https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs"
   "China.mrs|https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"
   "Openai.mrs|https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"

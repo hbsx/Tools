@@ -29,7 +29,7 @@ jobs:
           # 设置将仓库检出到本地的目录名称为 Tools-repo
           path: Tools-repo  # 本地目录名称：Tools-repo
 
-      # 步骤2：执行远程脚本来更新规则
+      # 步骤2：执行内嵌脚本来更新规则
       - name: 执行内嵌脚本
         run: |
           echo "开始执行脚本..."

@@ -9,6 +9,10 @@ DOMAIN,ad.jia.360.cn
 DOMAIN,ad.iot.360.cn
 
 # ======= A ======= #
+# 艾狄墨搏 - 广告服务商
+DOMAIN,monitor.ssp.admobile.top
+DOMAIN,sdk.ssp.admobile.top
+DOMAIN-SUFFIX,admobile.top
 ## 阿里云
 IP-CIDR, 203.107.1.1/24
 DOMAIN,ossgw.alicdn.com
@@ -72,7 +76,7 @@ DOMAIN,abyss.cyapi.cn
 DOMAIN,ad.cyapi.cn
 DOMAIN,gather.colorfulclouds.net
 # 菜鸟
-AND,((URL-REGEX,"^http:\/\/.+\/amdc\/mobileDispatch",extended-matching),(USER-AGENT,"Cainiao4iPhone*")),REJECT
+AND,((URL-REGEX,"^http:\/\/.+\/amdc\/mobileDispatch",extended-matching),(USER-AGENT,"Cainiao4iPhone*"))
 DOMAIN,adsmind.ugdtimg.com
 DOMAIN,amdc.m.youku.com
 DOMAIN,apiv4-iyes.youku.com
@@ -80,7 +84,6 @@ DOMAIN,httpdns.alicdn.com
 DOMAIN,huichuan-mc.sm.cn
 DOMAIN,huichuan.sm.cn
 DOMAIN,iyes.youku.com
-# DOMAIN,m-vali.cp31.ott.cibntv.net,REJECT
 DOMAIN,mc.atm.youku.com
 DOMAIN,vali-g1.cp31.ott.cibntv.net
 DOMAIN,vali-ugc.cp31.ott.cibntv.net
@@ -99,7 +102,6 @@ DOMAIN, pagead2.googlesyndication.com
 DOMAIN, www.googleadservices.com
 DOMAIN-KEYWORD, adservice.google.com.
 # 番茄小说
-DOMAIN,
 DOMAIN,lf-ad-ies.bytecdn.cn
 DOMAIN,i.snssdk.com
 DOMAIN,is.snssdk.com
@@ -119,6 +121,19 @@ DOMAIN,mssdk.volces.com
 DOMAIN,pangolin.snssdk.com
 DOMAIN,gromore.pangolin-sdk-toutiao.com
 DOMAIN,ether-pack.pangolin-sdk-toutiao.com
+DOMAIN-KEYWORD,zjurl
+DOMAIN-KEYWORD,bdurl
+DOMAIN-KEYWORD,365yg
+DOMAIN-KEYWORD,misc-l
+DOMAIN-KEYWORD,mssdk
+DOMAIN-KEYWORD,snssdk
+DOMAIN-KEYWORD,zijieapi
+DOMAIN-KEYWORD,-ad-sign.byteimg.com
+DOMAIN-KEYWORD,-misc
+DOMAIN-KEYWORD,-aliec
+DOMAIN-KEYWORD,-alisc
+DOMAIN-KEYWORD,-applog.fqnovel
+DOMAIN-KEYWORD,-bjlgy
 DOMAIN-KEYWORD,-ad-sign.byteimg.com
 DOMAIN-KEYWORD,api-access.pangolin-sdk-toutiao
 DOMAIN-KEYWORD,log-api.pangolin-sdk-toutiao
@@ -146,7 +161,11 @@ AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,-log-,extended-match
 AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,-dual-event-,extended-matching),(DOMAIN-SUFFIX,pangle.io,extended-matching))
 AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,pangolin,extended-matching),(DOMAIN-SUFFIX,sgsnssdk.com,extended-matching))
 AND,((DOMAIN-KEYWORD,ads,extended-matching),(DOMAIN-KEYWORD,-normal-lq,extended-matching),(DOMAIN-SUFFIX,zijieapi.com,extended-matching))
-URL-REGEX,"^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/"
+URL-REGEX,^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/
+URL-REGEX,^http:\/\/sf3-be-pack\.pglstatp-toutiao\.com\/obj\/ad-app-package\/
+URL-REGEX,^https:\/\/sf3-fe-tos\.pglstatp-toutiao\.com\/obj\/ad-pattern\/
+URL-REGEX,^https:\/\/lf-cdn-tos\.bytescm\.com\/obj\/static\/ad\/
+URL-REGEX,^https:\/\/tnc3-alisc1\.zijieapi\.com\/get_domains\/
 
 # ======= G ======= #
 # 工商银行 开屏广告
@@ -247,6 +266,12 @@ DOMAIN-SUFFIX,updatepage.kuwo.cn
 DOMAIN-SUFFIX,wa.kuwo.cn
 DOMAIN-SUFFIX,webstat.kuwo.cn
 DOMAIN-SUFFIX,rich.kuwo.cn
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v1\/album\/adBar
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v1\/app\/pasterAdvert
+URL-REGEX,^http:\/\/mobilead\.kuwo\.cn\/MobileAdServer
+URL-REGEX,^http:\/\/mobilead\.kuwo\.cn\/EcomResourceServer
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v1\/app\/startup
+URL-REGEX,^http:\/\/rich\.kuwo\.cn\/AdService
 # 快手联盟
 DOMAIN,gdfp.gifshow.com
 DOMAIN,open.e.kuaishou.com
@@ -275,6 +300,14 @@ DOMAIN-SUFFIX,ad.e.waimai.sankuai.com
 DOMAIN-SUFFIX,mads.meituan.com
 DOMAIN-SUFFIX,dreport.meituan.net
 DOMAIN-SUFFIX,d.meituan.net
+# 咪咕视频
+DOMAIN-SUFFIX,ad.cmvideo.cn
+DOMAIN,ggc.cmvideo.cn
+DOMAIN,ggic03.miguvideo.com
+DOMAIN,ggmk.miguvideo.com
+DOMAIN,ggv.cmvideo.cn
+DOMAIN,ggx.cmvideo.cn
+DOMAIN,ggx03.miguvideo.com
 
 # ======= O ======= #
 # Outlook
@@ -303,6 +336,23 @@ DOMAIN,us.l.qq.com
 DOMAIN,tangram.e.qq.com
 DOMAIN,tmeadbak.y.qq.com
 DOMAIN-SUFFIX,imtmp.net
+# 青龙
+DOMAIN-SUFFIX,o1098464.ingest.sentry.io
+# 蜻蜓FM
+DOMAIN,ad.qingting.fm
+DOMAIN,adlaunch.qingting.fm
+DOMAIN,ad-cdn. qingting.fm
+DOMAIN-SUFFIX,admgr.qingting.fm
+DOMAIN-SUFFIX,dload.qd.qingting.fm
+DOMAIN-SUFFIX,logger.qingting.fm
+DOMAIN-SUFFIX,s.qd.qingting.fm
+DOMAIN-SUFFIX,s.qd.qingtingfm.com
+# 七猫小说
+DOMAIN,cdn-new-ad.wtzw.com
+DOMAIN,a-remad.qm989.com
+DOMAIN,qzs.gdtimg.com
+DOMAIN,mobads-pre-config.cdn.bcebos.com
+DOMAIN,pgdt.ugdtimg.com
 
 # ======= R ======= #
 # RARBG 推广跳转
@@ -436,12 +486,22 @@ DOMAIN,ad.maoyan.com
 DOMAIN,e.jparking.cn
 
 # ======= X ======= #
+# 小象买菜 - 兜底TCP请求下发广告
+IP-CIDR,101.50.8.64/32,no-resolve
+IP-CIDR,101.50.8.75/32,no-resolve
+IP-CIDR,103.37.152.161/32,no-resolve
+IP-CIDR,103.37.152.162/32,no-resolve
+IP-CIDR,103.63.160.64/32,no-resolve
+IP-CIDR,119.29.48.215/32,no-resolve
+IP-CIDR,202.90.110.8/32,no-resolve
+IP-CIDR,203.76.217.241/32,no-resolve
+IP-CIDR,203.76.217.243/32,no-resolve
+IP-CIDR,203.76.217.37/32,no-resolve
+IP-CIDR6,2405:1480:3000:303f::303f/128,no-resolve
 # 小米
-DOMAIN, sdkconfig.ad.xiaomi.com
-# 迅雷 解除版权限制
-#DOMAIN, hub5btmain.v6.shub.sandai.net
-#DOMAIN, hub5emu.v6.shub.sandai.net
-#DOMAIN, hub5idx.v6.shub.sandai.net
+DOMAIN,sdkconfig.ad.xiaomi.com
+DOMAIN,data.mistat.xiaomi.com
+DOMAIN,tracking.intl.miui.com
 
 # ======= Y ======= #
 # 云闪付 开屏广告
@@ -503,3 +563,60 @@ DOMAIN-KEYWORD,log-dmp.suishenyun.cn
 DOMAIN-KEYWORD,client-dmp.suishenyun.cn
 DOMAIN-KEYWORD,pc.suishenyun.net
 DOMAIN-KEYWORD,v0-client-lz.rili.cn
+
+# ===== PornAds =====
+DOMAIN,4lke.online
+DOMAIN,a.adtng.com
+DOMAIN,a.labadena.com
+DOMAIN,a.magsrv.com
+DOMAIN,a.orbsrv.com
+DOMAIN,a.shukriya90.com
+DOMAIN,ads.exoclick.com
+DOMAIN,aff-partners-io.ck-cdn.com
+DOMAIN,aff.partners.io
+DOMAIN,creative.bbrdbr.com
+DOMAIN,creative.myavlive.com
+DOMAIN,creative.rmhfrtnd.com
+DOMAIN,etahub.com
+DOMAIN,evtubescms.phncdn.com
+DOMAIN,ezozojawg.com
+DOMAIN,go.aoalmfwinbsstec23.com
+DOMAIN,go.bbrdbr.com
+DOMAIN,go.go-srv.com
+DOMAIN,go.myavlive.com
+DOMAIN,go.rmhfrtnd.com
+DOMAIN,go.spankbanglive.com
+DOMAIN,go.xhamsterlive.com
+DOMAIN,go.xliirdr.com
+DOMAIN,go.xlivrdr.com
+DOMAIN,go.xxxjmp.com
+DOMAIN,go.xxxviijmp.com
+DOMAIN,go.xxxvjmp.com
+DOMAIN,hhbypdoecp.com
+DOMAIN,ht.youporn.com
+DOMAIN,mail.kguapp.com
+DOMAIN,marine.xhamster.com
+DOMAIN,partwithner.com
+DOMAIN,pv.vipads.cc
+DOMAIN,r.trackwilltrk.com
+DOMAIN,reactads.engine.adglare.net
+DOMAIN,rockpoint.xhamster.com
+DOMAIN,s.magsrv.com
+DOMAIN,s.orbsrv.com
+DOMAIN,uug27.com
+DOMAIN,www.traforama.com
+DOMAIN,www.vipads.live
+DOMAIN,x.eccorp.cc
+DOMAIN-SUFFIX,adxadserv.com
+DOMAIN-SUFFIX,chaturbate.com
+DOMAIN-SUFFIX,clarity.ms
+DOMAIN-SUFFIX,doppiocdn.live
+DOMAIN-SUFFIX,faphouse.com
+DOMAIN-SUFFIX,jads.co
+DOMAIN-SUFFIX,juicyads.com
+DOMAIN-SUFFIX,mnaspm.com
+DOMAIN-SUFFIX,stripchat.com
+DOMAIN-SUFFIX,stripchat.ooo
+DOMAIN-SUFFIX,trafficjunky.com
+DOMAIN-SUFFIX,trafficjunky.net
+DOMAIN-KEYWORD,-cdn2.adtng.com

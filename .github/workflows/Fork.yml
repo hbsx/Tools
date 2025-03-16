@@ -20,7 +20,7 @@ jobs:
       TZ: 'Asia/Shanghai'  # 配置时区为 Asia/Shanghai
 
     steps:
-      # 步骤1：检出目标仓库
+      # 检出目标仓库
       - name: 检出目标仓库  # 定义步骤名称：检出目标仓库
         uses: actions/checkout@v4  # 使用 GitHub 官方 checkout action 检出代码
         with:
@@ -29,7 +29,7 @@ jobs:
           # 设置将仓库检出到本地的目录名称为 Tools-repo
           path: Tools-repo  # 本地目录名称：Tools-repo
 
-      # 步骤2：执行内嵌脚本来更新规则
+      # 执行内嵌脚本来更新规则
       - name: 下载 mihomo 规则  # 下载并保存 mihomo 规则文件
         shell: bash
         run: |
@@ -86,7 +86,7 @@ jobs:
               curl -f -L "$url" -o "Tools-repo/Ruleset/mihomo/$file_name" || { echo "下载失败：$url"; exit 1; }
           done
 
-      # 步骤3：提交更改并推送到仓库
+      # 提交更改并推送到仓库
       - name: 推送更新到 Tools-repo 仓库      # 检查变更并推送更新到 Tools-repo 仓库 main 分支
         shell: bash
         run: |
@@ -94,8 +94,10 @@ jobs:
           cd "${{ github.workspace }}/Tools-repo"
           git fetch origin
           # 配置 Git 用户信息
-          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --local user.name "${{ github.actor }}"
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          # git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          # git config --local user.name "${{ github.actor }}"
           if [[ -n $(git status --porcelain) ]]; then
             git add -A
             git commit -m "Auto Update $(TZ='Asia/Shanghai' date +'%Y-%m-%d %H:%M:%S')"

@@ -28,8 +28,21 @@ DOMAIN,adash.man.aliyuncs.com
 DOMAIN,applog.uc.cn
 AND,((DOMAIN-KEYWORD,adash,extended-matching),(DOMAIN-SUFFIX,ut.taobao.com,extended-matching))
 # Apple
-DOMAIN, api-adservices.apple.com
-DOMAIN-SUFFIX, iadsdk.apple.com
+DOMAIN,ca.iadsdk.apple.com
+DOMAIN-SUFFIX,advp.apple.com
+DOMAIN-SUFFIX,iad-apple.com
+DOMAIN-SUFFIX,iadsdk.apple.com
+DOMAIN,advertising.apple.com
+DOMAIN,api-adservices.apple.com
+DOMAIN,apple.comscoreresearch.com
+DOMAIN,banners.itunes.apple.com
+DOMAIN,iad.apple.com
+DOMAIN,iadcontent.apple.com
+DOMAIN,iadctest.qwapi.com
+DOMAIN,iadmoo.apple.com
+DOMAIN,iadworkbench.apple.com
+DOMAIN,launch.apple.com
+DOMAIN,qwapi.apple.com
 # 安全浏览限制解除
 DOMAIN,lookup.api.bsb.baidu.com
 DOMAIN,proxy.safebrowsing.apple
@@ -233,6 +246,8 @@ DOMAIN-SUFFIX,igexin.com
 # ======= H ======= #
 # 海尔智家
 DOMAIN-SUFFIX,ehaier.com
+# 嗨量科技
+DOMAIN,adx.halomobi.com
 # 盒马
 AND,((URL-REGEX,^http:\/\/amdc\.m\.taobao\.com\/amdc\/mobileDispatch),(USER-AGENT,Hema4iPhone*))
 
@@ -294,6 +309,11 @@ DOMAIN,user.jpush.cn
 DOMAIN-SUFFIX,jiguang.cn
 DOMAIN-SUFFIX,jpush.cn
 DOMAIN-SUFFIX,jpush.io
+# 钧云 - ADHUB
+DOMAIN,api.htp.hubcloud.com.cn
+DOMAIN,res1.hubcloud.com.cn
+DOMAIN,sdktmp.hubcloud.com.cn
+DOMAIN,v.adx.hubcloud.com.cn
 
 # ======= K ======= #
 # 酷狗音乐
@@ -327,10 +347,13 @@ URL-REGEX,^http:\/\/rich\.kuwo\.cn\/AdService
 # 快手联盟
 DOMAIN,gdfp.gifshow.com
 DOMAIN,open.e.kuaishou.com
-DOMAIN-SUFFIX,adukwai.com
-DOMAIN,gdfp.gifshow.com
 DOMAIN,adtrack.e.kuaishou.com
+DOMAIN-SUFFIX,adukwai.com
 DOMAIN-SUFFIX,adbkwai.com
+# 酷安
+DOMAIN-SUFFIX,ulogs.umengcloud.com
+DOMAIN-SUFFIX,toblog.ctobsnssdk.com
+DOMAIN-SUFFIX,adashbc.ut.taobao.com
 
 # ======= L ======= #
 # 蓝奏云
@@ -363,6 +386,9 @@ DOMAIN,ggmk.miguvideo.com
 DOMAIN,ggv.cmvideo.cn
 DOMAIN,ggx.cmvideo.cn
 DOMAIN,ggx03.miguvideo.com
+# 美数科技
+DOMAIN,sdk.1rtb.net
+DOMAIN,cdn.1rtb.com
 
 # ======= O ======= #
 # Outlook
@@ -436,6 +462,8 @@ DOMAIN,furiousfar.com
 DOMAIN,swallowcrockerybless.com
 
 # ======= S ======= #
+# 上海倍孜
+DOMAIN,sdk.beizi.biz
 # 什么值得买
 DOMAIN,api.zuihuimai.com
 DOMAIN,aaid.uyunad.com
@@ -487,6 +515,8 @@ IP-CIDR,47.110.187.87/32
 IP-CIDR,47.243.147.125/32
 IP-CIDR,120.27.235.201/32
 IP-CIDR,121.196.197.147/32
+# 书旗小说
+DOMAIN,render-web.11222.cn
 
 # ======= T ======= #
 # 腾讯
@@ -547,6 +577,11 @@ DOMAIN-SUFFIX,appiersig.com
 DOMAIN-SUFFIX,googleads.g.doubleclick.net
 
 # ======= W ======= #
+# 网易邮箱
+DOMAIN-SUFFIX,sdk.e.qq.com
+DOMAIN-SUFFIX,gorgon.youdao.com
+DOMAIN-SUFFIX,nex.163.com
+DOMAIN-SUFFIX,mi.gdt.qq.com
 # 网易云音乐
 DOMAIN,gdt.qq.com
 DOMAIN,httpdns.n.netease.com
@@ -554,13 +589,11 @@ DOMAIN,iadmat.nosdn.127.net
 DOMAIN,iadmusicmat.music.126.net
 DOMAIN,iadmusicmatvideo.music.126.net
 DOMAIN-SUFFIX,163jiasu.com
-DOMAIN,nex.163.com
 DOMAIN,iad.g.163.com
 DOMAIN,adx-bj.anythinktech.com
 DOMAIN,api.anythinktech.com
 DOMAIN,tk.anythinktech.com
 DOMAIN,da.anythinktech.com
-DOMAIN,gorgon.youdao.com
 # 微博 开屏广告
 DOMAIN,adstrategy.biz.weibo.com
 DOMAIN,kadmimage.biz.weibo.com

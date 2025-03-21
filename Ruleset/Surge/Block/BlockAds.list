@@ -126,7 +126,6 @@ DOMAIN-KEYWORD,adservice.google.com.
 DOMAIN,mon.zijieapi.com
 DOMAIN,lf-ad-ies.bytecdn.cn
 DOMAIN,i.snssdk.com
-DOMAIN,is.snssdk.com
 DOMAIN,bds.snssdk.com
 DOMAIN,dm.bytedance.com
 DOMAIN,dm.pstatp.com
@@ -138,11 +137,18 @@ DOMAIN,tosv.boe.byted.org
 DOMAIN,tosv.byted.org
 DOMAIN,extlog.snssdk.com
 DOMAIN,mssdk-bu.bytedance.com
-DOMAIN,toblog.ctobsnssdk.com
 DOMAIN,mssdk.volces.com
 DOMAIN,pangolin.snssdk.com
+DOMAIN,toblog.ctobsnssdk.com
 DOMAIN,gromore.pangolin-sdk-toutiao.com
 DOMAIN,ether-pack.pangolin-sdk-toutiao.com
+DOMAIN-KEYWORD,-ad-sign.byteimg.com
+DOMAIN-KEYWORD,api-access.pangolin-sdk-toutiao
+DOMAIN-KEYWORD,log-api.pangolin-sdk-toutiao
+DOMAIN-KEYWORD,-ad.byteoversea.com
+DOMAIN-KEYWORD,video-cn.snssdk.com
+DOMAIN-KEYWORD,asiad.byteactivity
+DOMAIN-SUFFIX,lnk0.com
 DOMAIN-KEYWORD,zjurl
 DOMAIN-KEYWORD,bdurl
 DOMAIN-KEYWORD,365yg
@@ -150,54 +156,45 @@ DOMAIN-KEYWORD,misc-l
 DOMAIN-KEYWORD,mssdk
 DOMAIN-KEYWORD,snssdk
 DOMAIN-KEYWORD,zijieapi
-DOMAIN-KEYWORD,-ad-sign.byteimg.com
 DOMAIN-KEYWORD,-misc
 DOMAIN-KEYWORD,-aliec
 DOMAIN-KEYWORD,-alisc
 DOMAIN-KEYWORD,-applog.fqnovel
 DOMAIN-KEYWORD,-bjlgy
-DOMAIN-KEYWORD,api-access.pangolin-sdk-toutiao
-DOMAIN-KEYWORD,log-api.pangolin-sdk-toutiao
-DOMAIN-KEYWORD,-ad.byteoversea.com
-DOMAIN-KEYWORD,video-cn.snssdk.com
-DOMAIN-KEYWORD,asiad.byteactivity
-AND,((DOMAIN-KEYWORD,ssdk-,extended-matching),(DOMAIN-SUFFIX,pangle.io,extended-matching))
+DOMAIN-KEYWORD,dig.zjurl.cn
+DOMAIN-KEYWORD,dig.bdurl.net
+DOMAIN-KEYWORD,is.snssdk.com
+AND,((DOMAIN-KEYWORD,zijieapi),(DOMAIN-KEYWORD,ad))
 AND,((DOMAIN-KEYWORD,-ad-,extended-matching),(DOMAIN-SUFFIX,byteimg.com,extended-matching))
 AND,((DOMAIN-KEYWORD,-ttam-,extended-matching),(DOMAIN-SUFFIX,ibyteimg.com,extended-matching))
+AND,((DOMAIN-KEYWORD,ssdk-,extended-matching),(DOMAIN-SUFFIX,pangle.io,extended-matching))
 AND,((DOMAIN-KEYWORD,pangolin,extended-matching),(DOMAIN-SUFFIX,sgsnssdk.com,extended-matching))
 AND,((DOMAIN-KEYWORD,lf,extended-matching),(DOMAIN-KEYWORD,-short.bytetos.com,extended-matching))
-AND,((DOMAIN-KEYWORD,if,extended-matching),(DOMAIN-KEYWORD,-cdn-tos.bytescm.com,extended-matching))
+AND,((DOMAIN-KEYWORD,v,extended-matching),(DOMAIN-KEYWORD,-be-pack.pglstatp-toutiao.com,extended-matching))
+AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-be-pack.pglstatp-toutiao.com,extended-matching))
+AND,((DOMAIN-KEYWORD,s,extended-matching),(DOMAIN-KEYWORD,-fe-scm.pglstatp-toutiao.com,extended-matching))
 AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-ttcdn-tos.pstatp.com,extended-matching))
+AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-fe-tos.pglstatp-toutiao.com,extended-matching))
+AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-static.i18n-pglstatp.com,extended-matching))
+AND,((DOMAIN-KEYWORD,if,extended-matching),(DOMAIN-KEYWORD,-cdn-tos.bytescm.com,extended-matching))
 AND,((DOMAIN-KEYWORD,if,extended-matching),(DOMAIN-KEYWORD,-analytics.bytescm.com,extended-matching))
 AND,((DOMAIN-KEYWORD,lf,extended-matching),(DOMAIN-KEYWORD,-analytics.bytescm.com,extended-matching))
-AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-static.i18n-pglstatp.com,extended-matching))
-AND,((DOMAIN-KEYWORD,s,extended-matching),(DOMAIN-KEYWORD,-fe-scm.pglstatp-toutiao.com,extended-matching))
-AND,((DOMAIN-KEYWORD,v,extended-matching),(DOMAIN-KEYWORD,-be-pack.pglstatp-toutiao.com,extended-matching))
-AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-fe-tos.pglstatp-toutiao.com,extended-matching))
-AND,((DOMAIN-KEYWORD,sf,extended-matching),(DOMAIN-KEYWORD,-be-pack.pglstatp-toutiao.com,extended-matching))
 AND,((DOMAIN-KEYWORD,ads,extended-matching),(DOMAIN-KEYWORD,normal,extended-matching),(DOMAIN-SUFFIX,zijieapi.com,extended-matching))
 AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,-access-,extended-matching),(DOMAIN-SUFFIX,pangle.io,extended-matching))
 AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,-log-,extended-matching),(DOMAIN-SUFFIX,pangle.io,extended-matching))
 AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,-dual-event-,extended-matching),(DOMAIN-SUFFIX,pangle.io,extended-matching))
 AND,((DOMAIN-KEYWORD,api,extended-matching),(DOMAIN-KEYWORD,pangolin,extended-matching),(DOMAIN-SUFFIX,sgsnssdk.com,extended-matching))
 AND,((DOMAIN-KEYWORD,ads,extended-matching),(DOMAIN-KEYWORD,-normal-lq,extended-matching),(DOMAIN-SUFFIX,zijieapi.com,extended-matching))
-URL-REGEX,^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/
-URL-REGEX,^http:\/\/sf3-be-pack\.pglstatp-toutiao\.com\/obj\/ad-app-package\/
-URL-REGEX,^https:\/\/sf3-fe-tos\.pglstatp-toutiao\.com\/obj\/ad-pattern\/
-URL-REGEX,^https:\/\/lf-cdn-tos\.bytescm\.com\/obj\/static\/ad\/
-URL-REGEX,^https:\/\/tnc3-alisc1\.zijieapi\.com\/get_domains\/
+URL-REGEX,"^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/"
 
 # ======= G ======= #
 # 工商银行
 DOMAIN-SUFFIX,mall.icbc.com.cn
 DOMAIN,pageviewp.icbc.com.cn
 # 广告联盟
-DOMAIN-KEYWORD,-ad-sign.byteimg.com
-DOMAIN-KEYWORD,asiad.byteactivity
 DOMAIN-KEYWORD,pangolin-sdk-toutiao
 DOMAIN-KEYWORD,pangolin.snssdk.com
 DOMAIN-KEYWORD,pglstatp-toutiao
-DOMAIN-KEYWORD,video-cn.snssdk.com
 DOMAIN-SUFFIX,ads.linkedin.com
 DOMAIN-SUFFIX,ads.vungle.com
 DOMAIN-SUFFIX,adukwai.com
@@ -214,11 +211,9 @@ DOMAIN,adapi.izuiyou.com
 DOMAIN,adtracker.adfunlink.com
 DOMAIN,dig.bdurl.net
 DOMAIN,dsp-x.jd.com
-DOMAIN,et.tanx.com
 DOMAIN,gdfp.gifshow.com
 DOMAIN,init.supersonicads.com
 DOMAIN,janapi.jd.com
-DOMAIN,lf-ad-ies.bytecdn.cn
 DOMAIN,mercury-gateway.ixiaochuan.cn
 DOMAIN,mon.toutiaocloud.com
 DOMAIN,open.e.kuaishou.com
@@ -231,10 +226,8 @@ DOMAIN-SUFFIX,pangolin-sdk-toutiao.com
 DOMAIN-SUFFIX,pangolin-sdk-toutiao-b.com
 # 个推
 DOMAIN,b-gtc.getui.net
-DOMAIN,c-gtc.getui.net
 DOMAIN,c-hzgt2.getui.com
 DOMAIN,c-ido.getui.net
-DOMAIN,c-gtc.getui.net
 DOMAIN,dnms.getui.com
 DOMAIN,ido.getui.net
 DOMAIN,sdk-conf.getui.com
@@ -345,10 +338,7 @@ URL-REGEX,^http:\/\/mobilead\.kuwo\.cn\/EcomResourceServer
 URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v1\/app\/startup
 URL-REGEX,^http:\/\/rich\.kuwo\.cn\/AdService
 # 快手联盟
-DOMAIN,gdfp.gifshow.com
-DOMAIN,open.e.kuaishou.com
 DOMAIN,adtrack.e.kuaishou.com
-DOMAIN-SUFFIX,adukwai.com
 DOMAIN-SUFFIX,adbkwai.com
 # 酷安
 DOMAIN-SUFFIX,ulogs.umengcloud.com
@@ -398,17 +388,6 @@ DOMAIN,sin3-ib.adnxs.com
 
 # ======= P ======= #
 # 拼多多
-URL-REGEX,"^http:\/\/81\.69\.130\.131\/d"
-URL-REGEX,"^http:\/\/101\.35\.204\.35\/d"
-URL-REGEX,"^http:\/\/101\.35\.212\.35\/d"
-URL-REGEX,"^http:\/\/114\.110\.96\.6\/d"
-URL-REGEX,"^http:\/\/114\.110\.96\.26\/d"
-URL-REGEX,"^http:\/\/114\.110\.97\.30\/d"
-URL-REGEX,"^http:\/\/114\.110\.97\.97\/d"
-URL-REGEX,"^http:\/\/121\.5\.84\.85\/d"
-URL-REGEX,"^http:\/\/\[2402:4e00:1411:201:0:9964:ba21:5a41\]\/d"
-AND,((URL-REGEX,"^http:\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/d",extended-matching),(USER-AGENT,"*com.xunmeng.pinduoduo*")),REJECT
-AND,((URL-REGEX,"^http:\/\/\[((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))\]\/d4\?",extended-matching),(USER-AGENT,"*com.xunmeng.pinduoduo*")),REJECT
 DOMAIN,titan.pinduoduo.com
 DOMAIN,ta-a.pinduoduo.com
 DOMAIN,ta.pinduoduo.com
@@ -419,7 +398,6 @@ DOMAIN,th.pinduoduo.com
 # ======= Q ======= #
 # QQ音乐
 DOMAIN,adstats.tencentmusic.com
-DOMAIN,ad.tencentmusic.com
 DOMAIN,adcdn.tencentmusic.com
 DOMAIN,adcdn6.tencentmusic.com
 DOMAIN,adexpo.tencentmusic.com
@@ -427,14 +405,12 @@ DOMAIN,adclick.tencentmusic.com
 DOMAIN,otheve.beacon.qq.com
 DOMAIN,monitor.music.qq.com
 DOMAIN,stat.y.qq.com
-DOMAIN,tmead.y.qq.com
 DOMAIN,tmeadquic.y.qq.com
 DOMAIN,oth.str.mdt.qq.com
 DOMAIN,h.trace.qq.com
 DOMAIN,sdk.e.qq.com
 DOMAIN,p.l.qq.com
 DOMAIN,us.l.qq.com
-DOMAIN,tangram.e.qq.com
 DOMAIN,tmeadbak.y.qq.com
 DOMAIN-SUFFIX,imtmp.net
 # 青龙
@@ -452,8 +428,25 @@ DOMAIN-SUFFIX,s.qd.qingtingfm.com
 DOMAIN,cdn-new-ad.wtzw.com
 DOMAIN,a-remad.qm989.com
 DOMAIN,qzs.gdtimg.com
-DOMAIN,mobads-pre-config.cdn.bcebos.com
 DOMAIN,pgdt.ugdtimg.com
+# 汽水音乐去广告
+DOMAIN,frontier-aweme-hl.snssdk.com
+DOMAIN,frontier-quic-test.bytedance.com
+AND,((DOMAIN-KEYWORD,api100-core-quic-,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,api100-normal-quic-,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,api100-normal-quic-aweme-,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,api100-quic-core-,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,api100-quic-normal-,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,frontier100-aweme,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,ma5-normal-,extended-matching),(DOMAIN-SUFFIX,zijieapi.com,extended-matching))
+AND,((DOMAIN-KEYWORD,polaris5-normal-,extended-matching),(DOMAIN-SUFFIX,zijieapi.com,extended-matching))
+AND,((DOMAIN-KEYWORD,webcast100-ws-c-,extended-matching),(DOMAIN-SUFFIX,amemv.com,extended-matching))
+AND,((DOMAIN-KEYWORD,tnc,extended-matching),(AND,((OR,((DOMAIN-KEYWORD,-bjlgy,extended-matching),(DOMAIN-KEYWORD,-alisc,extended-matching),(DOMAIN-KEYWORD,-aliec,extended-matching),(DOMAIN-KEYWORD,-alisg,extended-matching))),(OR,((DOMAIN-SUFFIX,snssdk.com,extended-matching),(DOMAIN-SUFFIX,isnssdk.com,extended-matching),(DOMAIN-SUFFIX,toutiaoapi.com,extended-matching),(DOMAIN-SUFFIX,bytedance.com,extended-matching),(DOMAIN-SUFFIX,zijieapi.com,extended-matching))))))
+AND,((IP-CIDR,110.249.199.75/32,no-resolve),(DEST-PORT,6443))
+AND,((IP-CIDR,111.225.147.191/32,no-resolve),(DEST-PORT,6443))
+AND,((IP-CIDR,111.63.61.101/32,no-resolve),(DEST-PORT,6443))
+AND,((IP-CIDR,220.243.141.0/32,no-resolve),(DEST-PORT,6443))
+URL-REGEX,"^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/",REJECT,extended-matching
 
 # ======= R ======= #
 # RARBG 推广跳转
@@ -466,7 +459,6 @@ DOMAIN,swallowcrockerybless.com
 DOMAIN,sdk.beizi.biz
 # 什么值得买
 DOMAIN,api.zuihuimai.com
-DOMAIN,aaid.uyunad.com
 DOMAIN,acs4baichuan.m.taobao.com
 DOMAIN,adashxgc.ut.taobao.com
 DOMAIN,analytics-api.smzdm.com
@@ -521,7 +513,6 @@ DOMAIN,render-web.11222.cn
 # ======= T ======= #
 # 腾讯
 DOMAIN,adsmind.gdtimg.com
-DOMAIN,adsmind.ugdtimg.com
 DOMAIN,c2.gdt.qq.com
 DOMAIN,huatuocode.huatuo.qq.com
 DOMAIN,info4.video.qq.com
@@ -529,20 +520,11 @@ DOMAIN,info6.video.qq.com
 DOMAIN,ios.bugly.qq.com
 DOMAIN,pro.bugly.qq.com
 DOMAIN,ios.video.mpush.qq.com
-DOMAIN,us.l.qq.com
-DOMAIN,mi.gdt.qq.com
-DOMAIN,otheve.beacon.qq.com
 DOMAIN,pgdt.gtimg.cn
-DOMAIN,pgdt.ugdtimg.com
-DOMAIN,qzs.gdtimg.com
 DOMAIN,qzs.qq.com
 DOMAIN,rmonitor.qq.com
-DOMAIN,sdk.e.qq.com
 DOMAIN,sdkconfig.video.qq.com
 DOMAIN,t.gdt.qq.com
-DOMAIN,tmead.y.qq.com
-DOMAIN,tmeadbak.y.qq.com
-DOMAIN,tmeadcomm.y.qq.com
 DOMAIN,tpns.qq.com
 DOMAIN,v.gdt.qq.com
 DOMAIN,v2.gdt.qq.com
@@ -556,12 +538,8 @@ DOMAIN-SUFFIX,gdt.qq.com
 DOMAIN-SUFFIX,l.qq.com
 DOMAIN-SUFFIX,ugdtimg.com
 DOMAIN-SUFFIX,wxs.qq.com
-IP-CIDR,47.110.187.87/32
 # 淘宝
 DOMAIN,adashx.m.taobao.com
-DOMAIN,ossgw.alicdn.com
-DOMAIN,ems.youku.com
-DOMAIN,hudong.alicdn.com
 DOMAIN,h-adashx.ut.taobao.com
 DOMAIN,ut.taobao.com
 # Talkatone
@@ -678,7 +656,6 @@ DOMAIN,tracking.intl.miui.com
 DOMAIN,ads.95516.com
 DOMAIN,cm-10-138.getui.com
 DOMAIN,sdk.open.talk.getui.net
-DOMAIN,sdk-conf.getui.com
 DOMAIN,switch.cup.com.cn
 DOMAIN,tysdk.95516.com
 DOMAIN,ads.cup.com.cn
@@ -687,7 +664,6 @@ DOMAIN,cnlogs.umeng.com
 DOMAIN,errlog.umeng.com
 DOMAIN,errnewlog.umeng.com
 DOMAIN,ucc.umeng.com
-DOMAIN,ulogs.umeng.com
 DOMAIN,utoken.umeng.com
 DOMAIN,deeplink.umeng.com
 DOMAIN,aspect-upush.umeng.com
@@ -695,6 +671,20 @@ DOMAIN,plbslog.umeng.com
 DOMAIN,log.umtrack.com
 DOMAIN,aaid.umeng.com
 DOMAIN,log.umsns.com
+DOMAIN,sdk.tianmu.mobi
+DOMAIN,tracker.tianmu.mobi
+DOMAIN,api-htp.beizi.biz
+DOMAIN,ax.admobile.top
+DOMAIN,jump.admobile.top
+DOMAIN,adx.adtaipo.com
+DOMAIN,adx.kuaiyiad.com
+DOMAIN,adreport.adtianmai.com
+DOMAIN,adxapi.readgps.com
+DOMAIN,t.fanglinad.com
+DOMAIN,trk1.17admob.com
+DOMAIN,nfy.slyxmobi.com
+DOMAIN,api.mobrtb.com
+DOMAIN,ssp.maplehaze.cn
 
 # ======= Z ======= #
 # 知乎
@@ -708,12 +698,9 @@ IP-CIDR,118.89.204.198/32
 IP-CIDR,103.41.167.237/32
 IP-CIDR6,2402:4e00:1200:ed00:0:9089:6dac:96b6/128
 # 字节跳动
-DOMAIN,ad.zijieapi.com
 DOMAIN,applog.zijieapi.com
 DOMAIN-SUFFIX,-normal-lq.zijieapi.com
-DOMAIN-KEYWORD,-ad-sign.byteimg.com
 DOMAIN,httpdns.volcengineapi.com
-DOMAIN,dig.bdurl.net
 DOMAIN,dig.zjurl.cn
 # 中关村
 DOMAIN,apppv.zol.com.cn

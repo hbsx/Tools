@@ -34,6 +34,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          echo "开始下载 mihomo 规则文件..."
           repo_name=$(basename "$GITHUB_REPOSITORY")
           if [[ "$repo_name" != "Tools" ]]; then
               echo "当前仓库不是 Tools，跳过执行。"
@@ -87,14 +88,15 @@ jobs:
               curl -f -L "$url" -o "Tools-repo/Ruleset/mihomo/$file_name" || { echo "下载失败：$url"; exit 1; }
           done
 
-      # 提交更改并推送到仓库
       - name: 推送更新到 Tools-repo 仓库      # 检查变更并推送更新到 Tools-repo 仓库 main 分支
         shell: bash
         run: |
           set -euo pipefail
+          echo "检查仓库更新状态..."
           cd "${{ github.workspace }}/Tools-repo"
           git pull --rebase --autostash origin main
           if [[ -n $(git status --porcelain) ]]; then
+            echo "检测到变更，开始提交更新..."
             git pull --rebase --autostash origin main
             git config --local user.name "GitHub Actions"
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -119,7 +121,7 @@ jobs:
             📢 通知
             🚀 来源：GitHub Actions
             ✉️ 标题：同步上游规则
-            📦 仓库：JK789
+            📦 仓库：JK_789
             ⏰ 时间：${{ env.time }}
             🎉 状态：全部任务成功执行
 
@@ -129,5 +131,6 @@ jobs:
         with:
           # 设置保留的工作流运行记录天数为 0，即清除所有过期的记录
           retain_days: 0  # 过期记录保留天数设置为 0
-          # 保证至少保留最近 5 次的工作流运行记录，避免记录被全部清理
-          keep_minimum_runs: 5  # 最少保留 5 次工作流运行记录
+          # 保证至少保留最近 2 次的工作流运行记录，避免记录被全部清理
+          keep_minimum_runs: 2  # 最少保留 2 次工作流运行记录
+          

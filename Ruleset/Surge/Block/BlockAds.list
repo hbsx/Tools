@@ -1,6 +1,6 @@
 #!name = 广告拦截 & 补充版
 #!desc = 分流规则
-#!date = 2025-03-27 18:21:44
+#!date = 2025-03-27 20:52:30
 #!author = RuCu6 
 
 # ======= 0 ======= #
@@ -9,8 +9,14 @@ DOMAIN,ad.jia.360.cn
 DOMAIN,ad.iot.360.cn
 
 # ======= A ======= #
+# 阿里云盘
+IP-CIDR,203.107.1.1/24
 # 爱奇艺
 DOMAIN,api.iqiyi.com
+DOMAIN,access.if.iqiyi.com
+IP-CIDR,103.44.59.54/32
+IP-CIDR,111.63.147.158/32
+IP-CIDR,116.211.198.237/32
 # 艾狄墨搏 - 广告服务商
 DOMAIN,monitor.ssp.admobile.top
 DOMAIN,sdk.ssp.admobile.top
@@ -82,9 +88,9 @@ DOMAIN,dns.qiyipic.iqiyi.com
 DOMAIN,httpdns.n.shifen.com
 DOMAIN-SUFFIX,union.baidu.cn
 DOMAIN-SUFFIX,union.baidu.com
-URL-REGEX,"^http:\/\/180\.76\.76\.112\/v\d\/"
-URL-REGEX,"^http:\/\/180\.76\.76\.112\/v\d\/resolve"
-URL-REGEX,"^http:\/\/180\.76\.76\.220\/v\d\/resolve"
+URL-REGEX,^http:\/\/180\.76\.76\.112\/v\d\/
+URL-REGEX,^http:\/\/180\.76\.76\.112\/v\d\/resolve
+URL-REGEX,^http:\/\/180\.76\.76\.220\/v\d\/resolve
 IP-CIDR,186.76.76.200/32
 IP-CIDR,180.76.76.200/32
 # 百度地图
@@ -112,7 +118,7 @@ DOMAIN,abyss.cyapi.cn
 DOMAIN,ad.cyapi.cn
 DOMAIN,gather.colorfulclouds.net
 # 菜鸟
-AND,((URL-REGEX,"^http:\/\/.+\/amdc\/mobileDispatch",extended-matching),(USER-AGENT,"Cainiao4iPhone*"))
+AND,((URL-REGEX,^http:\/\/.+\/amdc\/mobileDispatch,extended-matching),(USER-AGENT,Cainiao4iPhone*))
 DOMAIN,adsmind.ugdtimg.com
 DOMAIN,amdc.m.youku.com
 DOMAIN,apiv4-iyes.youku.com
@@ -125,6 +131,13 @@ DOMAIN,vali-g1.cp31.ott.cibntv.net
 DOMAIN,vali-ugc.cp31.ott.cibntv.net
 DOMAIN,yk-ssp.ad.youku.com
 DOMAIN,ykad-data.youku.com
+
+# ======= D ======= #
+# 滴滴出行
+DOMAIN,hd.xiaojukeji.com
+DOMAIN,gwp.xiaojukeji.com
+AND,((IP-ASN,45090,no-resolve),(DEST-PORT,25641),(PROTOCOL,TCP))
+AND,((IP-ASN,63646,no-resolve),(DEST-PORT,25641),(PROTOCOL,TCP))
 
 # ======= F ======= #
 # Flurry
@@ -201,7 +214,7 @@ AND,((IP-CIDR,110.249.199.75/32,no-resolve),(DEST-PORT,6443))
 AND,((IP-CIDR,111.225.147.191/32,no-resolve),(DEST-PORT,6443))
 AND,((IP-CIDR,111.63.61.101/32,no-resolve),(DEST-PORT,6443))
 AND,((IP-CIDR,220.243.141.0/32,no-resolve),(DEST-PORT,6443))
-URL-REGEX,"^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/"
+URL-REGEX,^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/
 
 # ======= G ======= #
 # 工商银行
@@ -294,7 +307,7 @@ DOMAIN-KEYWORD,mapi.m.jd.com
 IP-CIDR,101.124.19.122/32
 IP-CIDR,103.224.222.208/32
 IP-CIDR6,2402:db40:5100:1011::5/128
-URL-REGEX,"^http:\/\/\w{32}\.jddebug\.com\/diagnose\?"
+URL-REGEX,^http:\/\/\w{32}\.jddebug\.com\/diagnose\?
 # 今日头条
 DOMAIN-KEYWORD,ad.toutiao.com
 DOMAIN-KEYWORD,clk.gentags.net
@@ -357,6 +370,16 @@ DOMAIN-SUFFIX,updatepage.kuwo.cn
 DOMAIN-SUFFIX,wa.kuwo.cn
 DOMAIN-SUFFIX,webstat.kuwo.cn
 DOMAIN-SUFFIX,rich.kuwo.cn
+IP-CIDR,111.206.98.63/32
+URL-REGEX,^http:\/\/rich\.kuwo\.cn\/AdService\/
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v\d\/user\/freeMode\/
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v\d\/app\/pasterAdvert\/
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v\d\/app\/startup\/config
+URL-REGEX,^http:\/\/rich\.kuwo\.cn\/EcomResourceServer\/
+URL-REGEX,^http:\/\/searchrecterm\.kuwo\.cn\/recterm\.s
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v\d\/app\/newMenuList\/menuListInfo
+URL-REGEX,^http:\/\/vip\d\.kuwo\.cn\/vip\/v\d\/sysinfo\?op=getRePayAndDoPayBox
+URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v\d\/album\/adBar\/
 URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v1\/album\/adBar
 URL-REGEX,^http:\/\/wapi\.kuwo\.cn\/openapi\/v1\/app\/pasterAdvert
 URL-REGEX,^http:\/\/mobilead\.kuwo\.cn\/MobileAdServer
@@ -412,6 +435,26 @@ DOMAIN,ggx03.miguvideo.com
 # 美数科技
 DOMAIN,sdk.1rtb.net
 DOMAIN,cdn.1rtb.com
+# 猫眼电影
+DOMAIN,ad.maoyan.com
+# 芒果
+DOMAIN,credits.bz.mgtv.com
+DOMAIN,credits2.bz.mgtv.com
+DOMAIN,credits3.bz.mgtv.com
+DOMAIN,dflow.bz.mgtv.com
+DOMAIN,encounter.bz.mgtv.com
+DOMAIN,floor.bz.mgtv.com
+DOMAIN,layer.bz.mgtv.com
+DOMAIN,mob.bz.mgtv.com
+DOMAIN,rc-topic-api.bz.mgtv.com
+DOMAIN,rprain.bz.mgtv.com
+DOMAIN,rprain.log.mgtv.com
+DOMAIN,vip.bz.mgtv.com
+DOMAIN-SUFFIX,da.mgtv.com
+URL-REGEX,^http:\/\/[\d\.]+:\d{5}\/\?cmd=indexes
+URL-REGEX,^http:\/\/[\d\.]+\/odin\/c1\/(channel\/ads|skin\/config)\?
+URL-REGEX,^http:\/\/mobile-thor\.api\.mgtv\.com\/v1\/vod\/cms\/list\?
+URL-REGEX,^http:\/\/mobileso\.bz\.mgtv\.com\/spotlight\/search\/v1\?
 
 # ======= O ======= #
 # Outlook
@@ -427,6 +470,8 @@ DOMAIN,ta.pinduoduo.com
 DOMAIN,th-a.pinduoduo.com
 DOMAIN,th-b.pinduoduo.com
 DOMAIN,th.pinduoduo.com
+AND,((URL-REGEX,^http:\/\/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\/d,extended-matching),(USER-AGENT,*com.xunmeng.pinduoduo*))
+AND,((URL-REGEX,^http:\/\/\[((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))\]\/d4\?,extended-matching),(USER-AGENT,*com.xunmeng.pinduoduo*))
 
 # ======= Q ======= #
 # QQ音乐
@@ -480,7 +525,7 @@ AND,((IP-CIDR,110.249.199.75/32,no-resolve),(DEST-PORT,6443))
 AND,((IP-CIDR,111.225.147.191/32,no-resolve),(DEST-PORT,6443))
 AND,((IP-CIDR,111.63.61.101/32,no-resolve),(DEST-PORT,6443))
 AND,((IP-CIDR,220.243.141.0/32,no-resolve),(DEST-PORT,6443))
-URL-REGEX,"^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/"
+URL-REGEX,^http:\/\/p\d+-be-pack-sign\.pglstatp-toutiao\.com\/(ad-app-package|web\.business\.image)\/
 
 # ======= R ======= #
 # RARBG 推广跳转
@@ -566,6 +611,8 @@ DOMAIN,win.gdt.qq.com
 DOMAIN,wup.imtt.qq.com
 DOMAIN,tpstelemetry.tencent.com
 DOMAIN,ii.gdt.qq.com
+DOMAIN,otheve.beacon.qq.com
+DOMAIN,vv6.video.qq.com
 DOMAIN-KEYWORD,trace.qq.com
 DOMAIN-KEYWORD,trace.video.qq.com
 DOMAIN-SUFFIX,gdt.qq.com
@@ -574,6 +621,10 @@ DOMAIN-SUFFIX,ugdtimg.com
 DOMAIN-SUFFIX,wxs.qq.com
 IP-CIDR,119.29.29.98/32
 IP-CIDR,119.29.29.99/32
+IP-CIDR,47.110.187.87/32
+URL-REGEX,^http:\/\/[\d\.:]*\/?(defaultts\.tc|vmind\.qqvideo\.tc|finderpdd\.video)\.qq\.com\/\w+
+URL-REGEX,^http:\/\/apd-vlive\.apdcdn\.tc\.qq\.com\/vmind\.qqvideo\.tc\.qq\.com\/\w+
+URL-REGEX,^http:\/\/apd-\w+\.v\.smtcdns\.com\/(defaultts|omts|vmind\.qqvideo)\.tc\.qq\.com\/\w+
 # 淘宝
 DOMAIN,httpdns.danuoyi.tbcache.com
 DOMAIN,adashx.m.taobao.com
@@ -619,6 +670,9 @@ DOMAIN,adx-bj.anythinktech.com
 DOMAIN,api.anythinktech.com
 DOMAIN,tk.anythinktech.com
 DOMAIN,da.anythinktech.com
+# 网易新闻
+DOMAIN,nex.163.com
+DOMAIN,gw.m.163.com
 # 微博
 DOMAIN,adstrategy.biz.weibo.com
 DOMAIN,kadmimage.biz.weibo.com
@@ -628,8 +682,8 @@ DOMAIN,sdkmonitor.biz.weibo.com
 DOMAIN,dns.weibo.cn
 IP-CIDR,39.97.130.51/32
 IP-CIDR,39.97.128.148/32
-URL-REGEX,"^http:\/\/api\.weibo\.cn\/2\/httpdns\/config"
-URL-REGEX,"^http:\/\/api\.weibo\.cn\/httpdns\/config"
+URL-REGEX,^http:\/\/api\.weibo\.cn\/2\/httpdns\/config
+URL-REGEX,^http:\/\/api\.weibo\.cn\/httpdns\/config
 # 微信小程序
 DOMAIN,wxsnsdy.wxs.qq.com
 DOMAIN,wxsmsdy.video.qq.com
@@ -688,8 +742,8 @@ IP-CIDR6,2409:8702:4860:10::4d/128,no-resolve
 DOMAIN,dns.weibo.cn
 IP-CIDR,39.97.130.51/32
 IP-CIDR,39.97.128.148/32
-URL-REGEX,"^http:\/\/api\.weibo\.cn\/2\/httpdns\/config"
-URL-REGEX,"^http:\/\/api\.weibo\.cn\/httpdns\/config"
+URL-REGEX,^http:\/\/api\.weibo\.cn\/2\/httpdns\/config
+URL-REGEX,^http:\/\/api\.weibo\.cn\/httpdns\/config
 
 # ======= X ======= #
 # 小象买菜 - 兜底TCP请求下发广告
@@ -710,6 +764,14 @@ DOMAIN,data.mistat.xiaomi.com
 DOMAIN,tracking.intl.miui.com
 DOMAIN,httpdns.browser.miui.com
 DOMAIN,resolver.msg.xiaomi.net
+# 闲鱼
+AND,((URL-REGEX,^http:\/\/.+\/amdc\/mobileDispatch,extended-matching),(USER-AGENT,%E9%97%B2%E9%B1%BC*))
+# 喜马拉雅
+DOMAIN,adse.ximalaya.com
+DOMAIN,adsehera.ximalaya.com
+DOMAIN,adse.wsa.ximalaya.com
+DOMAIN,adbehavior.ximalaya.com
+DOMAIN,adbehavior.wsa.ximalaya.com
 
 # ======= Y ======= #
 # 云闪付 开屏广告
@@ -745,6 +807,26 @@ DOMAIN,trk1.17admob.com
 DOMAIN,nfy.slyxmobi.com
 DOMAIN,api.mobrtb.com
 DOMAIN,ssp.maplehaze.cn
+# 优酷
+DOMAIN,acs4baichuan.m.taobao.com
+DOMAIN,adsmind.ugdtimg.com
+DOMAIN,amdc.m.youku.com
+DOMAIN,api.sm.cn
+DOMAIN,apiv4-iyes.youku.com
+DOMAIN,baichuan-sdk.alicdn.com
+DOMAIN,cad.youku.com
+DOMAIN,huichuan-mc.sm.cn
+DOMAIN,huichuan.sm.cn
+DOMAIN,iyes.youku.com
+DOMAIN,m-vali.cp31.ott.cibntv.net
+DOMAIN,mc.atm.youku.com
+DOMAIN,nbsdk-baichuan.alicdn.com
+DOMAIN,pre-acs.youku.com
+DOMAIN,vali-g1.cp31.ott.cibntv.net
+DOMAIN,vali-ugc.cp31.ott.cibntv.net
+DOMAIN,yk-ssp.ad.youku.com
+DOMAIN,ykad-data.youku.com
+DOMAIN,youku-acs.m.taobao.com
 
 # ======= Z ======= #
 # 知乎
@@ -758,7 +840,7 @@ IP-CIDR,118.89.204.198/32
 IP-CIDR,103.41.167.237/32
 IP-CIDR,118.89.204.198/23
 IP-CIDR6,2402:4e00:1200:ed00:0:9089:6dac:96b6/128
-URL-REGEX,"^http:\/\/103\.41\.167\.237\/v2\/resolv"
+URL-REGEX,^http:\/\/103\.41\.167\.237\/v2\/resolv
 # 字节跳动
 DOMAIN,applog.zijieapi.com
 DOMAIN-SUFFIX,-normal-lq.zijieapi.com
@@ -902,19 +984,19 @@ DOMAIN,httpdns.zybang.com
 DOMAIN,httpdns.calorietech.com
 DOMAIN,hd.xiaojukeji.com
 IP-CIDR,5.5.5.5/32
-URL-REGEX,"^http:\/\/47\.101\.175\.206\/resolve"
-URL-REGEX,"^http:\/\/47\.100\.123\.169\/resolve"
-URL-REGEX,"^http:\/\/120\.46\.169\.234\/resolve"
-URL-REGEX,"^http:\/\/121\.36\.72\.124\/resolve"
-URL-REGEX,"^http:\/\/116\.63\.10\.135\/resolve"
-URL-REGEX,"^http:\/\/117\.185\.228\.108\/resolve"
-URL-REGEX,"^http:\/\/117\.144\.238\.29\/resolve"
-URL-REGEX,"^http:\/\/122\.9\.7\.134\/resolve"
-URL-REGEX,"^http:\/\/101\.91\.140\.124\/resolve"
-URL-REGEX,"^http:\/\/101\.91\.140\.224\/resolve"
-URL-REGEX,"^http:\/\/122\.9\.13\.79\/resolve"
-URL-REGEX,"^http:\/\/122\.9\.15\.129\/resolve"
-URL-REGEX,"^http:\/\/112\.65\.200\.117\/resolve"
-URL-REGEX,"^http:\/\/112\.64\.218\.119\/resolve"
-URL-REGEX,"^http:\/\/114\.116\.215\.110\/resolve"
-URL-REGEX,"^http:\/\/116\.63\.10\.31\/resolve"
+URL-REGEX,^http:\/\/47\.101\.175\.206\/resolve
+URL-REGEX,^http:\/\/47\.100\.123\.169\/resolve
+URL-REGEX,^http:\/\/120\.46\.169\.234\/resolve
+URL-REGEX,^http:\/\/121\.36\.72\.124\/resolve
+URL-REGEX,^http:\/\/116\.63\.10\.135\/resolve
+URL-REGEX,^http:\/\/117\.185\.228\.108\/resolve
+URL-REGEX,^http:\/\/117\.144\.238\.29\/resolve
+URL-REGEX,^http:\/\/122\.9\.7\.134\/resolve
+URL-REGEX,^http:\/\/101\.91\.140\.124\/resolve
+URL-REGEX,^http:\/\/101\.91\.140\.224\/resolve
+URL-REGEX,^http:\/\/122\.9\.13\.79\/resolve
+URL-REGEX,^http:\/\/122\.9\.15\.129\/resolve
+URL-REGEX,^http:\/\/112\.65\.200\.117\/resolve
+URL-REGEX,^http:\/\/112\.64\.218\.119\/resolve
+URL-REGEX,^http:\/\/114\.116\.215\.110\/resolve
+URL-REGEX,^http:\/\/116\.63\.10\.31\/resolve

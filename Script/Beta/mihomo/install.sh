@@ -195,6 +195,8 @@ install_mihomo() {
     local folders="/root/mihomo"
     rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders"
+    check_distro
+    echo -e "${yellow}当前系统版本：${reset}[ ${green}${distro}${reset} ]"
     get_schema
     echo -e "${yellow}当前系统架构：${reset}[ ${green}${arch_raw}${reset} ]"
     download_version

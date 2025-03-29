@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 21:14:58
+#!date = 2025-03-29 21:21:53
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.508"
+sh_ver="0.1.509"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
@@ -94,6 +94,10 @@ show_status() {
     local file="/root/mihomo/mihomo"
     local version_file="/root/mihomo/version.txt"
     local install_status run_status auto_start software_version
+
+    # 确保检测 Alpine 还是 Systemd
+    distro=$(cat /etc/os-release | grep -E '^ID=' | cut -d= -f2)
+
     if [ ! -f "$file" ]; then
         install_status="${red}未安装${reset}"
         run_status="${red}未运行${reset}"
@@ -101,7 +105,9 @@ show_status() {
         software_version="${red}未安装${reset}"
     else
         install_status="${green}已安装${reset}"
+        
         if [ "$distro" = "alpine" ]; then
+            # 检测是否运行
             if [ -f "/run/mihomo.pid" ]; then
                 pid=$(cat /run/mihomo.pid)
                 if [ -d "/proc/$pid" ]; then
@@ -112,12 +118,16 @@ show_status() {
             else
                 run_status="${red}未运行${reset}"
             fi
-            if rc-status default 2>/dev/null | grep -q "mihomo"; then
+
+            # 检测开机自启（更严谨匹配）
+            if rc-status default 2>/dev/null | awk '{print $1}' | grep -qx "mihomo"; then
                 auto_start="${green}已设置${reset}"
             else
                 auto_start="${red}未设置${reset}"
             fi
+
         else
+            # systemd 模式
             if systemctl is-active --quiet mihomo; then
                 run_status="${green}已运行${reset}"
             else
@@ -129,12 +139,15 @@ show_status() {
                 auto_start="${red}未设置${reset}"
             fi
         fi
+
+        # 检测版本号
         if [ -f "$version_file" ]; then
             software_version=$(cat "$version_file")
         else
             software_version="${red}未安装${reset}"
         fi
     fi
+
     echo -e "安装状态：${install_status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"

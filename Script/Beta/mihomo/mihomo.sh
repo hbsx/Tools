@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 15:30:57
+#!date = 2025-03-29 15:35:35
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.505"
+sh_ver="0.1.506"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
@@ -168,19 +168,22 @@ service_mihomo() {
             start_menu
             return
         fi
+
+        # 对于 start 与 stop，使用 is_running_alpine 检测服务是否运行
         if [[ "$action" == "start" ]]; then
-            if rc-service mihomo status 2>/dev/null | grep -qi "running"; then
+            if is_running_alpine; then
                 echo -e "${yellow}已${action_text}，无需重复操作${reset}"
                 start_menu
                 return
             fi
         elif [[ "$action" == "stop" ]]; then
-            if ! rc-service mihomo status 2>/dev/null | grep -qi "running"; then
+            if ! is_running_alpine; then
                 echo -e "${yellow}已${action_text}，无需重复操作${reset}"
                 start_menu
                 return
             fi
         fi
+
         echo -e "${green}正在${action_text}请等待${reset}"
         sleep 1s
         case "$action" in

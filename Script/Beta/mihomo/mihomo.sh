@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-10 16:00
+#!date = 2025-03-29 15:00:01
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,12 +14,12 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.501"
+sh_ver="0.1.502"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
 
-# 自动检测系统类型
+# 自动检测系统类型，只支持 Alpine、Debian 和 Ubuntu
 check_distro() {
     if [ -f /etc/alpine-release ]; then
         distro="alpine"
@@ -187,7 +187,7 @@ service_mihomo() {
         return
     fi
 
-    # Debian/Ubuntu 部分使用 systemctl
+    # Debian/Ubuntu 部分均采用 systemctl
     if [[ "$action" == "enable" || "$action" == "disable" ]]; then
         local is_enabled
         is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")

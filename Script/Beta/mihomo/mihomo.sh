@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 15:08:44
+#!date = 2025-03-29 15:13:38
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -282,7 +282,7 @@ uninstall_mihomo() {
 install_mihomo() {
     check_network
     local folders="/root/mihomo"
-    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/install.sh"
+    local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
@@ -404,7 +404,7 @@ update_mihomo() {
 update_shell() {
     check_network
     local shell_file="/usr/bin/mihomo"
-    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/main/Script/mihomo/mihomo.sh"
+    local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/install.sh"
     local sh_new_ver
     sh_new_ver=$(wget --no-check-certificate -qO- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"

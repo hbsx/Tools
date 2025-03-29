@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 16:13:23
+#!date = 2025-03-29 20:19:42
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,10 +14,13 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.507"
-use_cdn=false
-distro="unknown"
+sh_ver="0.1.506"
 
+use_cdn=false
+distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
+
+
+# 定义 is_running_alpine 函数，通过检测 /run/mihomo.pid 及 /proc 中对应的进程目录判断服务是否在运行
 is_running_alpine() {
     if [ -f "/run/mihomo.pid" ]; then
         pid=$(cat /run/mihomo.pid)
@@ -28,24 +31,29 @@ is_running_alpine() {
     return 1
 }
 
+# 系统检测：支持 Alpine、Debian 和 Ubuntu
 check_distro() {
-    if [ -f /etc/alpine-release ] || grep -qi "alpine" /etc/os-release; then
-        distro="Alpine Linux"
+    if [ -f /etc/alpine-release ]; then
+        distro="alpine"
     elif [ -f /etc/os-release ]; then
         . /etc/os-release
-        case "$ID" in
-            debian) distro="Debian" ;;
-            ubuntu) distro="Ubuntu" ;;
-            *) 
-                echo -e "${red}不支持的系统：${ID:-未知}${reset}"
-                exit 1
-                ;;
-        esac
+        if echo "$ID" | grep -qi "alpine"; then
+            distro="alpine"
+        else
+            case "$ID" in
+                debian|ubuntu)
+                    distro="debian"
+                    ;;
+                *)
+                    echo -e "${red}不支持的系统：${ID}${reset}"
+                    exit 1
+                    ;;
+            esac
+        fi
     else
         echo -e "${red}无法识别当前系统类型${reset}"
         exit 1
     fi
-    echo -e "${green}检测到系统：${distro}${reset}"
 }
 
 check_network() {
@@ -171,6 +179,7 @@ service_mihomo() {
             start_menu
             return
         fi
+        # 对于 start/stop 操作使用 is_running_alpine 函数判断运行状态
         if [[ "$action" == "start" ]]; then
             if is_running_alpine; then
                 echo -e "${yellow}已${action_text}，无需重复操作${reset}"
@@ -184,6 +193,7 @@ service_mihomo() {
                 return
             fi
         fi
+
         echo -e "${green}正在${action_text}请等待${reset}"
         sleep 1s
         case "$action" in
@@ -199,6 +209,8 @@ service_mihomo() {
         start_menu
         return
     fi
+
+    # Debian/Ubuntu 使用 systemctl 管理服务
     if [[ "$action" == "enable" || "$action" == "disable" ]]; then
         local is_enabled
         is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
@@ -217,11 +229,13 @@ service_mihomo() {
         start_menu
         return
     fi
+
     if [[ "$action" == "logs" ]]; then
         echo -e "${green}正在实时查看 mihomo 日志，按 Ctrl+C 退出${reset}"
         journalctl -u mihomo -o cat -f
         return
     fi
+
     local service_status
     service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
     if [[ "$action" == "start" && "$service_status" == "active" ]] || 

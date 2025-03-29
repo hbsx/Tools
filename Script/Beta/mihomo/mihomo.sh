@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 20:19:42
+#!date = 2025-03-29 20:50:54
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.506"
+sh_ver="0.1.507"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
@@ -164,7 +164,13 @@ service_mihomo() {
             else
                 echo -e "${green}正在${action_text}请等待${reset}"
                 sleep 1s
-                rc-update add mihomo default && echo -e "${green}${action_text}成功${reset}" || echo -e "${red}${action_text}失败${reset}"
+                if rc-update add mihomo default; then
+                    echo -e "${green}${action_text}成功${reset}"
+                    logger -t mihomo "Alpine: ${action_text}成功"
+                else
+                    echo -e "${red}${action_text}失败${reset}"
+                    logger -t mihomo "Alpine: ${action_text}失败"
+                fi
             fi
             start_menu
             return
@@ -174,11 +180,18 @@ service_mihomo() {
             else
                 echo -e "${green}正在${action_text}请等待${reset}"
                 sleep 1s
-                rc-update del mihomo && echo -e "${green}${action_text}成功${reset}" || echo -e "${red}${action_text}失败${reset}"
+                if rc-update del mihomo; then
+                    echo -e "${green}${action_text}成功${reset}"
+                    logger -t mihomo "Alpine: ${action_text}成功"
+                else
+                    echo -e "${red}${action_text}失败${reset}"
+                    logger -t mihomo "Alpine: ${action_text}失败"
+                fi
             fi
             start_menu
             return
         fi
+
         # 对于 start/stop 操作使用 is_running_alpine 函数判断运行状态
         if [[ "$action" == "start" ]]; then
             if is_running_alpine; then
@@ -203,8 +216,10 @@ service_mihomo() {
         esac
         if [ $? -eq 0 ]; then
             echo -e "${green}${action_text}成功${reset}"
+            logger -t mihomo "Alpine: ${action_text}成功"
         else
             echo -e "${red}${action_text}失败${reset}"
+            logger -t mihomo "Alpine: ${action_text}失败"
         fi
         start_menu
         return
@@ -222,8 +237,10 @@ service_mihomo() {
             sleep 1s
             if systemctl "$action" mihomo; then
                 echo -e "${green}${action_text}成功${reset}"
+                logger -t mihomo "Debian/Ubuntu: ${action_text}成功"
             else
                 echo -e "${red}${action_text}失败${reset}"
+                logger -t mihomo "Debian/Ubuntu: ${action_text}失败"
             fi
         fi
         start_menu
@@ -248,8 +265,10 @@ service_mihomo() {
     sleep 1s
     if systemctl "$action" mihomo; then
         echo -e "${green}${action_text}成功${reset}"
+        logger -t mihomo "Debian/Ubuntu: ${action_text}成功"
     else
         echo -e "${red}${action_text}失败${reset}"
+        logger -t mihomo "Debian/Ubuntu: ${action_text}失败"
     fi
     start_menu
 }
@@ -455,10 +474,13 @@ config_mihomo() {
     check_network
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
-    local iface
+    local iface ipv4 ipv6 config_url
+
+    # 获取默认网卡及 IP 信息
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
@@ -470,53 +492,51 @@ config_mihomo() {
         2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
     esac
+
     config_url=$(get_url "$config_url")
-    wget -q -O "${config_file}" "$config_url" || { echo -e "${red}配置文件下载失败${reset}"; exit 1; }
+    wget -q -O "$config_file" "$config_url" || { 
+        echo -e "${red}配置文件下载失败${reset}"; exit 1; 
+    }
+
+    # 添加机场订阅信息
+    local proxy_providers="proxy-providers:"
+    local counter=1
     while true; do
-        read -p "请输入需要配置的机场数量（默认 1 个，最多 5 个）：" airport_count
-        airport_count=${airport_count:-1}
-        if [[ "$airport_count" =~ ^[1-5]$ ]]; then
-            break
-        else
-            echo -e "${red}无效的数量，请输入 1 到 5 之间的正整数${reset}"
-        fi
-    done
-    proxy_providers="proxy-providers:"
-    for ((i=1; i<=airport_count; i++)); do
-        read -p "请输入第 $i 个机场的订阅连接：" airport_url
-        read -p "请输入第 $i 个机场的名称：" airport_name
-        proxy_providers="$proxy_providers
-  provider_0$i:
-    url: \"$airport_url\"
+        read -p "请输入机场的订阅连接：" airport_url
+        read -p "请输入机场的名称：" airport_name
+        proxy_providers="${proxy_providers}
+  provider_$(printf "%02d" $counter):
+    url: \"${airport_url}\"
     type: http
     interval: 86400
     health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
     override:
-      additional-prefix: \"[$airport_name]\""
+      additional-prefix: \"[${airport_name}]\""
+        counter=$((counter + 1))
+        read -p "继续输入订阅？(或者输入 n/N 结束): " cont
+        if [[ "$cont" =~ ^[nN]$ ]]; then
+            break
+        fi
     done
+
+    # 将机场配置插入到配置文件中
     awk -v providers="$proxy_providers" '
-    /^# 机场配置/ {
-        print
-        print providers
-        next
-    }
-    { print }
+      /^# 机场配置/ { print; print providers; next }
+      { print }
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
+
     if [ "$distro" = "alpine" ]; then
         rc-service mihomo restart
     else
         systemctl daemon-reload
         systemctl restart mihomo
     fi
-    echo -e "${green}mihomo 配置完成，准备启动中${reset}"
-    echo -e ""
-    echo -e "${green}恭喜你，你的 mihomo 已成功启动并设置为开机自启，配置文件保存到 ${yellow}${config_file}${reset}"
-    echo -e ""
-    echo -e "${red}下面是 mihomo 管理面板地址和进入管理菜单命令${reset}"
+
+    echo -e "${green}配置完成，配置文件已保存到：${yellow}${config_file}${reset}"
+    echo -e "${red}mihomo 管理面板地址和管理命令：${reset}"
     echo -e "${cyan}=========================${reset}"
-    echo -e "${green}http://$ipv4:9090/ui ${reset}"
-    echo -e ""
-    echo -e "${yellow}mihomo          进入菜单 ${reset}"
+    echo -e "${green}http://$ipv4:9090/ui${reset}"
+    echo -e "${green}命令：mihomo 进入管理菜单${reset}"
     echo -e "${cyan}=========================${reset}"
     start_menu
 }

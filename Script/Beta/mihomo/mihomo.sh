@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 22:08:00
+#!date = 2025-03-29 22:15:50
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,22 +14,10 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.511"
+sh_ver="0.1.512"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
-
-
-# 定义 is_running_alpine 函数，通过检测 /run/mihomo.pid 及 /proc 中对应的进程目录判断服务是否在运行
-is_running_alpine() {
-    if [ -f "/run/mihomo.pid" ]; then
-        pid=$(cat /run/mihomo.pid)
-        if [ -d "/proc/$pid" ]; then
-            return 0
-        fi
-    fi
-    return 1
-}
 
 # 系统检测：支持 Alpine、Debian 和 Ubuntu
 check_distro() {
@@ -83,6 +71,16 @@ check_installation() {
         return 1
     fi
     return 0
+}
+
+is_running_alpine() {
+    if [ -f "/run/mihomo.pid" ]; then
+        pid=$(cat /run/mihomo.pid)
+        if [ -d "/proc/$pid" ]; then
+            return 0
+        fi
+    fi
+    return 1
 }
 
 start_menu() {
@@ -327,6 +325,8 @@ uninstall_mihomo() {
         echo ""
     elif [ "$distro" = "alpine" ] && [ ! -d "$folders" ]; then
         echo -e "${green}mihomo 卸载完成${reset}"
+        echo ""
+        echo -e "卸载成功，如果你想删除此脚本，则退出脚本后，输入 ${green}rm $shell_file -f${reset} 进行删除"
     else
         echo -e "${red}卸载过程中出现问题，请手动检查${reset}"
     fi

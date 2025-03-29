@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-03-29 15:13:38
+#!date = 2025-03-29 15:18:02
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -25,15 +25,19 @@ check_distro() {
         distro="alpine"
     elif [ -f /etc/os-release ]; then
         . /etc/os-release
-        case "$ID" in
-            debian|ubuntu)
-                distro="debian"
-                ;;
-            *)
-                echo -e "${red}不支持的系统：${ID}${reset}"
-                exit 1
-                ;;
-        esac
+        if echo "$ID" | grep -qi "alpine"; then
+            distro="alpine"
+        else
+            case "$ID" in
+                debian|ubuntu)
+                    distro="debian"
+                    ;;
+                *)
+                    echo -e "${red}不支持的系统：${ID}${reset}"
+                    exit 1
+                    ;;
+            esac
+        fi
     else
         echo -e "${red}无法识别当前系统类型${reset}"
         exit 1

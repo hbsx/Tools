@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-03-29 15:19:57
+#!date = 2025-03-29 16:09:40
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -16,32 +16,26 @@ reset="\033[0m"   ## 重置
 
 sh_ver="1.0.0"
 use_cdn=false
+distro="unknown"
 
-distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
-
-# 自动检测系统类型
 check_distro() {
-    if [ -f /etc/alpine-release ]; then
-        distro="alpine"
+    if [ -f /etc/alpine-release ] || grep -qi "alpine" /etc/os-release; then
+        distro="Alpine Linux"
     elif [ -f /etc/os-release ]; then
         . /etc/os-release
-        if echo "$ID" | grep -qi "alpine"; then
-            distro="alpine"
-        else
-            case "$ID" in
-                debian|ubuntu)
-                    distro="debian"
-                    ;;
-                *)
-                    echo -e "${red}不支持的系统：${ID}${reset}"
-                    exit 1
-                    ;;
-            esac
-        fi
+        case "$ID" in
+            debian) distro="Debian" ;;
+            ubuntu) distro="Ubuntu" ;;
+            *) 
+                echo -e "${red}不支持的系统：${ID:-未知}${reset}"
+                exit 1
+                ;;
+        esac
     else
         echo -e "${red}无法识别当前系统类型${reset}"
         exit 1
     fi
+    echo -e "${green}检测到系统：${distro}${reset}"
 }
 
 check_network() {

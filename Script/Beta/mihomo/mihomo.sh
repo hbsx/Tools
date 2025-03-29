@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 20:50:54
+#!date = 2025-03-29 21:14:58
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.507"
+sh_ver="0.1.508"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
@@ -37,19 +37,21 @@ check_distro() {
         distro="alpine"
     elif [ -f /etc/os-release ]; then
         . /etc/os-release
-        if echo "$ID" | grep -qi "alpine"; then
-            distro="alpine"
-        else
-            case "$ID" in
-                debian|ubuntu)
-                    distro="debian"
-                    ;;
-                *)
-                    echo -e "${red}不支持的系统：${ID}${reset}"
-                    exit 1
-                    ;;
-            esac
-        fi
+        case "$ID" in
+            debian)
+                distro="debian"
+                ;;
+            ubuntu)
+                distro="ubuntu"
+                ;;
+            alpine)
+                distro="alpine"
+                ;;
+            *)
+                echo -e "${red}不支持的系统：${ID}${reset}"
+                exit 1
+                ;;
+        esac
     else
         echo -e "${red}无法识别当前系统类型${reset}"
         exit 1
@@ -110,7 +112,7 @@ show_status() {
             else
                 run_status="${red}未运行${reset}"
             fi
-            if rc-update show | grep -q "mihomo"; then
+            if rc-status default 2>/dev/null | grep -q "mihomo"; then
                 auto_start="${green}已设置${reset}"
             else
                 auto_start="${red}未设置${reset}"
@@ -532,12 +534,7 @@ config_mihomo() {
         systemctl restart mihomo
     fi
 
-    echo -e "${green}配置完成，配置文件已保存到：${yellow}${config_file}${reset}"
-    echo -e "${red}mihomo 管理面板地址和管理命令：${reset}"
-    echo -e "${cyan}=========================${reset}"
-    echo -e "${green}http://$ipv4:9090/ui${reset}"
-    echo -e "${green}命令：mihomo 进入管理菜单${reset}"
-    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}配置完成"
     start_menu
 }
 

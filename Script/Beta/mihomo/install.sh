@@ -217,7 +217,7 @@ install_mihomo() {
 # 此处修改为无需先输入机场数量，而是循环提示输入，直到用户输入 n/N 表示结束
 config_mihomo() {
     local folders="/root/mihomo"
-    local config_file="${folders}/config.yaml"
+    local config_file="/root/mihomo/config.yaml"
     local iface ipv4 ipv6 config_url
 
     # 获取默认网卡及 IP 信息

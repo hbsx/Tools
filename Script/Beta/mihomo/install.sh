@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2024-12-20 11:30
+#!date = 2025-03-29 11:29:41
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -70,7 +70,7 @@ get_schema() {
 update_system() {
     if [ "$distro" = "alpine" ]; then
         apk update && apk upgrade
-        apk add curl git gzip wget nano iptables tzdata jq unzip
+        apk add curl git gzip wget nano iptables tzdata jq unzip openrc
     else
         apt update && apt upgrade -y
         apt install -y curl git gzip wget nano iptables tzdata jq unzip

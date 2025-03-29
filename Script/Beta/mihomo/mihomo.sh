@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 21:52:56
+#!date = 2025-03-29 22:08:00
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.510"
+sh_ver="0.1.511"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
@@ -289,9 +289,12 @@ logs_mihomo() { service_mihomo logs; }
 
 uninstall_mihomo() {
     check_installation || { start_menu; return; }
+    # 定义文件路径
     local folders="/root/mihomo"
     local shell_file="/usr/bin/mihomo"
+    local service_file="/etc/init.d/mihomo"
     local system_file="/etc/systemd/system/mihomo.service"
+    # 提示确认卸载
     read -p "$(echo -e "${red}警告：卸载后将删除当前配置和文件！\n${yellow}确认卸载 mihomo 吗？${reset} (y/n): ")" input
     case "$input" in
         [Yy]* ) echo -e "${green}mihomo 卸载中请等待${reset}" ;;
@@ -300,19 +303,23 @@ uninstall_mihomo() {
     esac
     sleep 2s
     echo -e "${green}mihomo 卸载命令已发出${reset}"
+    # Alpine 系统卸载逻辑
     if [ "$distro" = "alpine" ]; then
         rc-service mihomo stop 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
         rc-update del mihomo 2>/dev/null || { echo -e "${red}取消开机自启失败${reset}"; exit 1; }
+        rm -f "$service_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
     else
         systemctl stop mihomo.service 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
         systemctl disable mihomo.service 2>/dev/null || { echo -e "${red}禁用 mihomo 服务失败${reset}"; exit 1; }
         rm -f "$system_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
     fi
     rm -rf "$folders" || { echo -e "${red}删除相关文件夹失败${reset}"; exit 1; }
+    # 对于 Debian 或 Ubuntu 系统，重新加载 systemd 配置
     if [ "$distro" != "alpine" ]; then
         systemctl daemon-reload || { echo -e "${red}重新加载 systemd 配置失败${reset}"; exit 1; }
     fi
     sleep 3s
+    # 检查卸载是否成功
     if [ "$distro" = "debian" ] && [ ! -f "$system_file" ] && [ ! -d "$folders" ]; then
         echo -e "${green}mihomo 卸载完成${reset}"
         echo ""

@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 21:21:53
+#!date = 2025-03-29 21:41:43
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -181,10 +181,8 @@ service_mihomo() {
                 sleep 1s
                 if rc-update add mihomo default; then
                     echo -e "${green}${action_text}成功${reset}"
-                    logger -t mihomo "Alpine: ${action_text}成功"
                 else
                     echo -e "${red}${action_text}失败${reset}"
-                    logger -t mihomo "Alpine: ${action_text}失败"
                 fi
             fi
             start_menu
@@ -197,10 +195,8 @@ service_mihomo() {
                 sleep 1s
                 if rc-update del mihomo; then
                     echo -e "${green}${action_text}成功${reset}"
-                    logger -t mihomo "Alpine: ${action_text}成功"
                 else
                     echo -e "${red}${action_text}失败${reset}"
-                    logger -t mihomo "Alpine: ${action_text}失败"
                 fi
             fi
             start_menu
@@ -231,10 +227,8 @@ service_mihomo() {
         esac
         if [ $? -eq 0 ]; then
             echo -e "${green}${action_text}成功${reset}"
-            logger -t mihomo "Alpine: ${action_text}成功"
         else
             echo -e "${red}${action_text}失败${reset}"
-            logger -t mihomo "Alpine: ${action_text}失败"
         fi
         start_menu
         return
@@ -252,10 +246,8 @@ service_mihomo() {
             sleep 1s
             if systemctl "$action" mihomo; then
                 echo -e "${green}${action_text}成功${reset}"
-                logger -t mihomo "Debian/Ubuntu: ${action_text}成功"
             else
                 echo -e "${red}${action_text}失败${reset}"
-                logger -t mihomo "Debian/Ubuntu: ${action_text}失败"
             fi
         fi
         start_menu

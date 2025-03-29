@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 15:19:57
+#!date = 2025-03-29 15:30:57
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -14,7 +14,7 @@ blue="\033[34m"   ## 蓝色
 cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
-sh_ver="0.1.503"
+sh_ver="0.1.505"
 
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
@@ -88,8 +88,14 @@ show_status() {
     else
         install_status="${green}已安装${reset}"
         if [ "$distro" = "alpine" ]; then
-            if rc-service mihomo status 2>/dev/null | grep -qi "running"; then
-                run_status="${green}已运行${reset}"
+            # 使用 pid 文件检测服务是否运行
+            if [ -f "/run/mihomo.pid" ]; then
+                pid=$(cat /run/mihomo.pid)
+                if [ -d "/proc/$pid" ]; then
+                    run_status="${green}已运行${reset}"
+                else
+                    run_status="${red}未运行${reset}"
+                fi
             else
                 run_status="${red}未运行${reset}"
             fi

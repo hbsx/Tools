@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-03-29 14:55:20
+#!date = 2025-03-29 15:03:15
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -16,6 +16,7 @@ reset="\033[0m"   ## 重置
 
 sh_ver="1.0.0"
 use_cdn=false
+
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
 
 # 自动检测系统类型

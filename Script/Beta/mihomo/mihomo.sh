@@ -2,7 +2,7 @@
 
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-03-29 15:00:01
+#!date = 2025-03-29 15:03:15
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -15,8 +15,8 @@ cyan="\033[36m"   ## 青色
 reset="\033[0m"   ## 重置
 
 sh_ver="0.1.502"
-
 use_cdn=false
+
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
 
 # 自动检测系统类型，只支持 Alpine、Debian 和 Ubuntu

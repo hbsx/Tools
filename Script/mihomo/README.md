@@ -6,19 +6,19 @@
 >
 > 2.支持 tun 和 tproxy 两种模式，看你心情选择。理论上 TUN 占用高那么一丢丢！
 >
-> 3.本脚本支持 Alpine Debian Ubuntu 系统
+> 3.本脚本支持 Alpine Debian Fedora Ubuntu 系统
 
-## TUN 模式教程 {注意：好像需要直通（PVE 虚拟机下操作）}
+## 开启 TUN 模式 {注意：好像需要直通（PVE 虚拟机下操作）}
 
 ### 1.PVE 8.X 开启 tun
 
-### 1.1.在 PVE 虚拟机创建 LXC 容器，创建完成以后不要 启动虚拟机
+### 2.在 PVE 虚拟机创建 LXC 容器，创建完成以后不要 启动虚拟机
 
-### 1.2.选择刚刚创建的 LXC 容器，鼠标依次点击，资源 - 添加 - 直通设备（Device Passthrough） 如下图
+### 3.选择刚刚创建的 LXC 容器，鼠标依次点击，资源 - 添加 - 直通设备（Device Passthrough） 如下图
 
 ![image](https://github.com/user-attachments/assets/f185b446-cc76-4337-817b-0139f688445f)
 
-### 1.3.在里面填入下面代码 效果如下
+### 4.在里面填入下面代码 效果如下
 
 ```bash
 /dev/net/tun
@@ -26,28 +26,34 @@
 
 ![image](https://github.com/user-attachments/assets/7ad8bb51-d593-439a-9fdf-2649d3f44e82)
 
-### 1.3.如果你是 PVE 7.X 开启 TUN ，如下操作
+### 5.如果你是 PVE 7.X 开启 TUN ，如下操作
 
-#### 1.3.1.在 PVE 里面，依次 节点 - Shell 里面执行，如下图位置
+#### 5.1.在 PVE 里面，依次 节点 - Shell 里面执行，如下图位置
 
 ![image](https://github.com/user-attachments/assets/ba043dca-b12b-4b92-963c-4f809305ec11)
 
-#### 1.3.2.下面的 LXCID 修改成你的实际 ID (比如，我是 100 就改成 nano /etc/pve/lxc/100.conf)
+#### 5.2.下面的 LXCID 修改成你的实际 ID (比如，我是 100 就改成 nano /etc/pve/lxc/100.conf)
 
 ```bash
 nano /etc/pve/lxc/LXCID.conf
 ```
 
-#### 1.3.3.粘贴下面代码，然后用 Ctrl+X 保存，输入 Y 确认
+#### 5.3.粘贴下面代码，然后用 Ctrl+X 保存，输入 Y 确认
 
 ```bash
 lxc.cgroup2.devices.allow: c 10:200 rwm
 lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 ```
 
-## TProxy 模式 不需要其他额外操作，下面步骤都一样
+---
 
-## Debian Ubuntu 系统操作教程
+## 开启 TProxy 模式 不需要其他额外操作，下面步骤都一样
+
+---
+
+## 换源
+
+## Debian Ubuntu 系统
 
 ### 1.启动容器，然后使用下面命令，一键换源（清华源）
 
@@ -63,7 +69,7 @@ EOF
 ### 2.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
-echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && systemctl restart sshd
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd
 ```
 
 ### 3.更新系统
@@ -78,7 +84,7 @@ apt update && apt full-upgrade -y
 apt-get install -y curl git wget nano
 ```
 
-## Alpine 系统操作教程
+## Alpine 系统
 
 ### 1.1.启动容器，然后使用下面命令，一键换源（清华源）
 
@@ -112,6 +118,36 @@ apk update && apk upgrade
 apk add curl git wget nano bash
 ```
 
+## Fedora 系统
+
+### 01.启动容器，然后使用下面命令，一键换源（清华源）
+
+```bash
+sed -e 's|^metalink=|#metalink=|g' \
+    -e 's|^#baseurl=http://download.example/pub/fedora/linux|baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora|g' \
+    -i.bak \
+    /etc/yum.repos.d/fedora.repo \
+    /etc/yum.repos.d/fedora-updates.repo
+```
+
+### 02.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+dnf install openssh-server -y && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl enable sshd && systemctl restart sshd
+```
+
+### 03.更新系统
+
+```bash
+dnf upgrade --refresh -y
+```
+
+### 04.安装必须插件
+
+```bash
+dnf install -y curl git wget nano bash
+```
+
 ### 前期工作准备完毕，下面使用一键脚本安装 mihomo
 
 #### 已经加入自动识别网络环境功能，确保你的设备能正常联网就行
@@ -131,7 +167,7 @@ wget -O install.sh --no-check-certificate https://github.boki.moe/https://raw.gi
 ### 使用以下命令，检查 mihomo 的运行状况
 
 ```bash
-# Debian Ubuntu 系统
+# Debian Ubuntu Fedora 系统
 systemctl status mihomo
 
 # Alpine 系统
@@ -141,7 +177,7 @@ rc-service mihomo status
 ### 使用以下命令，检查 mihomo 的运行日志
 
 ```bash
-# Debian Ubuntu 系统
+# Debian Ubuntu Fedora 系统
 journalctl -u mihomo -o cat -e
 ```
 

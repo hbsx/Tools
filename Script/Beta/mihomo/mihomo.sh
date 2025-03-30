@@ -1,8 +1,8 @@
 #!/bin/bash
-# !name = mihomo 一键管理脚本
-# !desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-# !date = 2025-03-29 22:34:58
-# !author = ChatGPT
+#!name = mihomo 一键管理脚本
+#!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
+#!date = 2025-03-30 09:20:23
+#!author = ChatGPT
 
 set -e -o pipefail
 

@@ -1,8 +1,8 @@
 #!/bin/bash
-# !name = mihomo 一键安装脚本
-# !desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-# !date = 2025-03-29 20:21:08
-# !author = ChatGPT
+#!name = mihomo 一键安装脚本
+#!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
+#!date = 2025-03-30 09:20:23
+#!author = ChatGPT
 
 set -e -o pipefail
  

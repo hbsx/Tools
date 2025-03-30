@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 15:24:24
+#!date = 2025-03-30 15:25:02
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -174,9 +174,7 @@ download_version() {
 download_mihomo() {
     local version_file="/root/mihomo/version.txt"
     download_version
-
     local filename="mihomo-linux-${arch}-${version}.gz"
-    # 对于 amd64 架构使用兼容版本文件名
     if [ "$arch" == "amd64" ]; then
         filename="mihomo-linux-${arch}-compatible-${version}.gz"
     fi
@@ -186,13 +184,10 @@ download_mihomo() {
         echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"
         exit 1
     }
-    
     gunzip "$filename" || {
         echo -e "${red}mihomo 解压失败${reset}"
         exit 1
     }
-    
-    # 移动解压后的文件到当前目录下并重命名为 mihomo
     if [ -f "mihomo-linux-${arch}-compatible-${version}" ]; then
         mv "mihomo-linux-${arch}-compatible-${version}" mihomo
     elif [ -f "mihomo-linux-${arch}-${version}" ]; then
@@ -201,7 +196,6 @@ download_mihomo() {
         echo -e "${red}找不到解压后的文件${reset}"
         exit 1
     fi
-    
     chmod +x mihomo
     echo "$version" > "$version_file"
 }

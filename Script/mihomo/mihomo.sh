@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 17:01:55
+#!date = 2025-03-30 17:14:12
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -509,7 +509,7 @@ update_shell() {
     local shell_file="/usr/bin/mihomo"
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh"
     local sh_new_ver
-    sh_new_ver=$(wget -t 3 -T 30 -O- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    sh_new_ver=$(curl -sSL "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新，无需更新${reset}"
@@ -556,7 +556,7 @@ config_mihomo() {
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
     esac
     config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -O "$config_file" "$config_url" || { 
+    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
         echo -e "${red}配置文件下载失败${reset}"; exit 1; 
     }
     local proxy_providers="proxy-providers:"

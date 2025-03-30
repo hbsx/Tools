@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 17:04:43
+#!date = 2025-03-30 17:14:12
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -316,7 +316,7 @@ config_mihomo() {
             ;;
     esac
     config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -O "$config_file" "$config_url" || { 
+    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
         echo -e "${red}配置文件下载失败${reset}"
         exit 1
     }

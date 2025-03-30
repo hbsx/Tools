@@ -109,7 +109,7 @@ apk update && apk upgrade
 ### 4.1.安装必须插件
 
 ```bash
-apk add curl git wget nano
+apk add curl git wget nano bash
 ```
 
 ### 前期工作准备完毕，下面使用一键脚本安装 mihomo

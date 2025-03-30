@@ -6,7 +6,7 @@
 >
 > 2.支持 tun 和 tproxy 两种模式，看你心情选择。理论上 TUN 占用高那么一丢丢！
 >
-> 3.本脚本支持 Debian 和 Ubuntu 系统
+> 3.本脚本支持 Alpine Debian Ubuntu 系统
 
 ## TUN 模式教程 {注意：好像需要直通（PVE 虚拟机下操作）}
 
@@ -47,7 +47,9 @@ lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 
 ## TProxy 模式 不需要其他额外操作，下面步骤都一样
 
-### 2.启动容器，使用下面命令，一键换源
+## Debian Ubuntu 系统操作教程
+
+### 1.启动容器，然后使用下面命令，一键换源（清华源）
 
 ```bash
 cat << EOF > /etc/apt/sources.list
@@ -58,22 +60,56 @@ deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main 
 EOF
 ```
 
-### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+### 2.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
 echo "PermitRootLogin yes" >> /etc/ssh/sshd_config && systemctl restart sshd
 ```
 
-### 4.更新系统
+### 3.更新系统
 
 ```bash
 apt update && apt full-upgrade -y
 ```
 
-### 5.安装必须插件
+### 4.安装必须插件
 
 ```bash
 apt-get install -y curl git wget nano
+```
+
+## Alpine 系统操作教程
+
+### 1.1.启动容器，然后使用下面命令，一键换源（清华源）
+
+```bash
+cat << EOF > /etc/apk/repositories
+https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.21/main
+https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.21/community
+EOF
+```
+
+### 2.1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+apk add --no-cache openssh && \
+mkdir -p /etc/ssh && ssh-keygen -A && \
+sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+rc-service sshd start && \
+rc-update add sshd
+```
+
+### 3.1.更新系统
+
+```bash
+apk update && apk upgrade
+```
+
+### 4.1.安装必须插件
+
+```bash
+apk add curl git wget nano
 ```
 
 ### 前期工作准备完毕，下面使用一键脚本安装 mihomo
@@ -115,6 +151,10 @@ wget -O install.sh --no-check-certificate https://raw.githubusercontent.com/Abcd
 ### 支持 Debian Ubuntu alpine 系统
 
 ```bash
+# 二选一
+ln -sf /usr/share/zoneinfo/Asia/Hong_Kong /etc/localtime
+echo "Asia/Hong_Kong" > /etc/timezone
+
 cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 echo "Asia/Shanghai" | tee /etc/timezone > /dev/null
 ```

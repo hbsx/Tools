@@ -53,9 +53,9 @@ lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 
 ## 换源
 
-## Debian Ubuntu 系统
+## Debian 系统清华源
 
-### 1.启动容器，然后使用下面命令，一键换源（清华源）
+### 1.启动容器，然后使用下面命令，一键换源
 
 ```bash
 cat << EOF > /etc/apt/sources.list
@@ -66,27 +66,28 @@ deb https://mirrors.tuna.tsinghua.edu.cn/debian-security bookworm-security main 
 EOF
 ```
 
-### 2.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+## Ubuntu 系统清华源
 
 ```bash
-sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd
+cat << EOF > /etc/apt/sources.list
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ kinetic main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ kinetic-updates main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ kinetic-backports main restricted universe multiverse
+deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ kinetic-security main restricted universe multiverse
+EOF
 ```
 
-### 3.更新系统
+## Fedora 系统清华源
 
 ```bash
-apt update && apt full-upgrade -y
+sed -e 's|^metalink=|#metalink=|g' \
+    -e 's|^#baseurl=http://download.example/pub/fedora/linux|baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora|g' \
+    -i.bak \
+    /etc/yum.repos.d/fedora.repo \
+    /etc/yum.repos.d/fedora-updates.repo
 ```
 
-### 4.安装必须插件
-
-```bash
-apt-get install -y curl git wget nano
-```
-
-## Alpine 系统
-
-### 1.1.启动容器，然后使用下面命令，一键换源（清华源）
+## Alpine 系统清华源
 
 ```bash
 cat << EOF > /etc/apk/repositories
@@ -95,7 +96,49 @@ https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.21/community
 EOF
 ```
 
-### 2.1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+## Debian Ubuntu 系统
+
+### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd
+```
+
+### 2.更新系统
+
+```bash
+apt update && apt full-upgrade -y
+```
+
+### 3.安装必须插件
+
+```bash
+apt-get install -y curl git wget nano
+```
+
+## Fedora 系统
+
+### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+dnf install openssh-server -y && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl enable sshd && systemctl restart sshd
+```
+
+### 2.更新系统
+
+```bash
+dnf upgrade --refresh -y
+```
+
+### 3.安装必须插件
+
+```bash
+dnf install -y curl git wget nano bash
+```
+
+## Alpine 系统
+
+### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
 apk add --no-cache openssh && \
@@ -106,47 +149,19 @@ rc-service sshd start && \
 rc-update add sshd
 ```
 
-### 3.1.更新系统
+### 2.更新系统
 
 ```bash
 apk update && apk upgrade
 ```
 
-### 4.1.安装必须插件
+### 3.安装必须插件
 
 ```bash
 apk add curl git wget nano bash
 ```
 
-## Fedora 系统
-
-### 01.启动容器，然后使用下面命令，一键换源（清华源）
-
-```bash
-sed -e 's|^metalink=|#metalink=|g' \
-    -e 's|^#baseurl=http://download.example/pub/fedora/linux|baseurl=https://mirrors.tuna.tsinghua.edu.cn/fedora|g' \
-    -i.bak \
-    /etc/yum.repos.d/fedora.repo \
-    /etc/yum.repos.d/fedora-updates.repo
-```
-
-### 02.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
-
-```bash
-dnf install openssh-server -y && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl enable sshd && systemctl restart sshd
-```
-
-### 03.更新系统
-
-```bash
-dnf upgrade --refresh -y
-```
-
-### 04.安装必须插件
-
-```bash
-dnf install -y curl git wget nano bash
-```
+---
 
 ### 前期工作准备完毕，下面使用一键脚本安装 mihomo
 

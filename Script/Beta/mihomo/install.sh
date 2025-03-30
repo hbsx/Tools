@@ -6,25 +6,33 @@
 
 set -e -o pipefail
 
-# 定义颜色变量
-red="\033[31m"    
-green="\033[32m"  
-yellow="\033[33m" 
-blue="\033[34m"   
-cyan="\033[36m"   
-reset="\033[0m"   
+#############################
+#         颜色变量         #
+#############################
+red="\033[31m"    # 红色
+green="\033[32m"  # 绿色
+yellow="\033[33m" # 黄色
+blue="\033[34m"   # 蓝色
+cyan="\033[36m"   # 青色
+reset="\033[0m"   # 重置 
 
+#############################
+#       全局变量定义       #
+#############################
 sh_ver="1.0.0"
 use_cdn=false
-distro="unknown"
+distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
+arch=""           # 系统架构
+arch_raw=""       # 原始架构信息
 
-# 全局变量：包管理命令及服务管理函数
+# 包管理与服务管理命令变量
 pkg_update=""
 pkg_install=""
-service_enable=""
-service_restart=""
+# service_enable 与 service_restart 根据系统类型定义为函数
 
-# 检测系统类型：支持 alpine、debian、ubuntu（分别显示）
+#############################
+#       系统检测函数       #
+#############################
 check_distro() {
     if [ -f /etc/alpine-release ]; then
         distro="alpine"
@@ -50,7 +58,7 @@ check_distro() {
         exit 1
     fi
 
-    # 根据系统类型统一设置包管理和服务管理命令
+    # 根据系统类型设置包管理命令和服务管理函数
     if [ "$distro" = "alpine" ]; then
         pkg_update="apk update && apk upgrade"
         pkg_install="apk add"
@@ -64,51 +72,85 @@ check_distro() {
     fi
 }
 
-# 检查网络状态，如无法访问 Google 则启用 CDN 代理
+#############################
+#       网络检测函数       #
+#############################
 check_network() {
+    # 检测是否能访问 Google，不可访问则启用 CDN
     if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
         use_cdn=true
     fi
 }
 
-# 根据 CDN 状态返回最终 URL，并测试连通性
+#############################
+#        URL 处理函数       #
+#############################
 get_url() {
     local url=$1
     local final_url
-    final_url=$([ "$use_cdn" = true ] && echo "https://gh-proxy.com/$url" || echo "$url")
+    # 根据 CDN 状态返回对应 URL
+    if [ "$use_cdn" = true ]; then
+        final_url="https://gh-proxy.com/$url"
+    else
+        final_url="$url"
+    fi
+
+    # 测试连通性，若失败则退出
     if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
         echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
         exit 1
     fi
+
     echo "$final_url"
 }
 
-# 获取系统架构信息，并转换为标准格式
+#############################
+#      系统架构检测函数     #
+#############################
 get_schema() {
     arch_raw=$(uname -m)
     case "$arch_raw" in
-        x86_64)      arch='amd64' ;;
-        x86|i686|i386) arch='386' ;;
-        aarch64|arm64) arch='arm64' ;;
-        armv7l)      arch='armv7' ;;
-        s390x)       arch='s390x' ;;
-        *) echo -e "${red}不支持的架构：${arch_raw}${reset}"; exit 1 ;;
+        x86_64)
+            arch='amd64'
+            ;;
+        x86|i686|i386)
+            arch='386'
+            ;;
+        aarch64|arm64)
+            arch='arm64'
+            ;;
+        armv7l)
+            arch='armv7'
+            ;;
+        s390x)
+            arch='s390x'
+            ;;
+        *)
+            echo -e "${red}不支持的架构：${arch_raw}${reset}"
+            exit 1
+            ;;
     esac
 }
 
-# 更新系统及安装必要软件包（使用预设变量）
+#############################
+#     系统更新及安装函数    #
+#############################
 update_system() {
     eval "$pkg_update"
-    eval "$pkg_install curl git gzip wget nano iptables tzdata jq unzip" 
+    eval "$pkg_install curl git gzip wget nano iptables tzdata jq unzip"
 }
 
-# 开启 IPv4 与 IPv6 转发
+#############################
+#    IPv4/IPv6 转发检查    #
+#############################
 check_ip_forward() {
     local sysctl_file="/etc/sysctl.conf"
+    # 检查并开启 IPv4 转发
     sysctl net.ipv4.ip_forward | grep -q "1" || {
         sysctl -w net.ipv4.ip_forward=1
         echo "net.ipv4.ip_forward=1" >> "$sysctl_file"
     }
+    # 检查并开启 IPv6 转发
     sysctl net.ipv6.conf.all.forwarding | grep -q "1" || {
         sysctl -w net.ipv6.conf.all.forwarding=1
         echo "net.ipv6.conf.all.forwarding=1" >> "$sysctl_file"
@@ -116,43 +158,69 @@ check_ip_forward() {
     sysctl -p > /dev/null
 }
 
-# 下载远程版本号
+#############################
+#      远程版本获取函数     #
+#############################
 download_version() {
     local version_url
     version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
     version=$(curl -sSL "$version_url") || { 
-        echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; 
+        echo -e "${red}获取 mihomo 远程版本失败${reset}"
+        exit 1
     }
 }
 
-# 下载并解压 mihomo 可执行文件
+#############################
+#     mihomo 下载函数      #
+#############################
 download_mihomo() {
     local version_file="/root/mihomo/version.txt"
     download_version
+
     local filename="mihomo-linux-${arch}-${version}.gz"
-    [[ "$arch" == "amd64" ]] && filename="mihomo-linux-${arch}-compatible-${version}.gz"
+    # 对于 amd64 架构使用兼容版本文件名
+    if [ "$arch" == "amd64" ]; then
+        filename="mihomo-linux-${arch}-compatible-${version}.gz"
+    fi
+
     local download_url
     download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
+    
     wget -t 3 -T 30 "$download_url" -O "$filename" || { 
-        echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"; exit 1; 
+        echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"
+        exit 1
     }
-    gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
-    mv "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || \
-    mv "mihomo-linux-${arch}-${version}" mihomo || { 
-        echo -e "${red}找不到解压后的文件${reset}"; exit 1; 
+    
+    gunzip "$filename" || {
+        echo -e "${red}mihomo 解压失败${reset}"
+        exit 1
     }
+    
+    # 移动解压后的文件到当前目录下并重命名为 mihomo
+    if [ -f "mihomo-linux-${arch}-compatible-${version}" ]; then
+        mv "mihomo-linux-${arch}-compatible-${version}" mihomo
+    elif [ -f "mihomo-linux-${arch}-${version}" ]; then
+        mv "mihomo-linux-${arch}-${version}" mihomo
+    else
+        echo -e "${red}找不到解压后的文件${reset}"
+        exit 1
+    fi
+    
     chmod +x mihomo
     echo "$version" > "$version_file"
 }
 
-# 下载系统服务配置文件，并调用统一的服务启用函数
+#############################
+#   系统服务配置下载函数    #
+#############################
 download_service() {
     if [ "$distro" = "alpine" ]; then
         local service_file="/etc/init.d/mihomo"
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc")
         wget -q -O "$service_file" "$service_url" || { 
-            echo -e "${red}Alpine 服务下载失败${reset}"; exit 1; 
+            echo -e "${red}Alpine 服务下载失败${reset}"
+            exit 1
         }
         chmod +x "$service_file"
         service_enable
@@ -161,46 +229,59 @@ download_service() {
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service")
         curl -s -o "$system_file" "$service_url" || { 
-            echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"; exit 1; 
+            echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
+            exit 1
         }
         chmod +x "$system_file"
         service_enable
     fi
 }
 
-# 下载管理面板文件
+#############################
+#     管理面板文件下载      #
+#############################
 download_wbeui() {
     local wbe_file="/root/mihomo/ui"
     local wbe_url="https://github.com/metacubex/metacubexd.git"
     git clone "$wbe_url" -b gh-pages "$wbe_file" || { 
-        echo -e "${red}管理面板下载失败，请检查网络后重试${reset}"; exit 1; 
+        echo -e "${red}管理面板下载失败，请检查网络后重试${reset}"
+        exit 1
     }
 }
 
-# 下载 mihomo 管理脚本到 /usr/bin
+#############################
+#    管理脚本下载函数      #
+#############################
 download_shell() {
     local shell_file="/usr/bin/mihomo"
     local sh_url
     sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { 
-        echo -e "${red}mihomo 管理脚本下载失败，请检查网络后重试${reset}"; exit 1; 
+        echo -e "${red}mihomo 管理脚本下载失败，请检查网络后重试${reset}"
+        exit 1
     }
     chmod +x "$shell_file"
     hash -r
 }
 
-# 安装 mihomo：下载文件、服务、管理面板及脚本，并提示后续配置
+#############################
+#       安装主流程函数      #
+#############################
 install_mihomo() {
     local folders="/root/mihomo"
     rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders"
+
     check_distro
     echo -e "${yellow}当前系统版本：${reset}[ ${green}${distro}${reset} ]"
+
     get_schema
     echo -e "${yellow}当前系统架构：${reset}[ ${green}${arch_raw}${reset} ]"
+
     download_version
     echo -e "${yellow}当前软件版本：${reset}[ ${green}${version}${reset} ]"
+
     download_mihomo
     download_service
     download_wbeui
@@ -208,15 +289,23 @@ install_mihomo() {
 
     read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}也可上传自定义配置到 ${folders} (文件名必须为 config.yaml)\n${red}是否继续${green}(y/n): ${reset}")" confirm
     case "$confirm" in
-        [Yy]*) config_mihomo ;;
-        [Nn]*) echo -e "${green}跳过配置文件下载${reset}" ;;
-         *) echo -e "${red}无效选择，跳过配置文件下载${reset}" ;;
+        [Yy]*)
+            config_mihomo
+            ;;
+        [Nn]*)
+            echo -e "${green}跳过配置文件下载${reset}"
+            ;;
+         *)
+            echo -e "${red}无效选择，跳过配置文件下载${reset}"
+            ;;
     esac
+
     rm -f /root/install.sh
 }
 
-# 下载并生成配置文件，同时添加机场订阅信息
-# 此处修改为无需先输入机场数量，而是循环提示输入，直到用户输入 n/N 表示结束
+#############################
+#      配置文件生成函数     #
+#############################
 config_mihomo() {
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
@@ -227,6 +316,7 @@ config_mihomo() {
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
 
+    # 提示选择运行模式
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
@@ -234,17 +324,25 @@ config_mihomo() {
     read -p "$(echo -e "${green}请选择运行模式（推荐使用 TUN 模式）请输入选择(1/2): ${reset}")" confirm
     confirm=${confirm:-1}
     case "$confirm" in
-        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
-        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
-        *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
+        1)
+            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+            ;;
+        2)
+            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
+            ;;
+        *)
+            echo -e "${red}无效选择，跳过配置文件下载。${reset}"
+            return
+            ;;
     esac
 
     config_url=$(get_url "$config_url")
     wget -q -O "$config_file" "$config_url" || { 
-        echo -e "${red}配置文件下载失败${reset}"; exit 1; 
+        echo -e "${red}配置文件下载失败${reset}"
+        exit 1
     }
 
-    # 添加机场订阅信息
+    # 循环提示添加机场订阅信息
     local proxy_providers="proxy-providers:"
     local counter=1
     while true; do
@@ -265,7 +363,7 @@ config_mihomo() {
         fi
     done
 
-    # 将机场配置插入到配置文件中
+    # 将机场订阅信息插入到配置文件中（插入到 "# 机场配置" 行后）
     awk -v providers="$proxy_providers" '
       /^# 机场配置/ { print; print providers; next }
       { print }
@@ -281,7 +379,9 @@ config_mihomo() {
     echo -e "${cyan}=========================${reset}"
 }
 
-# 主流程：依次执行系统检测、网络检查、更新系统、开启转发及安装
+#############################
+#          主流程          #
+#############################
 check_distro
 check_network
 update_system

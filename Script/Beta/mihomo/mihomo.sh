@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 17:17:45
+#!date = 2025-03-30 17:23:08
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -19,7 +19,7 @@ reset="\033[0m"   # 重置
 #############################
 #       全局变量定义       #
 #############################
-sh_ver="0.1.521"
+sh_ver="0.1.520"
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
 arch=""           # 系统架构（转换后的标准格式）
@@ -510,7 +510,6 @@ update_shell() {
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh"
     local sh_new_ver
     sh_new_ver=$(curl -sSL "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
-    # sh_new_ver=$(wget -t 3 -T 30 -O- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新，无需更新${reset}"

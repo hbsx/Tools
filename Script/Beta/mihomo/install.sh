@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 15:25:02
+#!date = 2025-03-30 16:24:54
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -172,15 +172,15 @@ download_version() {
 #     mihomo 下载函数      #
 #############################
 download_mihomo() {
+    local download_url
     local version_file="/root/mihomo/version.txt"
-    download_version
     local filename="mihomo-linux-${arch}-${version}.gz"
+    download_version
     if [ "$arch" == "amd64" ]; then
         filename="mihomo-linux-${arch}-compatible-${version}.gz"
     fi
-    local download_url
     download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
-    wget -t 3 -T 30 "$download_url" -O "$filename" || { 
+    wget -t 3 -T 30 -q -O "$filename" "$download_url" || { 
         echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"
         exit 1
     }
@@ -208,7 +208,7 @@ download_service() {
         local service_file="/etc/init.d/mihomo"
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc")
-        wget -q -O "$service_file" "$service_url" || { 
+        wget -t 3 -T 30 -q -O "$service_file" "$service_url" || { 
             echo -e "${red}Alpine 服务下载失败${reset}"
             exit 1
         }
@@ -218,7 +218,7 @@ download_service() {
         local system_file="/etc/systemd/system/mihomo.service"
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service")
-        curl -s -o "$system_file" "$service_url" || { 
+        wget -t 3 -T 30 -q -O "$system_file" "$service_url" || { 
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
         }
@@ -247,7 +247,7 @@ download_shell() {
     local sh_url
     sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
-    wget -q -O "$shell_file" "$sh_url" || {
+    wget -t 3 -T 30 -q -O "$shell_file" "$sh_url" || {
         echo -e "${red}mihomo 管理脚本下载失败，请检查网络后重试${reset}"
         exit 1
     }
@@ -316,7 +316,7 @@ config_mihomo() {
             ;;
     esac
     config_url=$(get_url "$config_url")
-    wget -q -O "$config_file" "$config_url" || { 
+    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
         echo -e "${red}配置文件下载失败${reset}"
         exit 1
     }

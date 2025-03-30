@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 09:20:23
+#!date = 2025-03-30 10:10:52
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -34,9 +34,7 @@ pkg_install=""
 #       系统检测函数       #
 #############################
 check_distro() {
-    if [ -f /etc/alpine-release ]; then
-        distro="alpine"
-    elif [ -f /etc/os-release ]; then
+    if [ -f /etc/os-release ]; then
         . /etc/os-release
         case "$ID" in
             debian)

@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 10:10:52
+#!date = 2025-03-30 11:35:33
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -46,6 +46,9 @@ check_distro() {
             alpine)
                 distro="alpine"
                 ;;
+            fedora)
+                distro="fedora"
+                ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
                 exit 1
@@ -62,6 +65,11 @@ check_distro() {
         pkg_install="apk add"
         service_enable() { rc-update add mihomo default; }
         service_restart() { rc-service mihomo restart; }
+    elif [ "$distro" = "fedora" ]; then
+        pkg_update="dnf update -y"
+        pkg_install="dnf install -y"
+        service_enable() { systemctl enable mihomo; }
+        service_restart() { systemctl restart mihomo; }
     else
         pkg_update="apt update && apt upgrade -y"
         pkg_install="apt install -y"

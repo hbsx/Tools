@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 10:10:52
+#!date = 2025-03-30 11:35:33
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -19,7 +19,7 @@ reset="\033[0m"   # 重置
 #############################
 #       全局变量定义       #
 #############################
-sh_ver="0.1.518"
+sh_ver="0.1.519"
 use_cdn=false
 distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
 arch=""           # 系统架构（转换后的标准格式）
@@ -40,6 +40,9 @@ check_distro() {
                 ;;
             alpine)
                 distro="alpine"
+                ;;
+            fedora)
+                distro="fedora"
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"

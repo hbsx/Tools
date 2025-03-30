@@ -131,12 +131,17 @@ wget -O install.sh --no-check-certificate https://github.boki.moe/https://raw.gi
 ### 使用以下命令，检查 mihomo 的运行状况
 
 ```bash
+# Debian Ubuntu 系统
 systemctl status mihomo
+
+# Alpine 系统
+rc-service mihomo status
 ```
 
 ### 使用以下命令，检查 mihomo 的运行日志
 
 ```bash
+# Debian Ubuntu 系统
 journalctl -u mihomo -o cat -e
 ```
 

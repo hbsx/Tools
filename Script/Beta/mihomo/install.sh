@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 11:56:28
+#!date = 2025-03-30 14:46:45
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -66,7 +66,7 @@ check_distro() {
         service_enable() { rc-update add mihomo default; }
         service_restart() { rc-service mihomo restart; }
     elif [ "$distro" = "fedora" ]; then
-        pkg_update="dnf update && dnf upgrade -y"
+        pkg_update="dnf upgrade --refresh -y"
         pkg_install="dnf install -y"
         service_enable() { systemctl enable mihomo; }
         service_restart() { systemctl restart mihomo; }

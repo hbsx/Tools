@@ -1,17 +1,17 @@
 #!name = mihomo TProxy 配置文件
 #!desc = 说明：理论上适用于所有的 Meta 内核，使用最新的 mrs 规则
-#!date = 2024-11-09 11:20
+#!date = 2025-03-30 17:35:27
 #!source = https://wiki.metacubex.one/example/conf/#__tabbed_1_2
 #!author = MetaCubeX
 
 # 机场配置
 
+
 proxies: 
   - name: "直连"
     type: direct
     udp: true
-    
-# 全局配置
+
 ipv6: true
 allow-lan: true
 mixed-port: 7890
@@ -19,7 +19,6 @@ tproxy-port: 7891
 unified-delay: true
 tcp-concurrent: true
 
-# 配置 WEB UI
 external-ui: ui
 external-controller: 0.0.0.0:9090
 external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-pages.zip"
@@ -27,12 +26,10 @@ external-ui-url: "https://github.com/MetaCubeX/metacubexd/archive/refs/heads/gh-
 find-process-mode: strict
 global-client-fingerprint: chrome
 
-# profile 应为扩展配置，但在 mihomo, 仅作为缓存项使用
 profile:
   store-selected: true
   store-fake-ip: true
 
-# 嗅探域名 可选配置
 sniffer:
   enable: true
   sniff:
@@ -47,7 +44,6 @@ sniffer:
     - "Mijia Cloud"
     - "+.push.apple.com"
 
-# 自动配置 iptables
 iptables: 
   enable: true
   inbound-interface: eth0
@@ -55,7 +51,7 @@ iptables:
 dns:
   enable: true
   ipv6: true
-  listen: 0.0.0.0:53
+  listen: 0.0.0.0:1053
   enhanced-mode: fake-ip
   fake-ip-filter:
     - "*"
@@ -110,14 +106,6 @@ proxy-groups:
   - name: Github
     type: select
     proxies:  [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
-
-  - name: TikTok
-    type: select
-    proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
-
-  - name: Openai
-    type: select
-    proxies: [默认,香港,台湾,日本,新加坡,美国,其它地区,全部节点,自动选择,直连]
 
   - name: 国内
     type: select
@@ -177,7 +165,6 @@ proxy-groups:
 
 rules:
   - RULE-SET,private_ip,直连,no-resolve
-  - RULE-SET,ads_domain,REJECT
   - RULE-SET,github_domain,Github
   - RULE-SET,twitter_domain,Twitter
   - RULE-SET,youtube_domain,YouTube
@@ -187,8 +174,6 @@ rules:
   - RULE-SET,bilibili_domain,哔哩哔哩
   - RULE-SET,bahamut_domain,巴哈姆特
   - RULE-SET,spotify_domain,Spotify
-  - RULE-SET,openai_domain,Openai
-  - RULE-SET,tiktok_domain,TikTok
   - RULE-SET,cn_domain,国内
   - RULE-SET,geolocation-!cn,其他
 
@@ -248,15 +233,6 @@ rule-providers:
   geolocation-!cn:
     <<: *domain
     url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"
-  ads_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs"
-  openai_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/openai.mrs"
-  tiktok_domain:
-    <<: *domain
-    url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"
 
   private_ip:
     <<: *ip

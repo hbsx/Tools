@@ -116,6 +116,8 @@ apt update && apt full-upgrade -y
 apt-get install -y curl git wget nano
 ```
 
+---
+
 ## Fedora 系统操作流程
 
 ### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
@@ -135,6 +137,8 @@ dnf upgrade --refresh -y
 ```bash
 dnf install -y curl git wget nano bash
 ```
+
+---
 
 ## Alpine 系统操作流程
 

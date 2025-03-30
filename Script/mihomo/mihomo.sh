@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 16:24:54
+#!date = 2025-03-30 17:01:55
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -417,7 +417,7 @@ download_alpha_mihomo() {
     [ "$arch" = "amd64" ] && filename="mihomo-linux-${arch}-compatible-${version}.gz"
     local download_url
     download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
-    wget -t 3 -T 30 -q -O "$filename" "$download_url" || {
+    wget -t 3 -T 30 -O "$filename" "$download_url" || {
         echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"
         exit 1
     }
@@ -440,7 +440,7 @@ download_latest_mihomo() {
     [ "$arch" = "amd64" ] && filename="mihomo-linux-${arch}-compatible-v${version}.gz"
     local download_url
     download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/v${version}/${filename}")
-    wget -t 3 -T 30 -q -O "$filename" "$download_url" || {
+    wget -t 3 -T 30 -O "$filename" "$download_url" || {
         echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"
         exit 1
     }
@@ -509,7 +509,7 @@ update_shell() {
     local shell_file="/usr/bin/mihomo"
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh"
     local sh_new_ver
-    sh_new_ver=$(wget -t 3 -T 30 -q -O- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    sh_new_ver=$(wget -t 3 -T 30 -O- "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新，无需更新${reset}"
@@ -523,7 +523,7 @@ update_shell() {
         * )     echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
     esac
     [ -f "$shell_file" ] && rm "$shell_file"
-    wget -t 3 -T 30 -q -O "$shell_file" "$(get_url "$sh_ver_url")"
+    wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_ver_url")"
     chmod +x "$shell_file"
     hash -r
     echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${sh_new_ver}${reset} 】"
@@ -556,7 +556,7 @@ config_mihomo() {
         *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
     esac
     config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
+    wget -t 3 -T 30 -O "$config_file" "$config_url" || { 
         echo -e "${red}配置文件下载失败${reset}"; exit 1; 
     }
     local proxy_providers="proxy-providers:"

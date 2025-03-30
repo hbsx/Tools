@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 16:24:54
+#!date = 2025-03-30 17:01:55
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -180,7 +180,7 @@ download_mihomo() {
         filename="mihomo-linux-${arch}-compatible-${version}.gz"
     fi
     download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
-    wget -t 3 -T 30 -q -O "$filename" "$download_url" || { 
+    wget -t 3 -T 30 -O "$filename" "$download_url" || { 
         echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"
         exit 1
     }
@@ -208,7 +208,7 @@ download_service() {
         local service_file="/etc/init.d/mihomo"
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc")
-        wget -t 3 -T 30 -q -O "$service_file" "$service_url" || {
+        wget -t 3 -T 30 -O "$service_file" "$service_url" || {
             echo -e "${red}Alpine 服务下载失败${reset}"
             exit 1
         }
@@ -218,7 +218,7 @@ download_service() {
         local system_file="/etc/systemd/system/mihomo.service"
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service")
-        wget -t 3 -T 30 -q -O "$system_file" "$service_url" || { 
+        wget -t 3 -T 30 -O "$system_file" "$service_url" || { 
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
         }
@@ -247,7 +247,7 @@ download_shell() {
     local sh_url
     sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
+    wget -t 3 -T 30 -O "$config_file" "$config_url" || { 
         echo -e "${red}mihomo 管理脚本下载失败，请检查网络后重试${reset}"
         exit 1
     }
@@ -316,7 +316,7 @@ config_mihomo() {
             ;;
     esac
     config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
+    wget -t 3 -T 30 -O "$config_file" "$config_url" || { 
         echo -e "${red}配置文件下载失败${reset}"
         exit 1
     }

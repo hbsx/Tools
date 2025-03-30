@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 14:46:45
+#!date = 2025-03-30 15:16:59
 #!author = ChatGPT
 
 set -e -o pipefail
@@ -263,7 +263,8 @@ download_shell() {
     local sh_url
     sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
-    wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { 
+    wget -q -O "$shell_file" "$sh_url" || {
+    # wget -q -O "$shell_file" --no-check-certificate "$sh_url" || { 
         echo -e "${red}mihomo 管理脚本下载失败，请检查网络后重试${reset}"
         exit 1
     }

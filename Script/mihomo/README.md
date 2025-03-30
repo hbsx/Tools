@@ -45,8 +45,6 @@ lxc.cgroup2.devices.allow: c 10:200 rwm
 lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 ```
 
----
-
 ## 开启 TProxy 模式 不需要其他额外操作，下面步骤都一样
 
 ---
@@ -96,7 +94,9 @@ https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.21/community
 EOF
 ```
 
-## Debian Ubuntu 系统
+---
+
+## Debian Ubuntu 系统操作流程
 
 ### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
@@ -116,7 +116,7 @@ apt update && apt full-upgrade -y
 apt-get install -y curl git wget nano
 ```
 
-## Fedora 系统
+## Fedora 系统操作流程
 
 ### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
@@ -136,7 +136,7 @@ dnf upgrade --refresh -y
 dnf install -y curl git wget nano bash
 ```
 
-## Alpine 系统
+## Alpine 系统操作流程
 
 ### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 

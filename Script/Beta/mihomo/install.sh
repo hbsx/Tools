@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-03-31 19:22:03
+#!date = 2025-03-31 19:25:34
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -147,7 +147,6 @@ check_ip_forward() {
     fi
     sysctl -p > /dev/null
 }
-
 
 #############################
 #      远程版本获取函数     #

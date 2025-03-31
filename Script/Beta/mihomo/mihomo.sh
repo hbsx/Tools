@@ -1,7 +1,7 @@
 #!/bin/bash
-#!name = mihomo 一键管理脚本
+#!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-03-31 16:56:37
+#!date = 2025-03-31 17:34:13
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -61,10 +61,8 @@ check_distro() {
 #############################
 check_network() {
     if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
-        echo -e "${red}检测到没有有科学环境，使用 CDN${reset}" >&2
         use_cdn=true
     else
-        echo -e "${green}检测到有科学环境，无需使用 CDN${reset}" >&2
         use_cdn=false
     fi
 }
@@ -129,8 +127,6 @@ show_status() {
     local file="/root/mihomo/mihomo"
     local version_file="/root/mihomo/version.txt"
     local install_status run_status auto_start software_version
-
-    # 获取系统ID信息
     distro=$(grep -E '^ID=' /etc/os-release | cut -d= -f2)
     if [ ! -f "$file" ]; then
         install_status="${red}未安装${reset}"
@@ -139,7 +135,6 @@ show_status() {
         software_version="${red}未安装${reset}"
     else
         install_status="${green}已安装${reset}"
-        # Alpine 系统判断服务状态和自启
         if [ "$distro" = "alpine" ]; then
             if [ -f "/run/mihomo.pid" ]; then
                 pid=$(cat /run/mihomo.pid)
@@ -157,7 +152,6 @@ show_status() {
                 auto_start="${red}未设置${reset}"
             fi
         else
-            # Debian/Ubuntu 系统判断服务状态和自启
             if systemctl is-active --quiet mihomo; then
                 run_status="${green}已运行${reset}"
             else
@@ -169,14 +163,12 @@ show_status() {
                 auto_start="${red}未设置${reset}"
             fi
         fi
-
         if [ -f "$version_file" ]; then
             software_version=$(cat "$version_file")
         else
             software_version="${red}未安装${reset}"
         fi
     fi
-
     echo -e "安装状态：${install_status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
@@ -185,7 +177,7 @@ show_status() {
 }
 
 #############################
-#      服务管理函数        #
+#      服务管理函数         #
 #############################
 service_mihomo() {
     check_installation || { start_menu; return; }
@@ -199,8 +191,6 @@ service_mihomo() {
         disable) action_text="取消开机自启" ;;
         logs)    action_text="查看日志" ;;
     esac
-
-    # Alpine 系统下的服务管理
     if [ "$distro" = "alpine" ]; then
         if [ "$action" == "logs" ]; then
             echo -e "${green}日志查看：请使用 logread 或查看 /var/log/messages${reset}"
@@ -264,8 +254,6 @@ service_mihomo() {
         start_menu
         return
     fi
-
-    # Debian/Ubuntu Fedora 系统下的服务管理
     if [ "$action" == "enable" ] || [ "$action" == "disable" ]; then
         local is_enabled
         is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
@@ -284,13 +272,11 @@ service_mihomo() {
         start_menu
         return
     fi
-
     if [ "$action" == "logs" ]; then
         echo -e "${green}正在实时查看 mihomo 日志，按 Ctrl+C 退出${reset}"
         journalctl -u mihomo -o cat -f
         return
     fi
-
     local service_status
     service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
     if { [ "$action" == "start" ] && [ "$service_status" == "active" ]; } || \
@@ -299,7 +285,6 @@ service_mihomo() {
         start_menu
         return
     fi
-
     echo -e "${green}正在${action_text}请等待${reset}"
     sleep 1s
     if systemctl "$action" mihomo; then
@@ -383,6 +368,7 @@ install_mihomo() {
         case "$input" in
             [Yy]* )
                 echo -e "${green}开始删除，重新安装中请等待${reset}"
+                uninstall_mihomo
                 ;;
             [Nn]* )
                 echo -e "${yellow}取消安装，保持现有安装${reset}"
@@ -571,6 +557,9 @@ update_mihomo() {
     start_menu
 }
 
+#############################
+#       脚本更新函数        #
+#############################
 update_shell() {
     check_network
     local shell_file="/usr/bin/mihomo"
@@ -618,13 +607,9 @@ config_mihomo() {
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
     local iface ipv4 ipv6 config_url
-
-    # 获取默认网络接口及对应 IP
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
-
-    # 选择运行模式
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
@@ -648,7 +633,6 @@ config_mihomo() {
         echo -e "${red}配置文件下载失败${reset}"
         exit 1
     }
-    # 添加机场订阅配置
     local proxy_providers="proxy-providers:"
     local counter=1
     while true; do
@@ -668,7 +652,6 @@ config_mihomo() {
             break
         fi
     done
-    # 在配置文件中插入机场订阅配置
     awk -v providers="$proxy_providers" '
       /^# 机场配置/ { print; print providers; next }
       { print }

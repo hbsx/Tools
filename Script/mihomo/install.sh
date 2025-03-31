@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 16:56:37
+#!date = 2025-03-31 17:34:13
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -70,10 +70,10 @@ check_distro() {
 #############################
 check_network() {
     if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
-        echo -e "${red}检测到没有有科学环境，使用 CDN${reset}" >&2
+        echo -e "${yellow}检测到没有有科学环境，使用 CDN${reset}" >&2
         use_cdn=true
     else
-        echo -e "${green}检测到有科学环境，无需使用 CDN${reset}" >&2
+        echo -e "${green}检测到有科学环境，不使用 CDN${reset}" >&2
         use_cdn=false
     fi
 }
@@ -93,7 +93,6 @@ get_url() {
         echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
         return 1
     fi
-
     echo "$final_url"
 }
 
@@ -249,7 +248,72 @@ download_shell() {
 }
 
 #############################
-#       安装主流程函数       #
+#       配置文件生成函数     #
+#############################
+config_mihomo() {
+    local folders="/root/mihomo"
+    local config_file="/root/mihomo/config.yaml"
+    local iface ipv4 ipv6 config_url
+    iface=$(ip route | awk '/default/ {print $5}')
+    ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
+    ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+    echo -e "${cyan}-------------------------${reset}"
+    echo -e "${yellow}1. TUN 模式${reset}"
+    echo -e "${yellow}2. TProxy 模式${reset}"
+    echo -e "${cyan}-------------------------${reset}"
+    read -p "$(echo -e "${green}请选择运行模式（推荐使用 TUN 模式）请输入选择(1/2): ${reset}")" confirm
+    confirm=${confirm:-1}
+    case "$confirm" in
+        1)
+            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+            ;;
+        2)
+            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
+            ;;
+        *)
+            echo -e "${red}无效选择，跳过配置文件下载。${reset}"
+            return
+            ;;
+    esac
+    config_url=$(get_url "$config_url")
+    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || {
+        echo -e "${red}配置文件下载失败${reset}"
+        exit 1
+    }
+    local proxy_providers="proxy-providers:"
+    local counter=1
+    while true; do
+        read -p "请输入机场的订阅连接：" airport_url
+        read -p "请输入机场的名称：" airport_name
+        proxy_providers="${proxy_providers}
+  provider_$(printf "%02d" $counter):
+    url: \"${airport_url}\"
+    type: http
+    interval: 86400
+    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
+    override:
+      additional-prefix: \"[${airport_name}]\""
+        counter=$((counter + 1))
+        read -p "$(echo -e "${yellow}是否继续输入订阅？（输入 n 或 N 结束）：${reset}")" cont
+        if [[ "$cont" =~ ^[nN]$ ]]; then
+            break
+        fi
+    done
+    awk -v providers="$proxy_providers" '
+      /^# 机场配置/ { print; print providers; next }
+      { print }
+    ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
+    service_restart
+    echo -e "${green}配置完成，配置文件已保存到：${yellow}${config_file}${reset}"
+    echo -e "${red}mihomo 管理面板地址和管理命令：${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}http://$ipv4:9090/ui${reset}"
+    echo -e "${green}命令：mihomo 进入管理菜单${reset}"
+    echo -e "${cyan}=========================${reset}"
+}
+
+#############################
+#       安装主流程函数      #
 #############################
 install_mihomo() {
     local folders="/root/mihomo"
@@ -281,72 +345,7 @@ install_mihomo() {
 }
 
 #############################
-#      配置文件生成函数     #
-#############################
-config_mihomo() {
-    local folders="/root/mihomo"
-    local config_file="/root/mihomo/config.yaml"
-    local iface ipv4 ipv6 config_url
-    iface=$(ip route | awk '/default/ {print $5}')
-    ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
-    ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
-    echo -e "${cyan}-------------------------${reset}"
-    echo -e "${yellow}1. TUN 模式${reset}"
-    echo -e "${yellow}2. TProxy 模式${reset}"
-    echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "${green}请选择运行模式（推荐使用 TUN 模式）请输入选择(1/2): ${reset}")" confirm
-    confirm=${confirm:-1}
-    case "$confirm" in
-        1)
-            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
-            ;;
-        2)
-            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
-            ;;
-        *)
-            echo -e "${red}无效选择，跳过配置文件下载。${reset}"
-            return
-            ;;
-    esac
-    config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
-        echo -e "${red}配置文件下载失败${reset}"
-        exit 1
-    }
-    local proxy_providers="proxy-providers:"
-    local counter=1
-    while true; do
-        read -p "请输入机场的订阅连接：" airport_url
-        read -p "请输入机场的名称：" airport_name
-        proxy_providers="${proxy_providers}
-  provider_$(printf "%02d" $counter):
-    url: \"${airport_url}\"
-    type: http
-    interval: 86400
-    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
-    override:
-      additional-prefix: \"[${airport_name}]\""
-        counter=$((counter + 1))
-        read -p "继续输入订阅？(或者输入 n/N 结束): " cont
-        if [[ "$cont" =~ ^[nN]$ ]]; then
-            break
-        fi
-    done
-    awk -v providers="$proxy_providers" '
-      /^# 机场配置/ { print; print providers; next }
-      { print }
-    ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
-    service_restart
-    echo -e "${green}配置完成，配置文件已保存到：${yellow}${config_file}${reset}"
-    echo -e "${red}mihomo 管理面板地址和管理命令：${reset}"
-    echo -e "${cyan}=========================${reset}"
-    echo -e "${green}http://$ipv4:9090/ui${reset}"
-    echo -e "${green}命令：mihomo 进入管理菜单${reset}"
-    echo -e "${cyan}=========================${reset}"
-}
-
-#############################
-#          主流程          #
+#           主流程          #
 #############################
 check_distro
 check_network

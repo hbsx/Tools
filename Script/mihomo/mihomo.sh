@@ -1,9 +1,10 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 17:14:12
+#!date = 2025-03-31 16:28:00
 #!author = ChatGPT
 
+# 当遇到错误或管道错误时立即退出
 set -e -o pipefail
 
 #############################
@@ -59,8 +60,7 @@ check_distro() {
 #       网络检测函数       #
 #############################
 check_network() {
-    # 检查是否能访问 Google，不可访问则启用 CDN 代理
-    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+    if curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
         use_cdn=true
     fi
 }
@@ -70,21 +70,22 @@ check_network() {
 #############################
 get_url() {
     local url=$1
-    local final_url=""
+    local final_url
     if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/$url"
+        final_url="https://gh-proxy.com/${url#http*://}"
     else
         final_url="$url"
     fi
-    if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-        echo -e "${red}连接失败，可能是网络或者代理站点不可用，请检查网络并稍后重试${reset}" >&2
-        exit 1
+    if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
+        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
+        return 1
     fi
+
     echo "$final_url"
 }
 
 #############################
-#    安装检测函数：检查 mihomo 是否已安装    #
+#    检查 mihomo 是否已安装  #
 #############################
 check_installation() {
     local file="/root/mihomo/mihomo"
@@ -97,7 +98,7 @@ check_installation() {
 }
 
 #############################
-#    Alpine 系统运行状态检测    #
+#    Alpine 系统运行状态检测  #
 #############################
 is_running_alpine() {
     if [ -f "/run/mihomo.pid" ]; then

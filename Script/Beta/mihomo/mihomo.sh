@@ -1,9 +1,10 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
-#!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 17:23:08
+#!desc = 管理 & 面板
+#!date = 2025-03-31 16:28:00
 #!author = ChatGPT
 
+# 当遇到错误或管道错误时立即退出
 set -e -o pipefail
 
 #############################
@@ -14,16 +15,16 @@ green="\033[32m"  # 绿色
 yellow="\033[33m" # 黄色
 blue="\033[34m"   # 蓝色
 cyan="\033[36m"   # 青色
-reset="\033[0m"   # 重置
+reset="\033[0m"   # 重置颜色
 
 #############################
 #       全局变量定义       #
 #############################
-sh_ver="0.1.520"
+sh_ver="0.1.521"
 use_cdn=false
-distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
-arch=""           # 系统架构（转换后的标准格式）
-arch_raw=""       # 原始架构信息
+distro="unknown"  # 系统类型：debian, ubuntu, alpine, fedora
+arch=""           # 转换后的系统架构
+arch_raw=""       # 原始系统架构信息
 
 #############################
 #       系统检测函数       #
@@ -59,8 +60,7 @@ check_distro() {
 #       网络检测函数       #
 #############################
 check_network() {
-    # 检查是否能访问 Google，不可访问则启用 CDN 代理
-    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+    if curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
         use_cdn=true
     fi
 }
@@ -70,21 +70,22 @@ check_network() {
 #############################
 get_url() {
     local url=$1
-    local final_url=""
+    local final_url
     if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/$url"
+        final_url="https://gh-proxy.com/${url#http*://}"
     else
         final_url="$url"
     fi
-    if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
-        echo -e "${red}连接失败，可能是网络或者代理站点不可用，请检查网络并稍后重试${reset}" >&2
-        exit 1
+    if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
+        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
+        return 1
     fi
+
     echo "$final_url"
 }
 
 #############################
-#    安装检测函数：检查 mihomo 是否已安装    #
+#    检查 mihomo 是否已安装  #
 #############################
 check_installation() {
     local file="/root/mihomo/mihomo"
@@ -97,7 +98,7 @@ check_installation() {
 }
 
 #############################
-#    Alpine 系统运行状态检测    #
+#    Alpine 系统运行状态检测  #
 #############################
 is_running_alpine() {
     if [ -f "/run/mihomo.pid" ]; then
@@ -124,6 +125,8 @@ show_status() {
     local file="/root/mihomo/mihomo"
     local version_file="/root/mihomo/version.txt"
     local install_status run_status auto_start software_version
+
+    # 获取系统ID信息
     distro=$(grep -E '^ID=' /etc/os-release | cut -d= -f2)
     if [ ! -f "$file" ]; then
         install_status="${red}未安装${reset}"
@@ -132,6 +135,7 @@ show_status() {
         software_version="${red}未安装${reset}"
     else
         install_status="${green}已安装${reset}"
+        # Alpine 系统判断服务状态和自启
         if [ "$distro" = "alpine" ]; then
             if [ -f "/run/mihomo.pid" ]; then
                 pid=$(cat /run/mihomo.pid)
@@ -149,6 +153,7 @@ show_status() {
                 auto_start="${red}未设置${reset}"
             fi
         else
+            # Debian/Ubuntu 系统判断服务状态和自启
             if systemctl is-active --quiet mihomo; then
                 run_status="${green}已运行${reset}"
             else
@@ -160,12 +165,14 @@ show_status() {
                 auto_start="${red}未设置${reset}"
             fi
         fi
+
         if [ -f "$version_file" ]; then
             software_version=$(cat "$version_file")
         else
             software_version="${red}未安装${reset}"
         fi
     fi
+
     echo -e "安装状态：${install_status}"
     echo -e "运行状态：${run_status}"
     echo -e "开机自启：${auto_start}"
@@ -188,6 +195,8 @@ service_mihomo() {
         disable) action_text="取消开机自启" ;;
         logs)    action_text="查看日志" ;;
     esac
+
+    # Alpine 系统下的服务管理
     if [ "$distro" = "alpine" ]; then
         if [ "$action" == "logs" ]; then
             echo -e "${green}日志查看：请使用 logread 或查看 /var/log/messages${reset}"
@@ -251,6 +260,8 @@ service_mihomo() {
         start_menu
         return
     fi
+
+    # Debian/Ubuntu Fedora 系统下的服务管理
     if [ "$action" == "enable" ] || [ "$action" == "disable" ]; then
         local is_enabled
         is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
@@ -269,11 +280,13 @@ service_mihomo() {
         start_menu
         return
     fi
+
     if [ "$action" == "logs" ]; then
         echo -e "${green}正在实时查看 mihomo 日志，按 Ctrl+C 退出${reset}"
         journalctl -u mihomo -o cat -f
         return
     fi
+
     local service_status
     service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
     if { [ "$action" == "start" ] && [ "$service_status" == "active" ]; } || \
@@ -282,14 +295,13 @@ service_mihomo() {
         start_menu
         return
     fi
+
     echo -e "${green}正在${action_text}请等待${reset}"
     sleep 1s
     if systemctl "$action" mihomo; then
         echo -e "${green}${action_text}成功${reset}"
-        logger -t mihomo "Debian/Ubuntu: ${action_text}成功"
     else
         echo -e "${red}${action_text}失败${reset}"
-        logger -t mihomo "Debian/Ubuntu: ${action_text}失败"
     fi
     start_menu
 }
@@ -313,9 +325,19 @@ uninstall_mihomo() {
     local system_file="/etc/systemd/system/mihomo.service"
     read -p "$(echo -e "${red}警告：卸载后将删除当前配置和文件！\n${yellow}确认卸载 mihomo 吗？${reset} (y/n): ")" input
     case "$input" in
-        [Yy]* ) echo -e "${green}mihomo 卸载中请等待${reset}" ;;
-        [Nn]* ) echo -e "${yellow}mihomo 卸载已取消${reset}"; start_menu; return ;;
-        * )     echo -e "${red}无效选择，卸载已取消${reset}"; start_menu; return ;;
+        [Yy]* )
+            echo -e "${green}mihomo 卸载中请等待${reset}"
+            ;;
+        [Nn]* )
+            echo -e "${yellow}mihomo 卸载已取消${reset}"
+            start_menu
+            return
+            ;;
+        * )
+            echo -e "${red}无效选择，卸载已取消${reset}"
+            start_menu
+            return
+            ;;
     esac
     sleep 2s
     echo -e "${green}mihomo 卸载命令已发出${reset}"
@@ -329,7 +351,6 @@ uninstall_mihomo() {
         rm -f "$system_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
     fi
     rm -rf "$folders" || { echo -e "${red}删除相关文件夹失败${reset}"; exit 1; }
-
     if [ "$distro" != "alpine" ]; then
         systemctl daemon-reload || { echo -e "${red}重新加载 systemd 配置失败${reset}"; exit 1; }
     fi
@@ -356,9 +377,19 @@ install_mihomo() {
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
         read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
         case "$input" in
-            [Yy]* ) echo -e "${green}开始删除，重新安装中请等待${reset}" ;;
-            [Nn]* ) echo -e "${yellow}取消安装，保持现有安装${reset}"; start_menu; return ;;
-            * )     echo -e "${red}无效选择，安装已取消${reset}"; start_menu; return ;;
+            [Yy]* )
+                echo -e "${green}开始删除，重新安装中请等待${reset}"
+                ;;
+            [Nn]* )
+                echo -e "${yellow}取消安装，保持现有安装${reset}"
+                start_menu
+                return
+                ;;
+            * )
+                echo -e "${red}无效选择，安装已取消${reset}"
+                start_menu
+                return
+                ;;
         esac
     fi
     bash <(curl -Ls "$(get_url "$install_url")")
@@ -399,12 +430,18 @@ download_alpha_version() {
     check_network
     local version_url
     version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
-    version=$(curl -sSL "$version_url") || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; }
+    version=$(curl -sSL "$version_url") || {
+        echo -e "${red}获取 mihomo 远程版本失败${reset}"
+        exit 1
+    }
 }
 
 download_latest_version() {
     local version_url="https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
-    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || { echo -e "${red}获取 mihomo 远程版本失败${reset}"; exit 1; }
+    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
+        echo -e "${red}获取 mihomo 远程版本失败${reset}"
+        exit 1
+    }
 }
 
 download_alpha_mihomo() {
@@ -421,10 +458,14 @@ download_alpha_mihomo() {
         echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"
         exit 1
     }
-    gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
+    gunzip "$filename" || {
+        echo -e "${red}mihomo 解压失败${reset}"
+        exit 1
+    }
     mv -f "mihomo-linux-${arch}-compatible-${version}" mihomo 2>/dev/null || \
-    mv -f "mihomo-linux-${arch}-${version}" mihomo || { 
-        echo -e "${red}找不到解压后的文件${reset}"; exit 1;
+    mv -f "mihomo-linux-${arch}-${version}" mihomo || {
+        echo -e "${red}找不到解压后的文件${reset}"
+        exit 1
     }
     chmod +x mihomo
     echo "$version" > "$version_file"
@@ -444,10 +485,14 @@ download_latest_mihomo() {
         echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"
         exit 1
     }
-    gunzip "$filename" || { echo -e "${red}mihomo 解压失败${reset}"; exit 1; }
+    gunzip "$filename" || {
+        echo -e "${red}mihomo 解压失败${reset}"
+        exit 1
+    }
     mv -f "mihomo-linux-${arch}-compatible-v${version}" mihomo 2>/dev/null || \
-    mv -f "mihomo-linux-${arch}-v${version}" mihomo || { 
-        echo -e "${red}找不到解压后的文件${reset}"; exit 1;
+    mv -f "mihomo-linux-${arch}-v${version}" mihomo || {
+        echo -e "${red}找不到解压后的文件${reset}"
+        exit 1
     }
     chmod +x mihomo
     echo "$version" > "$version_file"
@@ -473,9 +518,17 @@ update_mihomo() {
         download_version_type="latest"
     fi
     if [ "$download_version_type" == "alpha" ]; then
-        download_alpha_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
+        download_alpha_version || {
+            echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"
+            start_menu
+            return
+        }
     else
-        download_latest_version || { echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"; start_menu; return; }
+        download_latest_version || {
+            echo -e "${red}获取最新版本失败，请检查网络或源地址！${reset}"
+            start_menu
+            return
+        }
     fi
     local latest_version="$version"
     if [ "$current_version" == "$latest_version" ]; then
@@ -485,9 +538,19 @@ update_mihomo() {
     fi
     read -p "$(echo -e "${yellow}检查到有更新，是否升级到最新版本？${reset} (y/n): ")" input
     case "$input" in
-        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}" ;;
-        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
-        * )     echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
+        [Yy]* )
+            echo -e "${green}开始升级，升级中请等待${reset}"
+            ;;
+        [Nn]* )
+            echo -e "${yellow}取消升级，保持现有版本${reset}"
+            start_menu
+            return
+            ;;
+        * )
+            echo -e "${red}无效选择，升级已取消${reset}"
+            start_menu
+            return
+            ;;
     esac
     if [ "$download_version_type" == "alpha" ]; then
         download_alpha_mihomo || { echo -e "${red}mihomo 下载失败，请重试${reset}"; exit 1; }
@@ -518,9 +581,19 @@ update_shell() {
     fi
     read -p "$(echo -e "${yellow}检查到有更新，是否升级到最新版本？${reset} (y/n): ")" input
     case "$input" in
-        [Yy]* ) echo -e "${green}开始升级，升级中请等待${reset}" ;;
-        [Nn]* ) echo -e "${yellow}取消升级，保持现有版本${reset}"; start_menu; return ;;
-        * )     echo -e "${red}无效选择，升级已取消${reset}"; start_menu; return ;;
+        [Yy]* )
+            echo -e "${green}开始升级，升级中请等待${reset}"
+            ;;
+        [Nn]* )
+            echo -e "${yellow}取消升级，保持现有版本${reset}"
+            start_menu
+            return
+            ;;
+        * )
+            echo -e "${red}无效选择，升级已取消${reset}"
+            start_menu
+            return
+            ;;
     esac
     [ -f "$shell_file" ] && rm "$shell_file"
     wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_ver_url")"
@@ -541,9 +614,13 @@ config_mihomo() {
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
     local iface ipv4 ipv6 config_url
+
+    # 获取默认网络接口及对应 IP
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+
+    # 选择运行模式
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
@@ -551,14 +628,23 @@ config_mihomo() {
     read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
     confirm=${confirm:-1}
     case "$confirm" in
-        1) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml" ;;
-        2) config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml" ;;
-        *) echo -e "${red}无效选择，跳过配置文件下载。${reset}"; return ;;
+        1)
+            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+            ;;
+        2)
+            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
+            ;;
+        *)
+            echo -e "${red}无效选择，跳过配置文件下载。${reset}"
+            return
+            ;;
     esac
     config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || { 
-        echo -e "${red}配置文件下载失败${reset}"; exit 1; 
+    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || {
+        echo -e "${red}配置文件下载失败${reset}"
+        exit 1
     }
+    # 添加机场订阅配置
     local proxy_providers="proxy-providers:"
     local counter=1
     while true; do
@@ -573,15 +659,17 @@ config_mihomo() {
     override:
       additional-prefix: \"[${airport_name}]\""
         counter=$((counter + 1))
-        read -p "继续输入订阅？(或者输入 n/N 结束): " cont
+        read -p "$(echo -e "${yellow}是否继续输入订阅？（输入 n 或 N 结束）：${reset}")" cont
         if [[ "$cont" =~ ^[nN]$ ]]; then
             break
         fi
     done
+    # 在配置文件中插入机场订阅配置
     awk -v providers="$proxy_providers" '
       /^# 机场配置/ { print; print providers; next }
       { print }
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
+
     if [ "$distro" = "alpine" ]; then
         rc-service mihomo restart
     else

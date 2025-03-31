@@ -1,9 +1,10 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-30 17:17:05
+#!date = 2025-03-31 16:28:00
 #!author = ChatGPT
 
+# 当遇到错误或管道错误时立即退出
 set -e -o pipefail
  
 #############################
@@ -21,33 +22,37 @@ reset="\033[0m"   # 重置
 #############################
 sh_ver="1.0.0"
 use_cdn=false
-distro="unknown"  # 系统类型：debian（包括 Ubuntu）或 alpine
+distro="unknown"  # 系统类型：debian, ubuntu, alpine, fedora
 arch=""           # 系统架构
 arch_raw=""       # 原始架构信息
 
-# 包管理与服务管理命令变量
-pkg_update=""
-pkg_install=""
-# service_enable 与 service_restart 根据系统类型定义为函数
-
 #############################
-#       系统检测函数         #
+#       系统检测函数       #
 #############################
 check_distro() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         case "$ID" in
-            debian)
-                distro="debian"
-                ;;
-            ubuntu)
-                distro="ubuntu"
+            debian|ubuntu)
+                distro="$ID"
+                pkg_update="apt update && apt upgrade -y"
+                pkg_install="apt install -y"
+                service_enable() { systemctl enable mihomo; }
+                service_restart() { systemctl daemon-reload; systemctl start mihomo; }
                 ;;
             alpine)
                 distro="alpine"
+                pkg_update="apk update && apk upgrade"
+                pkg_install="apk add"
+                service_enable() { rc-update add mihomo default; }
+                service_restart() { rc-service mihomo restart; }
                 ;;
             fedora)
                 distro="fedora"
+                pkg_update="dnf upgrade --refresh -y"
+                pkg_install="dnf install -y"
+                service_enable() { systemctl enable mihomo; }
+                service_restart() { systemctl restart mihomo; }
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -58,30 +63,13 @@ check_distro() {
         echo -e "${red}无法识别当前系统类型${reset}"
         exit 1
     fi
-    if [ "$distro" = "alpine" ]; then
-        pkg_update="apk update && apk upgrade"
-        pkg_install="apk add"
-        service_enable() { rc-update add mihomo default; }
-        service_restart() { rc-service mihomo restart; }
-    elif [ "$distro" = "fedora" ]; then
-        pkg_update="dnf upgrade --refresh -y"
-        pkg_install="dnf install -y"
-        service_enable() { systemctl enable mihomo; }
-        service_restart() { systemctl restart mihomo; }
-    else
-        pkg_update="apt update && apt upgrade -y"
-        pkg_install="apt install -y"
-        service_enable() { systemctl enable mihomo; }
-        service_restart() { systemctl daemon-reload; systemctl start mihomo; }
-    fi
 }
 
 #############################
 #       网络检测函数         #
 #############################
 check_network() {
-    # 检测是否能访问 Google，不可访问则启用 CDN
-    if ! curl -s --head --max-time 3 "https://www.google.com" > /dev/null; then
+    if curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
         use_cdn=true
     fi
 }
@@ -93,14 +81,15 @@ get_url() {
     local url=$1
     local final_url
     if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/$url"
+        final_url="https://gh-proxy.com/${url#http*://}"
     else
         final_url="$url"
     fi
-    if ! curl --silent --head --fail --max-time 3 "$final_url" > /dev/null; then
+    if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
         echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
-        exit 1
+        return 1
     fi
+
     echo "$final_url"
 }
 

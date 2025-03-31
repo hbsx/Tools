@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-03-31 20:27:52
+#!date = 2025-03-31 20:42:33
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -300,7 +300,7 @@ config_mihomo() {
     override:
       additional-prefix: \"[${airport_name}]\""
         counter=$((counter + 1))
-        read -p "$(echo -e "${yellow}是否继续输入订阅？（输入 n 或 N 结束）：${reset}")" cont
+        read -p "$(echo -e "${yellow}是否继续输入订阅？（按回车继续，输入 n 或 N 结束）：${reset}")" cont
         if [[ "$cont" =~ ^[nN]$ ]]; then
             break
         fi

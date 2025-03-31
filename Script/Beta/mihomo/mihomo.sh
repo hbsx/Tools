@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-03-31 20:27:52
+#!date = 2025-03-31 20:42:33
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -659,7 +659,7 @@ config_mihomo() {
     override:
       additional-prefix: \"[${airport_name}]\""
         counter=$((counter + 1))
-        read -p "$(echo -e "${yellow}是否继续输入订阅？（输入 n 或 N 结束）：${reset}")" cont
+        read -p "$(echo -e "${yellow}是否继续输入订阅？（按回车继续，输入 n 或 N 结束）：${reset}")" cont
         if [[ "$cont" =~ ^[nN]$ ]]; then
             break
         fi

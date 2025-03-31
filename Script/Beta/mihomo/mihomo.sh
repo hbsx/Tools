@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-03-31 19:11:38
+#!date = 2025-03-31 19:30:23
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -75,11 +75,14 @@ get_url() {
     local final_url
     if [ "$use_cdn" = true ]; then
         final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
+            final_url="https://github.boki.moe/$url"
+        fi
     else
         final_url="$url"
     fi
     if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
-        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
+        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试。URL: $final_url${reset}" >&2
         return 1
     fi
     echo "$final_url"

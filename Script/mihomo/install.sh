@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 16:28:00
+#!date = 2025-03-31 16:45:22
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -69,7 +69,7 @@ check_distro() {
 #       网络检测函数         #
 #############################
 check_network() {
-    if curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
+    if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.facebook.com"; then
         use_cdn=true
     fi
 }

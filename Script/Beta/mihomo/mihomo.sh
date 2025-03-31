@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-03-31 19:30:23
+#!date = 2025-03-31 20:27:52
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -82,7 +82,7 @@ get_url() {
         final_url="$url"
     fi
     if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
-        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试。URL: $final_url${reset}" >&2
+        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试！${reset}" >&2
         return 1
     fi
     echo "$final_url"
@@ -364,8 +364,8 @@ install_mihomo() {
     local system_file="/etc/systemd/system/mihomo.service"
     local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
-        echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
-        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n${yellow}是否删除并重新安装？${reset} (y/n): ")" input
+        echo -e "${yellow}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
+        read -p "$(echo -e "${red}警告：重新安装将删除当前配置和文件！\n是否删除并重新安装？${reset} (y/n): ")" input
         case "$input" in
             [Yy]* )
                 echo -e "${green}开始删除，重新安装中请等待${reset}"
@@ -616,27 +616,29 @@ config_mihomo() {
     check_network
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
+    local tun_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+    local tproxy_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
     local iface ipv4 ipv6 config_url
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+    echo -e "${green}请选择运行模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "请选择运行模式（${green}推荐使用 TUN 模式${reset}）请输入选择(1/2): ")" confirm
+    read -p "$(echo -e "${green}请输入选择(1/2): ${reset}")" confirm
     confirm=${confirm:-1}
     case "$confirm" in
         1)
-            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+            config_url="$tun_config_url"
             ;;
         2)
-            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
+            config_url="$tproxy_config_url"
             ;;
         *)
             echo -e "${red}无效选择，跳过配置文件下载。${reset}"
             return
-            ;;
     esac
     config_url=$(get_url "$config_url")
     wget -t 3 -T 30 -q -O "$config_file" "$config_url" || {
@@ -698,10 +700,12 @@ switch_version() {
         start_menu
         return
     fi
-    echo -e "${yellow}请选择版本：${reset}"
+    echo -e "${green}请选择版本${reset}"
+    echo -e "${cyan}-------------------------${reset}"
     echo -e "${green}1. 测试版 (Prerelease-Alpha)${reset}"
     echo -e "${green}2. 正式版 (Latest)${reset}"
-    read -rp "请输入选项 (1/2): " choice
+    echo -e "${cyan}-------------------------${reset}"
+    read -p "$(echo -e "${yellow}请输入选项 (1/2): ${reset}")" choice
     case "$choice" in
         1)
             if [ "$download_version_type" == "alpha" ]; then

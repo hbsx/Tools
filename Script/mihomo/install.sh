@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 19:22:03
+#!date = 2025-03-31 20:27:53
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -70,7 +70,7 @@ check_distro() {
 #############################
 check_network() {
     if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
-        echo -e "${yellow}检测到没有有科学环境，使用 CDN${reset}" >&2
+        echo -e "${green}检测到没有有科学环境，使用 CDN${reset}" >&2
         use_cdn=true
     else
         echo -e "${green}检测到有科学环境，不使用 CDN${reset}" >&2
@@ -86,11 +86,14 @@ get_url() {
     local final_url
     if [ "$use_cdn" = true ]; then
         final_url="https://gh-proxy.com/$url"
+        if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
+            final_url="https://github.boki.moe/$url"
+        fi
     else
         final_url="$url"
     fi
     if ! curl --silent --head --fail --connect-timeout 3 -L "$final_url" -o /dev/null; then
-        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
+        echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试！${reset}" >&2
         return 1
     fi
     echo "$final_url"
@@ -201,7 +204,7 @@ download_service() {
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc")
         wget -t 3 -T 30 -O "$service_file" "$service_url" || {
-            echo -e "${red}Alpine 服务下载失败${reset}"
+            echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
         }
         chmod +x "$service_file"
@@ -210,7 +213,7 @@ download_service() {
         local system_file="/etc/systemd/system/mihomo.service"
         local service_url
         service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service")
-        wget -t 3 -T 30 -O "$system_file" "$service_url" || { 
+        wget -t 3 -T 30 -O "$system_file" "$service_url" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
         }
@@ -240,7 +243,7 @@ download_shell() {
     sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh")
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -t 3 -T 30 -O "$shell_file" "$sh_url" || {
-        echo -e "${red}mihomo 管理脚本下载失败，请检查网络后重试${reset}"
+        echo -e "${red}管理脚本下载失败，请检查网络后重试${reset}"
         exit 1
     }
     chmod +x "$shell_file"
@@ -253,26 +256,29 @@ download_shell() {
 config_mihomo() {
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
+    local tun_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+    local tproxy_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
     local iface ipv4 ipv6 config_url
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
+    echo -e "${green}请选择运行模式（推荐使用 TUN 模式）${reset}"
     echo -e "${cyan}-------------------------${reset}"
     echo -e "${yellow}1. TUN 模式${reset}"
     echo -e "${yellow}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "${green}请选择运行模式（推荐使用 TUN 模式）请输入选择(1/2): ${reset}")" confirm
+    read -p "$(echo -e "${green}请输入选择(1/2): ${reset}")" confirm
     confirm=${confirm:-1}
     case "$confirm" in
         1)
-            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
+            config_url="$tun_config_url"
             ;;
         2)
-            config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
+            config_url="$tproxy_config_url"
             ;;
         *)
-            echo -e "${red}无效选择，跳过配置文件下载。${reset}"
-            return
+            echo -e "${yellow}无效选择，使用默认 TUN 配置。${reset}"
+            config_url="$tun_config_url"
             ;;
     esac
     config_url=$(get_url "$config_url")
@@ -329,7 +335,7 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}安装完成，是否下载配置文件\n${yellow}也可上传自定义配置到 ${folders} (文件名必须为 config.yaml)\n${red}是否继续${green}(y/n): ${reset}")" confirm
+    read -p "$(echo -e "${green}恭喜你！安装完成，你可以下载推举配置文件\n${yellow}也可上传自定义配置到 ${folders} (文件名必须为 config.yaml)\n${red}输入(yY)下载配置文件，输入(nN)跳过下载${green}(y/n): ${reset}")" confirm
     case "$confirm" in
         [Yy]*)
             config_mihomo

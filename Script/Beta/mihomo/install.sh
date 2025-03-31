@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-03-31 16:45:22
+#!date = 2025-03-31 16:56:37
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -69,8 +69,12 @@ check_distro() {
 #       网络检测函数       #
 #############################
 check_network() {
-    if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.facebook.com"; then
+    if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
+        echo -e "${red}检测到没有有科学环境，使用 CDN${reset}" >&2
         use_cdn=true
+    else
+        echo -e "${green}检测到有科学环境，无需使用 CDN${reset}" >&2
+        use_cdn=false
     fi
 }
 

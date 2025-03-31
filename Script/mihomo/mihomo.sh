@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 16:45:22
+#!date = 2025-03-31 16:56:37
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -60,8 +60,12 @@ check_distro() {
 #       网络检测函数       #
 #############################
 check_network() {
-    if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.facebook.com"; then
+    if ! curl -s --head --fail --connect-timeout 3 -o /dev/null "https://www.google.com"; then
+        echo -e "${red}检测到没有有科学环境，使用 CDN${reset}" >&2
         use_cdn=true
+    else
+        echo -e "${green}检测到有科学环境，无需使用 CDN${reset}" >&2
+        use_cdn=false
     fi
 }
 

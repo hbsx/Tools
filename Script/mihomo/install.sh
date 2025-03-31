@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 19:13:19
+#!date = 2025-03-31 19:22:03
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -137,14 +137,14 @@ update_system() {
 #############################
 check_ip_forward() {
     local sysctl_file="/etc/sysctl.conf"
-    sysctl net.ipv4.ip_forward | grep -q "1" || {
+    if ! sysctl net.ipv4.ip_forward | grep -q "1"; then
         sysctl -w net.ipv4.ip_forward=1
-        echo "net.ipv4.ip_forward=1" >> "$sysctl_file"
-    }
-    sysctl net.ipv6.conf.all.forwarding | grep -q "1" || {
+        grep -q "net.ipv4.ip_forward=1" "$sysctl_file" || echo "net.ipv4.ip_forward=1" >> "$sysctl_file"
+    fi
+    if ! sysctl net.ipv6.conf.all.forwarding | grep -q "1"; then
         sysctl -w net.ipv6.conf.all.forwarding=1
-        echo "net.ipv6.conf.all.forwarding=1" >> "$sysctl_file"
-    }
+        grep -q "net.ipv6.conf.all.forwarding=1" "$sysctl_file" || echo "net.ipv6.conf.all.forwarding=1" >> "$sysctl_file"
+    fi
     sysctl -p > /dev/null
 }
 

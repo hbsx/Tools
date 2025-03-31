@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 18:57:27
+#!date = 2025-03-31 19:11:38
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -74,7 +74,7 @@ get_url() {
     local url=$1
     local final_url
     if [ "$use_cdn" = true ]; then
-        final_url="https://gh-proxy.com/${url#http*://}"
+        final_url="https://gh-proxy.com/$url"
     else
         final_url="$url"
     fi
@@ -82,7 +82,6 @@ get_url() {
         echo -e "${red}连接失败，可能是网络或代理站点不可用，请检查后重试${reset}" >&2
         return 1
     fi
-
     echo "$final_url"
 }
 

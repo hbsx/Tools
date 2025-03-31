@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-03-31 17:34:13
+#!date = 2025-03-31 18:57:27
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -340,9 +340,6 @@ uninstall_mihomo() {
         rm -f "$system_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
     fi
     rm -rf "$folders" || { echo -e "${red}删除相关文件夹失败${reset}"; exit 1; }
-    if [ "$distro" != "alpine" ]; then
-        systemctl daemon-reload || { echo -e "${red}重新加载 systemd 配置失败${reset}"; exit 1; }
-    fi
     sleep 3s
     if { [ "$distro" = "alpine" ] && [ ! -d "$folders" ]; } || { [ ! -f "$system_file" ] && [ ! -d "$folders" ]; }; then
         echo -e "${green}mihomo 卸载完成${reset}"
@@ -361,6 +358,8 @@ uninstall_mihomo() {
 install_mihomo() {
     check_network
     local folders="/root/mihomo"
+    local service_file="/etc/init.d/mihomo"
+    local system_file="/etc/systemd/system/mihomo.service"
     local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${red}检测到 mihomo 已经安装在 ${folders} 目录下${reset}"
@@ -368,7 +367,16 @@ install_mihomo() {
         case "$input" in
             [Yy]* )
                 echo -e "${green}开始删除，重新安装中请等待${reset}"
-                uninstall_mihomo
+                if [ "$distro" = "alpine" ]; then
+                    rc-service mihomo stop 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
+                    rc-update del mihomo 2>/dev/null || { echo -e "${red}取消开机自启失败${reset}"; exit 1; }
+                    rm -f "$service_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
+                else
+                    systemctl stop mihomo.service 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
+                    systemctl disable mihomo.service 2>/dev/null || { echo -e "${red}禁用 mihomo 服务失败${reset}"; exit 1; }
+                    rm -f "$system_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
+                fi
+                rm -rf "$folders" || { echo -e "${red}删除相关文件夹失败${reset}"; exit 1; }
                 ;;
             [Nn]* )
                 echo -e "${yellow}取消安装，保持现有安装${reset}"

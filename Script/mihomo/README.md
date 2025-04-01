@@ -216,7 +216,20 @@ sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
 sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
 systemctl enable --now sshd && \
 systemctl restart sshd
+```
 
+### 4.如何出现 PGP 密钥验证错误(先试试第一组，不行在试试第二组)
+
+```bash
+# 第一组
+pacman-key --init
+pacman-key --populate archlinux
+```
+
+```bash
+# 第二组
+pacman-key --refresh-keys
+pacman -Syu --noconfirm
 ```
 
 ---

@@ -121,13 +121,13 @@ apt update && apt full-upgrade -y
 ### 2.安装必须插件
 
 ```bash
-apt-get install -y curl git wget nano
+apt install -y curl git wget nano
 ```
 
 ### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
-apt update && apt install -y openssh-server && \
+apt install -y openssh-server && \
 sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
 sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
 systemctl enable ssh && \
@@ -153,7 +153,7 @@ dnf install -y curl git wget nano bash
 ### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
-dnf install openssh-server -y && \
+dnf install -y openssh-server && \
 sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
 sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
 systemctl enable sshd && \

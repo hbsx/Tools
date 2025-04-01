@@ -112,91 +112,110 @@ Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux/\$repo/os/\$arch" > /etc/pa
 
 ## Debian Ubuntu 系统操作流程
 
-### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
-
-```bash
-sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl restart sshd
-```
-
-### 2.更新系统
+### 1.更新系统
 
 ```bash
 apt update && apt full-upgrade -y
 ```
 
-### 3.安装必须插件
+### 2.安装必须插件
 
 ```bash
 apt-get install -y curl git wget nano
+```
+
+### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+dnf install openssh-server -y && \
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+systemctl enable sshd && \
+systemctl restart sshd
 ```
 
 ---
 
 ## Fedora 系统操作流程
 
-### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
-
-```bash
-dnf install openssh-server -y && sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && systemctl enable sshd && systemctl restart sshd
-```
-
-### 2.更新系统
+### 1.更新系统
 
 ```bash
 dnf upgrade --refresh -y
 ```
 
-### 3.安装必须插件
+### 2.安装必须插件
 
 ```bash
 dnf install -y curl git wget nano bash
+```
+
+### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+dnf install openssh-server -y && \
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+systemctl enable sshd && \
+systemctl restart sshd
 ```
 
 ---
 
 ## Alpine 系统操作流程
 
-### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+### 1.更新系统
+
+```bash
+apk update && apk upgrade
+```
+
+### 2.安装必须插件
+
+```bash
+apk add curl git wget nano bash
+```
+
+### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
 apk add --no-cache openssh && \
 mkdir -p /etc/ssh && ssh-keygen -A && \
 sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
 sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-rc-service sshd start && \
-rc-update add sshd
+rc-update add sshd && \
+rc-service sshd restart
 ```
 
-### 2.更新系统
-
-```bash
-apk update && apk upgrade
-```
-
-### 3.安装必须插件
-
-```bash
-apk add curl git wget nano bash
-```
+---
 
 ## Arch 系统操作流程
 
-### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
-
-```bash
-pacman -S --noconfirm openssh && systemctl enable --now sshd
-```
-
-### 2.更新系统
+### 1.更新系统
 
 ```bash
 pacman -Syu --noconfirm
 ```
 
-### 3.安装必须插件
+### 2.安装必须插件
 
 ```bash
 pacman -S --noconfirm curl git wget nano bash
+```
+
+### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+sed -i 's/^#\(Port 22\)/\1/' /etc/ssh/sshd_config && \
+sed -i 's/^#\(AddressFamily any\)/\1/' /etc/ssh/sshd_config && \
+sed -i 's/^#\(ListenAddress 0.0.0.0\)/\1/' /etc/ssh/sshd_config && \
+sed -i 's/^#\(ListenAddress ::\)/\1/' /etc/ssh/sshd_config && \
+sed -i 's/^#\(PermitRootLogin \)prohibit-password/\1yes/' /etc/ssh/sshd_config && \
+sed -i 's/^#\(PasswordAuthentication \)no/\1yes/' /etc/ssh/sshd_config && \
+pacman -Sy --noconfirm openssh && \
+ssh-keygen -A && \
+systemctl enable --now sshd && \
+systemctl restart sshd
 ```
 
 ---

@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 20:42:33
+#!date = 2025-04-01 09:51:12
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -655,11 +655,11 @@ config_mihomo() {
     url: \"${airport_url}\"
     type: http
     interval: 86400
-    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
+    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 300}
     override:
       additional-prefix: \"[${airport_name}]\""
         counter=$((counter + 1))
-        read -p "$(echo -e "${yellow}是否继续输入订阅？（按回车继续，输入 n 或 N 结束）：${reset}")" cont
+        read -p "$(echo -e "${yellow}是否继续输入订阅, 按回车继续, (输入 n 或 N 结束): ${reset}")" cont
         if [[ "$cont" =~ ^[nN]$ ]]; then
             break
         fi

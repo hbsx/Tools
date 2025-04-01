@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置（同时兼容 alpine、debian、ubuntu）
-#!date = 2025-03-31 20:42:33
+#!date = 2025-04-01 09:51:12
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -262,12 +262,12 @@ config_mihomo() {
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)
     ipv6=$(ip addr show "$iface" | awk '/inet6 / {print $2}' | cut -d/ -f1)
-    echo -e "${green}请选择运行模式（推荐使用 TUN 模式）${reset}"
+    echo -e "${green}请选择运行模式(推荐使用 TUN 模式)${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    echo -e "${yellow}1. TUN 模式${reset}"
-    echo -e "${yellow}2. TProxy 模式${reset}"
+    echo -e "${green}1. TUN 模式${reset}"
+    echo -e "${green}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "${green}请输入选择(1/2): ${reset}")" confirm
+    read -p "$(echo -e "${yellow}请输入选择(1/2): ${reset}")" confirm
     confirm=${confirm:-1}
     case "$confirm" in
         1)
@@ -296,11 +296,11 @@ config_mihomo() {
     url: \"${airport_url}\"
     type: http
     interval: 86400
-    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
+    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 300}
     override:
       additional-prefix: \"[${airport_name}]\""
         counter=$((counter + 1))
-        read -p "$(echo -e "${yellow}是否继续输入订阅？（按回车继续，输入 n 或 N 结束）：${reset}")" cont
+        read -p "$(echo -e "${yellow}是否继续输入订阅, 按回车继续, (输入 n 或 N 结束): ${reset}")" cont
         if [[ "$cont" =~ ^[nN]$ ]]; then
             break
         fi
@@ -335,7 +335,12 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}恭喜你！安装完成，你可以下载推举配置文件\n${yellow}也可上传自定义配置到 ${folders} (文件名必须为 config.yaml)\n${red}输入(yY)下载配置文件，输入(nN)跳过下载${green}(y/n): ${reset}")" confirm
+    read -p "$(echo -e "
+    ${green}恭喜你! mihomo 已经安装完成
+    ${yellow}你可以选择 y 或 Y 来下载配置文件
+    ${yellow}也可上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)
+    ${green}请输入选择(y/n): ${reset}
+    ")" confirm
     case "$confirm" in
         [Yy]*)
             config_mihomo

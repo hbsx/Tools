@@ -129,7 +129,6 @@ apt-get install -y curl git wget nano
 ```bash
 apt update && apt install -y openssh-server && \
 sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
 systemctl enable ssh && \
 systemctl restart ssh
 ```

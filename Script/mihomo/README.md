@@ -129,6 +129,7 @@ apt-get install -y curl git wget nano
 ```bash
 apt update && apt install -y openssh-server && \
 sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
 systemctl enable ssh && \
 systemctl restart ssh
 ```
@@ -205,16 +206,17 @@ pacman -S --noconfirm curl git wget nano bash
 ### 3.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
 
 ```bash
-sed -i 's/^#\(Port 22\)/\1/' /etc/ssh/sshd_config && \
-sed -i 's/^#\(AddressFamily any\)/\1/' /etc/ssh/sshd_config && \
-sed -i 's/^#\(ListenAddress 0.0.0.0\)/\1/' /etc/ssh/sshd_config && \
-sed -i 's/^#\(ListenAddress ::\)/\1/' /etc/ssh/sshd_config && \
-sed -i 's/^#\(PermitRootLogin \)prohibit-password/\1yes/' /etc/ssh/sshd_config && \
-sed -i 's/^#\(PasswordAuthentication \)no/\1yes/' /etc/ssh/sshd_config && \
 pacman -Sy --noconfirm openssh && \
 ssh-keygen -A && \
+sed -i 's/^#\?Port 22.*/Port 22/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?AddressFamily any.*/AddressFamily any/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?ListenAddress 0.0.0.0.*/ListenAddress 0.0.0.0/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?ListenAddress ::.*/ListenAddress ::/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?PermitRootLogin .*/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
 systemctl enable --now sshd && \
 systemctl restart sshd
+
 ```
 
 ---

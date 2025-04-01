@@ -6,7 +6,7 @@
 >
 > 2.支持 tun 和 tproxy 两种模式，看你心情选择。理论上 TUN 占用高那么一丢丢！
 >
-> 3.本脚本支持 Alpine Debian Fedora Ubuntu 系统
+> 3.本脚本支持 Arch Alpine Debian Fedora Ubuntu 系统
 
 ## 开启 TUN 模式 {注意：好像需要直通（PVE 虚拟机下操作）}
 
@@ -94,6 +94,20 @@ https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.21/community
 EOF
 ```
 
+## Arch 系统清华源(二选一)
+
+```bash
+pacman -S --noconfirm reflector && reflector --country China --age 6 --protocol https --sort rate --save /etc/pacman.d/mirrorlist && pacman -Syyu
+```
+
+```bash
+echo "Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/\$repo/os/\$arch
+Server = https://mirrors.bfsu.edu.cn/archlinux/\$repo/os/\$arch
+Server = https://mirrors.aliyun.com/archlinux/\$repo/os/\$arch
+Server = https://mirrors.zju.edu.cn/archlinux/\$repo/os/\$arch
+Server = https://mirrors.sjtug.sjtu.edu.cn/archlinux/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist && pacman -Syyu
+```
+
 ---
 
 ## Debian Ubuntu 系统操作流程
@@ -163,6 +177,26 @@ apk update && apk upgrade
 
 ```bash
 apk add curl git wget nano bash
+```
+
+## Arch 系统操作流程
+
+### 1.因为 PVE 虚拟机容器，默认是没有开启远程 root 登录，如需开启使用下面命令
+
+```bash
+pacman -S --noconfirm openssh && systemctl enable --now sshd
+```
+
+### 2.更新系统
+
+```bash
+pacman -Syu --noconfirm
+```
+
+### 3.安装必须插件
+
+```bash
+pacman -S --noconfirm curl git wget nano bash
 ```
 
 ---

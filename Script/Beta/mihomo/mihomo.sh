@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-03-31 20:42:33
+#!date = 2025-04-01 09:47:20
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -44,6 +44,9 @@ check_distro() {
                 ;;
             fedora)
                 distro="fedora"
+                ;;
+            arch)
+                distro="arch"
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -655,11 +658,11 @@ config_mihomo() {
     url: \"${airport_url}\"
     type: http
     interval: 86400
-    health-check: {enable: true, url: \"https://www.youtube.com/generate_204\", interval: 300}
+    health-check: {enable: true,url: "https://www.gstatic.com/generate_204",interval: 300}
     override:
       additional-prefix: \"[${airport_name}]\""
         counter=$((counter + 1))
-        read -p "$(echo -e "${yellow}是否继续输入订阅？（按回车继续，输入 n 或 N 结束）：${reset}")" cont
+        read -p "$(echo -e "${yellow}是否继续输入订阅, 按回车继续, (输入 n 或 N 结束): ${reset}")" cont
         if [[ "$cont" =~ ^[nN]$ ]]; then
             break
         fi
@@ -749,7 +752,8 @@ switch_version() {
             ;;
         *)
             echo -e "${red}无效选项，请输入 1 或 2${reset}"
-            exit 1
+            start_menu
+            return
             ;;
     esac
 }

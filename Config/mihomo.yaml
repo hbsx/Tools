@@ -1,11 +1,10 @@
 #!name = mihomo TUN 配置文件
 #!desc = 说明：理论上适用于所有的 Meta 内核，使用最新的 mrs 规则
-#!date = 2025-03-30 17:35:27
+#!date = 2025-04-01 09:47:20
 #!source = https://wiki.metacubex.one/example/conf/#__tabbed_1_2
 #!author = MetaCubeX
 
 # 机场配置
-
 
 proxies: 
   - name: "直连"

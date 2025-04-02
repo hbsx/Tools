@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:37:48
+#!date = 2025-04-02 19:48:01
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -343,8 +343,9 @@ install_mihomo() {
     download_wbeui
     download_shell
     echo -e "${green}恭喜你! mihomo 已经安装完成${reset}"
-    echo -e "${yellow}输入 y/Y 下载默认配置${reset}"
-    echo -e "${yellow}输入 n/N 上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)${reset}"
+    echo -e "${red}输入 y/Y 下载默认配置${reset}"
+    echo -e "${red}输入 n/N 取消下载默认配置${reset}"
+    echo -e "${red}把你自己的配置上传到 ${folders} 目录下(文件名必须为 config.yaml)${reset}"
     read -p "$(echo -e "${yellow}请输入选择(y/n) [默认: y]: ${reset}")" confirm
     confirm=${confirm:-y}
     case "$confirm" in

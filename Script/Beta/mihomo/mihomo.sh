@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-02 19:30:04
+#!date = 2025-04-02 19:48:01
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -373,12 +373,8 @@ install_mihomo() {
             [Yy]* )
                 echo -e "${green}开始删除，重新安装中请等待${reset}"
                 if [ "$distro" = "alpine" ]; then
-                    rc-service mihomo stop 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
-                    rc-update del mihomo 2>/dev/null || { echo -e "${red}取消开机自启失败${reset}"; exit 1; }
                     rm -f "$service_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
                 else
-                    systemctl stop mihomo.service 2>/dev/null || { echo -e "${red}停止 mihomo 服务失败${reset}"; exit 1; }
-                    systemctl disable mihomo.service 2>/dev/null || { echo -e "${red}禁用 mihomo 服务失败${reset}"; exit 1; }
                     rm -f "$system_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
                 fi
                 rm -rf "$folders" || { echo -e "${red}删除相关文件夹失败${reset}"; exit 1; }

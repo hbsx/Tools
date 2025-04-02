@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:30:04
+#!date = 2025-04-02 19:37:48
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -274,7 +274,7 @@ config_mihomo() {
     echo -e "${green}1. TUN 模式${reset}"
     echo -e "${green}2. TProxy 模式${reset}"
     echo -e "${cyan}-------------------------${reset}"
-    read -p "$(echo -e "${yellow}请输入选择(1/2): ${reset}")" confirm
+    read -p "$(echo -e "${yellow}请输入选择(1/2) [默认: TUN]: ${reset}")" confirm
     confirm=${confirm:-1}
     case "$confirm" in
         1)
@@ -343,9 +343,10 @@ install_mihomo() {
     download_wbeui
     download_shell
     echo -e "${green}恭喜你! mihomo 已经安装完成${reset}"
-    echo -e "${green}输入 yY 下载默认配置${reset}"
-    echo -e "${green}输入 nN 上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)${reset}"
-    read -p "$(echo -e "${yellow}请输入选择(y/n): ${reset}")" confirm
+    echo -e "${yellow}输入 y/Y 下载默认配置${reset}"
+    echo -e "${yellow}输入 n/N 上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)${reset}"
+    read -p "$(echo -e "${yellow}请输入选择(y/n) [默认: y]: ${reset}")" confirm
+    confirm=${confirm:-y}
     case "$confirm" in
         [Yy]*)
             config_mihomo

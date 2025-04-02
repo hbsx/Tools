@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:54:56
+#!date = 2025-04-02 19:58:03
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -318,7 +318,7 @@ config_mihomo() {
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
     service_restart
     echo -e "${green}配置完成，配置文件已保存到：${yellow}${config_file}${reset}"
-    echo -e "${red}mihomo 管理面板地址和管理命令${reset}"
+    echo -e "${red}管理面板地址和管理命令${reset}"
     echo -e "${cyan}=========================${reset}"
     echo -e "${green}http://$ipv4:9090/ui${reset}"
     echo -e "${green}命令: mihomo 进入管理菜单${reset}"

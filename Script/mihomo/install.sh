@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:06:52
+#!date = 2025-04-02 19:23:55
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -277,7 +277,7 @@ config_mihomo() {
             config_url="$tproxy_config_url"
             ;;
         *)
-            echo -e "${yellow}无效选择，使用默认 TUN 配置。${reset}"
+            echo -e "${red}无效选择，使用默认 TUN 配置。${reset}"
             config_url="$tun_config_url"
             ;;
     esac
@@ -289,8 +289,8 @@ config_mihomo() {
     local proxy_providers="proxy-providers:"
     local counter=1
     while true; do
-        read -p "请输入机场的订阅连接：" airport_url
-        read -p "请输入机场的名称：" airport_name
+        read -p "$(echo -e "${yellow}请输入机场的订阅连接: ${reset}")" airport_url
+        read -p "$(echo -e "${yellow}请输入机场的名称: ${reset}")" airport_name
         proxy_providers="${proxy_providers}
   provider_$(printf "%02d" $counter):
     url: \"${airport_url}\"
@@ -335,10 +335,10 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "${green}恭喜你! mihomo 已经安装完成
-${yellow}你可以选择 y 或 Y 来下载配置文件
-${yellow}也可上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)
-${green}请输入选择(y/n): ${reset}")" confirm
+    echo -e "${green}恭喜你! mihomo 已经安装完成${reset}"
+    echo -e "${green}输入 yY 下载默认配置${reset}"
+    echo -e "${green}输入 nN 上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)${reset}"
+    read -p "$(echo -e "${yellow}请输入选择(y/n): ${reset}")" confirm
     case "$confirm" in
         [Yy]*)
             config_mihomo

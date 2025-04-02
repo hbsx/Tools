@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-04-01 16:56:32
+#!date = 2025-04-02 19:23:55
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -648,8 +648,8 @@ config_mihomo() {
     local proxy_providers="proxy-providers:"
     local counter=1
     while true; do
-        read -p "请输入机场的订阅连接：" airport_url
-        read -p "请输入机场的名称：" airport_name
+        read -p "$(echo -e "${yellow}请输入机场的订阅连接: ${reset}")" airport_url
+        read -p "$(echo -e "${yellow}请输入机场的名称: ${reset}")" airport_name
         proxy_providers="${proxy_providers}
   provider_$(printf "%02d" $counter):
     url: \"${airport_url}\"
@@ -709,15 +709,15 @@ switch_version() {
     case "$choice" in
         1)
             if [ "$download_version_type" == "alpha" ]; then
-                echo -e "${yellow}当前已经是测试版，无需重复操作${reset}"
+                echo -e "${green}当前已经是测试版，无需重复操作${reset}"
                 start_menu
                 return
             fi
-            echo -e "${yellow}准备切换到测试版${reset}"
+            echo -e "${green}准备切换到测试版${reset}"
             download_alpha_version || { echo -e "${red}获取测试版版本失败，请检查网络或源地址！${reset}"; exit 1; }
             download_alpha_mihomo || { echo -e "${red}测试版安装失败${reset}"; exit 1; }
-            echo -e "${yellow}已经切换到测试版${reset}"
-            echo -e "${yellow}等待 3 秒后重启生效${reset}"
+            echo -e "${green}已经切换到测试版${reset}"
+            echo -e "${green}等待 3 秒后重启生效${reset}"
             sleep 3s
             if [ "$distro" = "alpine" ]; then
                 rc-service mihomo restart
@@ -729,15 +729,15 @@ switch_version() {
             ;;
         2)
             if [ "$download_version_type" == "latest" ]; then
-                echo -e "${yellow}当前已经是正式版，无需重复操作${reset}"
+                echo -e "${green}当前已经是正式版，无需重复操作${reset}"
                 start_menu
                 return
             fi
-            echo -e "${yellow}准备切换到正式版${reset}"
+            echo -e "${green}准备切换到正式版${reset}"
             download_latest_version || { echo -e "${red}获取正式版版本失败，请检查网络或源地址！${reset}"; exit 1; }
             download_latest_mihomo || { echo -e "${red}正式版安装失败${reset}"; exit 1; }
-            echo -e "${yellow}已经切换到正式版${reset}"
-            echo -e "${yellow}等待 3 秒后重启生效${reset}"
+            echo -e "${green}已经切换到正式版${reset}"
+            echo -e "${green}等待 3 秒后重启生效${reset}"
             sleep 3s
             if [ "$distro" = "alpine" ]; then
                 rc-service mihomo restart

@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:23:55
+#!date = 2025-04-02 19:30:04
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -53,6 +53,13 @@ check_distro() {
                 pkg_install="dnf install -y"
                 service_enable() { systemctl enable mihomo; }
                 service_restart() { systemctl restart mihomo; }
+                ;;
+            arch)
+                distro="arch"
+                pkg_update="pacman -Syu --noconfirm"
+                pkg_install="pacman -S --noconfirm"
+                service_enable() { systemctl enable mihomo; }
+                service_restart() { systemctl daemon-reload; systemctl start mihomo; }
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"

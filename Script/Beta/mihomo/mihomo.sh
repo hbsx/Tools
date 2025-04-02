@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-01 09:51:12
+#!date = 2025-04-02 19:30:04
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -651,8 +651,8 @@ config_mihomo() {
     local proxy_providers="proxy-providers:"
     local counter=1
     while true; do
-        read -p "请输入机场的订阅连接：" airport_url
-        read -p "请输入机场的名称：" airport_name
+        read -p "$(echo -e "${yellow}请输入机场的订阅连接: ${reset}")" airport_url
+        read -p "$(echo -e "${yellow}请输入机场的名称: ${reset}")" airport_name
         proxy_providers="${proxy_providers}
   provider_$(printf "%02d" $counter):
     url: \"${airport_url}\"

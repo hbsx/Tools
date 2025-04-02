@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-04-02 19:23:55
+#!date = 2025-04-02 19:30:04
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -20,7 +20,7 @@ reset="\033[0m"   # 重置
 #############################
 #       全局变量定义       #
 #############################
-sh_ver="0.1.7"
+sh_ver="0.1.8"
 use_cdn=false
 distro="unknown"  # 系统类型：debian, ubuntu, alpine, fedora
 arch=""           # 系统架构（转换后的标准格式）
@@ -44,6 +44,9 @@ check_distro() {
                 ;;
             fedora)
                 distro="fedora"
+                ;;
+            arch)
+                distro="arch"
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -749,7 +752,8 @@ switch_version() {
             ;;
         *)
             echo -e "${red}无效选项，请输入 1 或 2${reset}"
-            exit 1
+            start_menu
+            return
             ;;
     esac
 }

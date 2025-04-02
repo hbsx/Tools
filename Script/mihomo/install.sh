@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:02:44
+#!date = 2025-04-02 19:06:52
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -335,8 +335,7 @@ install_mihomo() {
     download_service
     download_wbeui
     download_shell
-    read -p "$(echo -e "
-${green}恭喜你! mihomo 已经安装完成
+    read -p "$(echo -e "${green}恭喜你! mihomo 已经安装完成
 ${yellow}你可以选择 y 或 Y 来下载配置文件
 ${yellow}也可上传你自己的配置到 ${folders} 目录下 (文件名必须为 config.yaml)
 ${green}请输入选择(y/n): ${reset}")" confirm

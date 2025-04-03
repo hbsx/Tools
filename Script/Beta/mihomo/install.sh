@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-03 15:53:03
+#!date = 2025-04-03 15:57:41
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -163,7 +163,7 @@ check_ip_forward() {
 #############################
 download_version() {
     local version_url="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt"
-    local version=$(curl -sSL "$(get_url "$version_url")") || {
+    version=$(curl -sSL "$(get_url "$version_url")") || {
         echo -e "${red}获取 mihomo 远程版本失败${reset}"
         exit 1
     }

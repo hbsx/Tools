@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-03 15:53:03
+#!date = 2025-04-03 15:57:41
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -428,7 +428,7 @@ get_schema() {
 download_alpha_version() {
     check_network
     local version_url="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt"
-    local version=$(curl -sSL "$(get_url "$version_url")") || {
+    version=$(curl -sSL "$(get_url "$version_url")") || {
         echo -e "${red}获取 mihomo 远程版本失败${reset}"
         exit 1
     }
@@ -436,7 +436,7 @@ download_alpha_version() {
 
 download_latest_version() {
     local version_url="https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
-    local version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
+    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
         echo -e "${red}获取 mihomo 远程版本失败${reset}"
         exit 1
     }

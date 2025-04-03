@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-02 19:58:03
+#!date = 2025-04-03 15:53:03
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -162,9 +162,8 @@ check_ip_forward() {
 #      远程版本获取函数      #
 #############################
 download_version() {
-    local version_url
-    version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
-    version=$(curl -sSL "$version_url") || { 
+    local version_url="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt"
+    local version=$(curl -sSL "$(get_url "$version_url")") || {
         echo -e "${red}获取 mihomo 远程版本失败${reset}"
         exit 1
     }
@@ -174,15 +173,12 @@ download_version() {
 #     mihomo 下载函数       #
 #############################
 download_mihomo() {
-    local download_url
+    download_version
     local version_file="/root/mihomo/version.txt"
     local filename="mihomo-linux-${arch}-${version}.gz"
-    download_version
-    if [ "$arch" == "amd64" ]; then
-        filename="mihomo-linux-${arch}-compatible-${version}.gz"
-    fi
-    download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
-    wget -t 3 -T 30 -O "$filename" "$download_url" || { 
+    [ "$arch" = "amd64" ] && filename="mihomo-linux-${arch}-compatible-${version}.gz"
+    local download_url="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}"
+    wget -t 3 -T 30 -O "$filename" "$(get_url "$download_url")" || {
         echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"
         exit 1
     }
@@ -208,23 +204,21 @@ download_mihomo() {
 download_service() {
     if [ "$distro" = "alpine" ]; then
         local service_file="/etc/init.d/mihomo"
-        local service_url
-        service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc")
-        wget -t 3 -T 30 -O "$service_file" "$service_url" || {
+        local service_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc"
+        wget -t 3 -T 30 -O "$service_file" "$(get_url "$service_url")" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
         }
         chmod +x "$service_file"
         service_enable
     else
-        local system_file="/etc/systemd/system/mihomo.service"
-        local service_url
-        service_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service")
-        wget -t 3 -T 30 -O "$system_file" "$service_url" || {
+        local service_file="/etc/systemd/system/mihomo.service"
+        local service_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service"
+        wget -t 3 -T 30 -O "$service_file" "$(get_url "$service_url")" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
         }
-        chmod +x "$system_file"
+        chmod +x "$service_file"
         service_enable
     fi
 }
@@ -246,10 +240,9 @@ download_wbeui() {
 #############################
 download_shell() {
     local shell_file="/usr/bin/mihomo"
-    local sh_url
-    sh_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh")
+    local sh_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh"
     [ -f "$shell_file" ] && rm -f "$shell_file"
-    wget -t 3 -T 30 -O "$shell_file" "$sh_url" || {
+    wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_url")" || {
         echo -e "${red}管理脚本下载失败，请检查网络后重试${reset}"
         exit 1
     }
@@ -288,8 +281,7 @@ config_mihomo() {
             config_url="$tun_config_url"
             ;;
     esac
-    config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || {
+    wget -t 3 -T 30 -q -O "$config_file" "$(get_url "$config_url")" || { 
         echo -e "${red}配置文件下载失败${reset}"
         exit 1
     }

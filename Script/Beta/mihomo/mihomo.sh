@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-02 19:54:56
+#!date = 2025-04-03 15:53:03
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -20,7 +20,7 @@ reset="\033[0m"   # 重置颜色
 #############################
 #       全局变量定义       #
 #############################
-sh_ver="0.0.01"
+sh_ver="0.0.02"
 use_cdn=false
 distro="unknown"  # 系统类型：debian, ubuntu, alpine, fedora
 arch=""           # 转换后的系统架构
@@ -427,9 +427,8 @@ get_schema() {
 #############################
 download_alpha_version() {
     check_network
-    local version_url
-    version_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt")
-    version=$(curl -sSL "$version_url") || {
+    local version_url="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt"
+    local version=$(curl -sSL "$(get_url "$version_url")") || {
         echo -e "${red}获取 mihomo 远程版本失败${reset}"
         exit 1
     }
@@ -437,7 +436,7 @@ download_alpha_version() {
 
 download_latest_version() {
     local version_url="https://api.github.com/repos/MetaCubeX/mihomo/releases/latest"
-    version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
+    local version=$(curl -sSL "$version_url" | jq -r '.tag_name' | sed 's/v//') || {
         echo -e "${red}获取 mihomo 远程版本失败${reset}"
         exit 1
     }
@@ -447,14 +446,12 @@ download_alpha_mihomo() {
     get_schema
     check_network
     download_alpha_version
-    local filename
     local version_file="/root/mihomo/version.txt"
-    filename="mihomo-linux-${arch}-${version}.gz"
+    local filename="mihomo-linux-${arch}-${version}.gz"
     [ "$arch" = "amd64" ] && filename="mihomo-linux-${arch}-compatible-${version}.gz"
-    local download_url
-    download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}")
-    wget -t 3 -T 30 -O "$filename" "$download_url" || {
-        echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"
+    local download_url="https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/${filename}"
+    wget -t 3 -T 30 -O "$filename" "$(get_url "$download_url")" || {
+        echo -e "${red}mihomo 下载失败，请检查网络后重试${reset}"
         exit 1
     }
     gunzip "$filename" || {
@@ -474,13 +471,11 @@ download_latest_mihomo() {
     get_schema
     check_network
     download_latest_version
-    local filename
     local version_file="/root/mihomo/version.txt"
-    filename="mihomo-linux-${arch}-v${version}.gz"
+    local filename="mihomo-linux-${arch}-v${version}.gz"
     [ "$arch" = "amd64" ] && filename="mihomo-linux-${arch}-compatible-v${version}.gz"
-    local download_url
-    download_url=$(get_url "https://github.com/MetaCubeX/mihomo/releases/download/v${version}/${filename}")
-    wget -t 3 -T 30 -O "$filename" "$download_url" || {
+    local download_url="https://github.com/MetaCubeX/mihomo/releases/download/v${version}/${filename}"
+    wget -t 3 -T 30 -O "$filename" "$(get_url "$download_url")" || {
         echo -e "${red}mihomo 下载失败，可能是网络问题，建议重新运行本脚本重试下载${reset}"
         exit 1
     }
@@ -573,8 +568,7 @@ update_shell() {
     check_network
     local shell_file="/usr/bin/mihomo"
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/mihomo/mihomo.sh"
-    local sh_new_ver
-    sh_new_ver=$(curl -sSL "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
+    local sh_new_ver=$(curl -sSL "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"
     if [ "$sh_ver" == "$sh_new_ver" ]; then
         echo -e "${green}当前已是最新，无需更新${reset}"
@@ -639,8 +633,7 @@ config_mihomo() {
             echo -e "${red}无效选择，跳过配置文件下载。${reset}"
             return
     esac
-    config_url=$(get_url "$config_url")
-    wget -t 3 -T 30 -q -O "$config_file" "$config_url" || {
+    wget -t 3 -T 30 -q -O "$config_file" "$(get_url "$config_url")" || { 
         echo -e "${red}配置文件下载失败${reset}"
         exit 1
     }

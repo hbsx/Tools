@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-03 15:57:41
+#!date = 2025-04-03 16:09:30
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -260,8 +260,7 @@ service_mihomo() {
         return
     fi
     if [ "$action" == "enable" ] || [ "$action" == "disable" ]; then
-        local is_enabled
-        is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
+        local is_enabled=$(systemctl is-enabled --quiet mihomo && echo "enabled" || echo "disabled")
         if { [ "$action" == "enable" ] && [ "$is_enabled" == "enabled" ]; } || \
            { [ "$action" == "disable" ] && [ "$is_enabled" == "disabled" ]; }; then
             echo -e "${yellow}已${action_text}，无需重复操作${reset}"
@@ -282,8 +281,7 @@ service_mihomo() {
         journalctl -u mihomo -o cat -f
         return
     fi
-    local service_status
-    service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
+    local service_status=$(systemctl is-active --quiet mihomo && echo "active" || echo "inactive")
     if { [ "$action" == "start" ] && [ "$service_status" == "active" ]; } || \
        { [ "$action" == "stop" ] && [ "$service_status" == "inactive" ]; }; then
         echo -e "${yellow}已${action_text}，无需重复操作${reset}"

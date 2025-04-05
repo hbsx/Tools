@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 16:14:46
+#!date = 2025-04-05 16:24:43
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -52,7 +52,7 @@ check_distro() {
                 pkg_update="dnf upgrade --refresh -y"
                 pkg_install="dnf install -y"
                 service_enable() { systemctl enable mihomo; }
-                service_restart() { systemctl restart mihomo; }
+                service_restart() { systemctl daemon-reload; systemctl start mihomo; }
                 ;;
             arch)
                 distro="arch"

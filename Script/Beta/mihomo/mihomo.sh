@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-05 16:04:29
+#!date = 2025-04-05 16:24:43
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -33,20 +33,33 @@ check_distro() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         case "$ID" in
-            debian)
-                distro="debian"
-                ;;
-            ubuntu)
-                distro="ubuntu"
+            debian|ubuntu)
+                distro="$ID"
+                pkg_update="apt update && apt upgrade -y"
+                pkg_install="apt install -y"
+                service_enable() { systemctl enable mihomo; }
+                service_restart() { systemctl daemon-reload; systemctl start mihomo; }
                 ;;
             alpine)
                 distro="alpine"
+                pkg_update="apk update && apk upgrade"
+                pkg_install="apk add"
+                service_enable() { rc-update add mihomo default; }
+                service_restart() { rc-service mihomo restart; }
                 ;;
             fedora)
                 distro="fedora"
+                pkg_update="dnf upgrade --refresh -y"
+                pkg_install="dnf install -y"
+                service_enable() { systemctl enable mihomo; }
+                service_restart() { systemctl daemon-reload; systemctl start mihomo; }
                 ;;
             arch)
                 distro="arch"
+                pkg_update="pacman -Syu --noconfirm"
+                pkg_install="pacman -S --noconfirm"
+                service_enable() { systemctl enable mihomo; }
+                service_restart() { systemctl daemon-reload; systemctl start mihomo; }
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -551,11 +564,7 @@ update_mihomo() {
     fi
     sleep 2s
     echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${latest_version}${reset} 】"
-    if [ "$distro" = "alpine" ]; then
-        rc-service mihomo restart
-    else
-        systemctl restart mihomo
-    fi
+    service_restart
     start_menu
 }
 
@@ -658,12 +667,7 @@ config_mihomo() {
       /^# 机场配置/ { print; print providers; next }
       { print }
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
-    if [ "$distro" = "alpine" ]; then
-        rc-service mihomo restart
-    else
-        systemctl daemon-reload
-        systemctl restart mihomo
-    fi
+    service_restart
     echo -e "${green}配置完成${reset}"
     start_menu
 }
@@ -728,11 +732,7 @@ switch_version() {
             echo -e "${yellow}已经切换到正式版${reset}"
             echo -e "${yellow}等待 3 秒后重启生效${reset}"
             sleep 3s
-            if [ "$distro" = "alpine" ]; then
-                rc-service mihomo restart
-            else
-                systemctl restart mihomo
-            fi
+            service_restart
             echo -e "${yellow}当前软件版本${reset}：【 ${green}v${version}${reset} 】"
             start_menu
             ;;

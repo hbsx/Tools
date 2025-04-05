@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-05 16:09:43
+#!date = 2025-04-05 16:24:43
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -33,20 +33,33 @@ check_distro() {
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         case "$ID" in
-            debian)
-                distro="debian"
-                ;;
-            ubuntu)
-                distro="ubuntu"
+            debian|ubuntu)
+                distro="$ID"
+                pkg_update="apt update && apt upgrade -y"
+                pkg_install="apt install -y"
+                service_enable() { systemctl enable v2ray; }
+                service_restart() { systemctl daemon-reload; systemctl start v2ray; }
                 ;;
             alpine)
                 distro="alpine"
+                pkg_update="apk update && apk upgrade"
+                pkg_install="apk add"
+                service_enable() { rc-update add v2ray default; }
+                service_restart() { rc-service v2ray restart; }
                 ;;
             fedora)
                 distro="fedora"
+                pkg_update="dnf upgrade --refresh -y"
+                pkg_install="dnf install -y"
+                service_enable() { systemctl enable v2ray; }
+                service_restart() { systemctl daemon-reload; systemctl start v2ray; }
                 ;;
             arch)
                 distro="arch"
+                pkg_update="pacman -Syu --noconfirm"
+                pkg_install="pacman -S --noconfirm"
+                service_enable() { systemctl enable v2ray; }
+                service_restart() { systemctl daemon-reload; systemctl start v2ray; }
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -495,11 +508,7 @@ update_v2ray() {
     }
     sleep 2s
     echo -e "${yellow}更新完成，当前版本已更新为：${reset}【 ${green}${latest_version}${reset} 】"
-    if [ "$distro" = "alpine" ]; then
-        rc-service v2ray restart
-    else
-        systemctl restart v2ray
-    fi
+    service_restart
     start_menu
 }
 
@@ -693,12 +702,7 @@ config_v2ray() {
         echo -e "${red}修改后的配置文件格式无效，请检查文件${reset}"
         exit 1
     fi
-    if [ "$distro" = "alpine" ]; then
-        rc-service v2ray restart
-    else
-        systemctl daemon-reload
-        systemctl restart v2ray
-    fi
+    service_restart
     echo -e "${green}v2ray 配置完成，准备启动中${reset}"
     echo -e ""
     echo -e "${green}恭喜你，你的 v2ray 已成功启动并设置为开机自启，配置文件保存到 ${yellow}${config_file}${reset}"

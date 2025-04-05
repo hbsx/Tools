@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 16:02:15
+#!date = 2025-04-05 16:06:08
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -378,9 +378,9 @@ install_v2ray() {
     check_distro
     echo -e "${yellow}当前系统版本：${reset}[ ${green}${distro}${reset} ]"
     get_schema
-    echo -e "当前系统架构：[ ${green}${arch_raw}${reset} ]" 
+    echo -e "${yellow}当前系统架构：${reset}[ ${green}${arch_raw}${reset} ]"
     download_version
-    echo -e "当前软件版本：[ ${green}${version}${reset} ]"
+    echo -e "${yellow}当前软件版本：${reset}[ ${green}${version}${reset} ]"
     download_v2ray
     download_service
     download_shell

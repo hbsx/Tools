@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-05 16:38:57
+#!date = 2025-04-05 16:40:48
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -696,14 +696,7 @@ config_v2ray() {
         exit 1
     fi
     service_restart
-    echo -e "${green}v2ray 配置完成，准备启动中${reset}"
-    echo -e ""
-    echo -e "${green}恭喜你，你的 v2ray 已成功启动并设置为开机自启，配置文件保存到 ${yellow}${config_file}${reset}"
-    echo -e ""
-    echo -e "${red}下面是 v2ray 进入管理菜单命令${reset}"
-    echo -e "${cyan}=========================${reset}"
-    echo -e "${yellow}v2ray          进入菜单 ${reset}"
-    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}配置完成${reset}"
     start_menu
 }
 

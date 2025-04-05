@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-03 16:09:30
+#!date = 2025-04-05 16:04:29
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -693,8 +693,12 @@ config_v2ray() {
         echo -e "${red}修改后的配置文件格式无效，请检查文件${reset}"
         exit 1
     fi
-    systemctl daemon-reload
-    systemctl restart v2ray
+    if [ "$distro" = "alpine" ]; then
+        rc-service mihomo restart
+    else
+        systemctl daemon-reload
+        systemctl restart mihomo
+    fi
     echo -e "${green}v2ray 配置完成，准备启动中${reset}"
     echo -e ""
     echo -e "${green}恭喜你，你的 v2ray 已成功启动并设置为开机自启，配置文件保存到 ${yellow}${config_file}${reset}"

@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键管理脚本
 #!desc = 管理 & 面板
-#!date = 2025-04-03 16:09:31
+#!date = 2025-04-05 16:04:29
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -658,7 +658,6 @@ config_mihomo() {
       /^# 机场配置/ { print; print providers; next }
       { print }
     ' "$config_file" > temp.yaml && mv temp.yaml "$config_file"
-
     if [ "$distro" = "alpine" ]; then
         rc-service mihomo restart
     else

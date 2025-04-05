@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 10:03:29
+#!date = 2025-04-05 15:53:10
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -107,6 +107,14 @@ get_url() {
 }
 
 #############################
+#    系统更新及安装函数    #
+#############################
+update_system() {
+    eval "$pkg_update"
+    eval "$pkg_install curl git gzip wget nano iptables tzdata jq unzip"
+}
+
+#############################
 #     系统架构检测函数     #
 #############################
 get_schema() {
@@ -132,14 +140,6 @@ get_schema() {
             exit 1
             ;;
     esac
-}
-
-#############################
-#    系统更新及安装函数    #
-#############################
-update_system() {
-    eval "$pkg_update"
-    eval "$pkg_install curl git gzip wget nano iptables tzdata jq unzip"
 }
 
 #############################

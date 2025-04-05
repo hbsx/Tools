@@ -19,10 +19,10 @@
 > [!NOTE]
 >
 > 爱穿 JK 的小姐姐
-
-## mihomo 教程
-
-[中文教程](https://github.com/Abcd789JK/Tools/blob/main/Script/mihomo/README.md)
+>
+> mihomo 教程
+>
+> [中文教程](https://github.com/Abcd789JK/Tools/blob/main/Script/mihomo/README.md)
 
 ## 致敬开源精神 净化网络环境
 

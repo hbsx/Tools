@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-05 16:30:16
+#!date = 2025-04-05 16:38:57
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -551,11 +551,12 @@ config_v2ray() {
     check_installation || { start_menu; return; }
     check_network
     local config_file="/root/v2ray/config.json"
-    local config_url=$(get_url "https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/v2ray.json")
-    curl -s -o "$config_file" "$config_url"
-    echo -e ""
+    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/v2ray.json"
+    wget -t 3 -T 30 -q -O "$config_file" "$(get_url "$config_url")" || { 
+        echo -e "${red}配置文件下载失败${reset}"
+        exit 1
+    }
     echo -e "${green}开始配置 v2ray ${reset}"
-    echo -e ""
     read -rp "是否快速生成配置文件？(y/n 默认[y]): " confirm
     confirm=${confirm:-y}
     if [[ "$confirm" == [Yy] ]]; then

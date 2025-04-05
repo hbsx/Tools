@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 16:06:08
+#!date = 2025-04-05 16:14:46
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -361,9 +361,13 @@ config_v2ray() {
         echo -e "${red}修改后的配置文件格式无效，请检查文件${reset}"
         exit 1
     fi
+    service_restart
     echo -e "${green}v2ray 配置已完成并保存到 ${config_file} 文件夹${reset}"
     echo -e "${green}v2ray 配置完成，正在启动中${reset}"
-    service_restart
+    echo -e "${red}管理命令${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}命令: v2ray 进入管理菜单${reset}"
+    echo -e "${cyan}=========================${reset}"
     echo -e "${green}v2ray 已成功启动并设置为开机自启${reset}"
 }
 

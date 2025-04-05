@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 15:53:10
+#!date = 2025-04-05 15:56:17
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -410,5 +410,4 @@ install_v2ray() {
 check_distro
 check_network
 update_system
-check_ip_forward
 install_mihomo

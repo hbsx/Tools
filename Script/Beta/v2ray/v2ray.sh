@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = v2ray 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-05 16:04:29
+#!date = 2025-04-05 16:09:43
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -694,10 +694,10 @@ config_v2ray() {
         exit 1
     fi
     if [ "$distro" = "alpine" ]; then
-        rc-service mihomo restart
+        rc-service v2ray restart
     else
         systemctl daemon-reload
-        systemctl restart mihomo
+        systemctl restart v2ray
     fi
     echo -e "${green}v2ray 配置完成，准备启动中${reset}"
     echo -e ""

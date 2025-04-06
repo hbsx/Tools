@@ -1,21 +1,21 @@
 #!name = mihomo win 配置文件
-#!date = 2025-03-30 17:39:04
+#!date = 2025-04-06 14:57:26
 #!source = https://wiki.metacubex.one/example/conf/#__tabbed_1_2
 
 # 全局锚点配置
 rule-anchor:
-  # 机场订阅锚点
+  # 机场订阅
   pr: &pr {type: http, interval: 3600, health-check: {enable: true, url: "https://www.gstatic.com/generate_204", interval: 300}}
-  # DNS锚点配置
+  # DNS 配置
   default: &default ['223.5.5.5', '119.29.29.29']
   direct: &direct ['https://223.5.5.5/dns-query', 'https://120.53.53.53/dns-query', 'https://dns.alidns.com/dns-query', 'https://doh.pub/dns-query']
-  # 策略锚点配置
+  # 策略配置
   pg: &pg {type: select, proxies: [默认, 自动, 香港, 日本, 美国, 狮城]}
   ps: &ps {type: select, proxies: [中国, 香港, 日本, 美国, 狮城]}
   mt: &mt {type: select, include-all: true}
   at: &at {type: url-test, include-all: true, tolerance: 10}
   lb: &lb {type: load-balance, include-all: true, tolerance: 10, strategy: consistent-hashing}
-  # 节点锚点配置
+  # 节点配置
   hk: &hk "(?i)港|hk|hongkong|hong kong"
   tw: &tw "(?i)台|tw|taiwan"
   jp: &jp "(?i)日本|jp|japan"
@@ -24,7 +24,7 @@ rule-anchor:
   al: &al "^((?!(中国|直连|拦截)).)*$"
   cn: &cn "中国"
   ad: &ad "拦截"
-  # 规则锚点配置
+  # 规则配置
   ipcidr: &ipcidr {type: http, interval: 21600, behavior: ipcidr, format: mrs}
   domain: &domain {type: http, interval: 21600, behavior: domain, format: mrs}
   classical: &classical {type: http, interval: 21600, behavior: classical, format: text}
@@ -112,15 +112,19 @@ dns:
 proxy-groups:
   # 策略组
   - {name: 默认, type: select, proxies: [自动, 香港, 日本, 美国, 狮城]}
-  - {name: 海外, <<: *pg}
-  - {name: 微软, <<: *pg}
-  - {name: 奈飞, <<: *pg}
-  - {name: 推特, <<: *pg}
-  - {name: 谷歌, <<: *pg}
-  - {name: 电报, <<: *pg}
+  - {name: Global, <<: *pg}
   - {name: TikTok, <<: *pg}
+  - {name: Netflix, <<: *pg}
+  - {name: Twitter, <<: *pg}
+  - {name: Disney, <<: *pg}
+  - {name: Spotify, <<: *pg}
+  - {name: YouTube, <<: *pg}
+  - {name: Facebook, <<: *pg}
+  - {name: Telegram, <<: *pg}
   - {name: ChatGPT, <<: *pg}
-  - {name: 游戏, <<: *ps}
+  - {name: Google, <<: *pg}
+  - {name: Microsoft, <<: *pg}
+  - {name: 游戏, <<: *pg}
   - {name: 苹果, <<: *ps}
   - {name: 直连, <<: *ps}
   # 节点筛选
@@ -142,41 +146,41 @@ rules:
   # OpenAI
   - RULE-SET,OpenAI_domain,ChatGPT
   # 电报
-  - RULE-SET,Telegram_domain,电报
+  - RULE-SET,Telegram_domain,Telegram
   # 游戏
   - RULE-SET,Epic_domain,游戏
   - RULE-SET,Steam_domain,游戏
   # 谷歌/油管
-  - RULE-SET,YouTube_domain,谷歌
-  - RULE-SET,Google_domain,谷歌
+  - RULE-SET,YouTube_domain,YouTube
+  - RULE-SET,Google_domain,Google
   # 微软
-  - RULE-SET,GitHub_domain,微软
-  - RULE-SET,OneDrive_domain,微软
-  - RULE-SET,Microsoft_domain,微软
+  - RULE-SET,GitHub_domain,Microsoft
+  - RULE-SET,OneDrive_domain,Microsoft
+  - RULE-SET,Microsoft_domain,Microsoft
   # 社交/媒体
   - RULE-SET,TikTok_domain,TikTok
-  - RULE-SET,Disney_domain,奈飞
-  - RULE-SET,Netflix_domain,奈飞
-  - RULE-SET,Spotify_domain,奈飞
-  - RULE-SET,PayPal_domain,推特
-  - RULE-SET,Twitter_domain,推特
-  - RULE-SET,Facebook_domain,推特
-  - RULE-SET,Instagram_domain,推特
+  - RULE-SET,Disney_domain,Disney
+  - RULE-SET,Netflix_domain,Netflix
+  - RULE-SET,Spotify_domain,Spotify
+  - RULE-SET,PayPal_domain,Twitter
+  - RULE-SET,Twitter_domain,Twitter
+  - RULE-SET,Facebook_domain,Facebook
+  - RULE-SET,Instagram_domain,Facebook
   # 苹果
   - RULE-SET,Apple_domain,苹果
   # 国内
   - RULE-SET,Bilibili_domain,直连
   - RULE-SET,China_domain,直连
   # 海外
-  - RULE-SET,Global_domain,海外
+  - RULE-SET,Global_domain,Global
   # ipcidr
-  - RULE-SET,Google_ip,谷歌
-  - RULE-SET,Netflix_ip,奈飞
-  - RULE-SET,Twitter_ip,推特
-  - RULE-SET,Facebook_ip,推特
-  - RULE-SET,Telegram_ip,电报
+  - RULE-SET,Google_ip,Google
+  - RULE-SET,Netflix_ip,Netflix
+  - RULE-SET,Twitter_ip,Twitter
+  - RULE-SET,Facebook_ip,Facebook
+  - RULE-SET,Telegram_ip,Telegram
   - RULE-SET,China_ip,直连
-  - MATCH,海外
+  - MATCH,Global
 
 # 规则订阅配置
 rule-providers:

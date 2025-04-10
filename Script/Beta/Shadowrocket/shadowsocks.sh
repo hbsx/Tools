@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = shadowsocks 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-05 16:40:48
+#!date = 2025-04-10 09:42:49
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -20,7 +20,7 @@ reset="\033[0m"   # 重置颜色
 #############################
 #       全局变量定义       #
 #############################
-sh_ver="0.0.02"
+sh_ver="0.0.01"
 use_cdn=false
 distro="unknown"  # 系统类型：debian, ubuntu, alpine, fedora
 arch=""           # 转换后的系统架构

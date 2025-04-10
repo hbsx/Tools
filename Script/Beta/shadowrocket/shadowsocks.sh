@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = shadowsocks 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-10 09:42:49
+#!date = 2025-04-10 09:52:30
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -439,7 +439,7 @@ download_version() {
 download_shadowsocks() {
     download_version
     local version_file="/root/shadowsocks/version.txt"
-    local filename="shadowsocks-v${version}${arch_raw}-unknown-linux-gnu.tar.xz"
+    local filename="shadowsocks-v${version}.${arch_raw}-unknown-linux-gnu.tar.xz"
     local download_url="https://github.com/shadowsocks/shadowsocks-rust/releases/download/v${version}/${filename}"
     wget -t 3 -T 30 -O "$filename" "$(get_url "$download_url")" || {
         echo -e "${red}shadowsocks 下载失败，请检查网络后重试${reset}"

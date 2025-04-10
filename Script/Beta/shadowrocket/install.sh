@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = shadowsocks 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 16:38:57
+#!date = 2025-04-10 10:00:16
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -159,17 +159,17 @@ download_version() {
 download_shadowsocks() {
     download_version
     local version_file="/root/shadowsocks/version.txt"
-    local filename="shadowsocks-v${version}${arch_raw}-unknown-linux-gnu.tar.xz"
+    local filename="shadowsocks-v${version}.${arch_raw}-unknown-linux-gnu.tar.xz"
     local download_url="https://github.com/shadowsocks/shadowsocks-rust/releases/download/v${version}/${filename}"
     wget -t 3 -T 30 -O "$filename" "$(get_url "$download_url")" || {
         echo -e "${red}shadowsocks 下载失败，请检查网络后重试${reset}"
         exit 1
     }
-    unzip "$filename" && rm "$filename" || { 
+    tar -xJf "$filename" && rm "$filename" || { 
         echo -e "${red}shadowsocks 解压失败${reset}"
         exit 1
     }
-    chmod +x shadowsocks
+    chmod +x ssserver
     echo "$version" > "$version_file"
 }
 
@@ -203,7 +203,7 @@ download_service() {
 #############################
 download_shell() {
     local shell_file="/usr/bin/shadowsocks"
-    local sh_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/shadowsocks/shadowsocks.sh"
+    local sh_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/shadowrocket/shadowsocks.sh"
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_url")" || {
         echo -e "${red}管理脚本下载失败，请检查网络后重试${reset}"

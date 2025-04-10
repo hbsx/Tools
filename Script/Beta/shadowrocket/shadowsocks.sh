@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = shadowsocks 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-10 09:52:30
+#!date = 2025-04-10 10:00:16
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -445,7 +445,7 @@ download_shadowsocks() {
         echo -e "${red}shadowsocks 下载失败，请检查网络后重试${reset}"
         exit 1
     }
-    unzip "$filename" && rm "$filename" || { 
+    tar -xJf "$filename" && rm "$filename" || { 
         echo -e "${red}shadowsocks 解压失败${reset}"
         exit 1
     }

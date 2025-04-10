@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = shadowsocks 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-10 10:00:16
+#!date = 2025-04-10 19:42:44
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -37,29 +37,29 @@ check_distro() {
                 distro="$ID"
                 pkg_update="apt update && apt upgrade -y"
                 pkg_install="apt install -y"
-                service_enable() { systemctl enable shadowsocks; }
-                service_restart() { systemctl daemon-reload; systemctl start shadowsocks; }
+                service_enable() { systemctl enable ssserver; }
+                service_restart() { systemctl daemon-reload; systemctl start ssserver; }
                 ;;
             alpine)
                 distro="alpine"
                 pkg_update="apk update && apk upgrade"
                 pkg_install="apk add"
-                service_enable() { rc-update add shadowsocks default; }
-                service_restart() { rc-service shadowsocks restart; }
+                service_enable() { rc-update add ssserver default; }
+                service_restart() { rc-service ssserver restart; }
                 ;;
             fedora)
                 distro="fedora"
                 pkg_update="dnf upgrade --refresh -y"
                 pkg_install="dnf install -y"
-                service_enable() { systemctl enable shadowsocks; }
-                service_restart() { systemctl daemon-reload; systemctl start shadowsocks; }
+                service_enable() { systemctl enable ssserver; }
+                service_restart() { systemctl daemon-reload; systemctl start ssserver; }
                 ;;
             arch)
                 distro="arch"
                 pkg_update="pacman -Syu --noconfirm"
                 pkg_install="pacman -S --noconfirm"
-                service_enable() { systemctl enable shadowsocks; }
-                service_restart() { systemctl daemon-reload; systemctl start shadowsocks; }
+                service_enable() { systemctl enable ssserver; }
+                service_restart() { systemctl daemon-reload; systemctl start ssserver; }
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -178,7 +178,7 @@ download_shadowsocks() {
 #############################
 download_service() {
     if [ "$distro" = "alpine" ]; then
-        local service_file="/etc/init.d/shadowsocks"
+        local service_file="/etc/init.d/ssserver"
         local service_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/shadowsocks.openrc"
         wget -t 3 -T 30 -O "$service_file" "$(get_url "$service_url")" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
@@ -187,7 +187,7 @@ download_service() {
         chmod +x "$service_file"
         service_enable
     else
-        local service_file="/etc/systemd/system/shadowsocks.service"
+        local service_file="/etc/systemd/system/ssserver.service"
         local service_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/shadowsocks.service"
         wget -t 3 -T 30 -O "$service_file" "$(get_url "$service_url")" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
@@ -202,7 +202,7 @@ download_service() {
 #    管理脚本下载函数      #
 #############################
 download_shell() {
-    local shell_file="/usr/bin/shadowsocks"
+    local shell_file="/usr/bin/ss"
     local sh_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/shadowrocket/shadowsocks.sh"
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_url")" || {
@@ -339,7 +339,7 @@ config_shadowsocks() {
     echo -e "${green}Shadowsocks 配置完成，正在启动中${reset}"
     echo -e "${red}管理命令${reset}"
     echo -e "${cyan}=========================${reset}"
-    echo -e "${green}命令: shadowsocks 进入管理菜单${reset}"
+    echo -e "${green}命令: ss 进入管理菜单${reset}"
     echo -e "${cyan}=========================${reset}"
     echo -e "${green}Shadowsocks 已成功启动并设置为开机自启${reset}"
 }

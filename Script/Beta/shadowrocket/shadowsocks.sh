@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = shadowsocks 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-10 10:00:16
+#!date = 2025-04-10 19:42:44
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -35,23 +35,23 @@ check_distro() {
         case "$ID" in
             debian|ubuntu)
                 distro="$ID"
-                service_enable() { systemctl enable shadowsocks; }
-                service_restart() { systemctl daemon-reload; systemctl start shadowsocks; }
+                service_enable() { systemctl enable ssserver; }
+                service_restart() { systemctl daemon-reload; systemctl start ssserver; }
                 ;;
             alpine)
                 distro="alpine"
-                service_enable() { rc-update add shadowsocks default; }
-                service_restart() { rc-service shadowsocks restart; }
+                service_enable() { rc-update add ssserver default; }
+                service_restart() { rc-service ssserver restart; }
                 ;;
             fedora)
                 distro="fedora"
-                service_enable() { systemctl enable shadowsocks; }
-                service_restart() { systemctl daemon-reload; systemctl start shadowsocks; }
+                service_enable() { systemctl enable ssserver; }
+                service_restart() { systemctl daemon-reload; systemctl start ssserver; }
                 ;;
             arch)
                 distro="arch"
-                service_enable() { systemctl enable shadowsocks; }
-                service_restart() { systemctl daemon-reload; systemctl start shadowsocks; }
+                service_enable() { systemctl enable ssserver; }
+                service_restart() { systemctl daemon-reload; systemctl start ssserver; }
                 ;;
             *)
                 echo -e "${red}不支持的系统：${ID}${reset}"
@@ -100,7 +100,7 @@ get_url() {
 #    检查 shadowsocks 是否已安装  #
 #############################
 check_installation() {
-    local file="/root/shadowsocks/shadowsocks"
+    local file="/root/shadowsocks/ssserver"
     if [ ! -f "$file" ]; then
         echo -e "${red}请先安装 shadowsocks${reset}"
         start_menu
@@ -113,8 +113,8 @@ check_installation() {
 #    Alpine 系统运行状态检测  #
 #############################
 is_running_alpine() {
-    if [ -f "/run/shadowsocks.pid" ]; then
-        pid=$(cat /run/shadowsocks.pid)
+    if [ -f "/run/ssserver.pid" ]; then
+        pid=$(cat /run/ssserver.pid)
         if [ -d "/proc/$pid" ]; then
             return 0
         fi
@@ -134,7 +134,7 @@ start_menu() {
 #         状态显示函数       #
 #############################
 show_status() {
-    local file="/root/shadowsocks/shadowsocks"
+    local file="/root/shadowsocks/ssserver"
     local version_file="/root/shadowsocks/version.txt"
     local install_status run_status auto_start software_version
     distro=$(grep -E '^ID=' /etc/os-release | cut -d= -f2)
@@ -146,8 +146,8 @@ show_status() {
     else
         install_status="${green}已安装${reset}"
         if [ "$distro" = "alpine" ]; then
-            if [ -f "/run/shadowsocks.pid" ]; then
-                pid=$(cat /run/shadowsocks.pid)
+            if [ -f "/run/ssserver.pid" ]; then
+                pid=$(cat /run/ssserver.pid)
                 if [ -d "/proc/$pid" ]; then
                     run_status="${green}已运行${reset}"
                 else
@@ -156,18 +156,18 @@ show_status() {
             else
                 run_status="${red}未运行${reset}"
             fi
-            if rc-status default 2>/dev/null | awk '{print $1}' | grep -qx "shadowsocks"; then
+            if rc-status default 2>/dev/null | awk '{print $1}' | grep -Fxq "ssserver"; then
                 auto_start="${green}已设置${reset}"
             else
                 auto_start="${red}未设置${reset}"
             fi
         else
-            if systemctl is-active --quiet shadowsocks; then
+            if systemctl is-active --quiet ssserver; then
                 run_status="${green}已运行${reset}"
             else
                 run_status="${red}未运行${reset}"
             fi
-            if systemctl is-enabled --quiet shadowsocks; then
+            if systemctl is-enabled --quiet ssserver; then
                 auto_start="${green}已设置${reset}"
             else
                 auto_start="${red}未设置${reset}"
@@ -208,12 +208,12 @@ service_shadowsocks() {
             return
         fi
         if [ "$action" == "enable" ]; then
-            if rc-update show default | grep -q "shadowsocks"; then
+            if rc-update show default | grep -q "ssserver"; then
                 echo -e "${yellow}已${action_text}，无需重复操作${reset}"
             else
                 echo -e "${green}正在${action_text}请等待${reset}"
                 sleep 1s
-                if rc-update add shadowsocks default; then
+                if rc-update add ssserver default; then
                     echo -e "${green}${action_text}成功${reset}"
                 else
                     echo -e "${red}${action_text}失败${reset}"
@@ -222,12 +222,12 @@ service_shadowsocks() {
             start_menu
             return
         elif [ "$action" == "disable" ]; then
-            if ! rc-update show default | grep -q "shadowsocks"; then
+            if ! rc-update show default | grep -q "ssserver"; then
                 echo -e "${yellow}已${action_text}，无需重复操作${reset}"
             else
                 echo -e "${green}正在${action_text}请等待${reset}"
                 sleep 1s
-                if rc-update del shadowsocks; then
+                if rc-update del ssserver; then
                     echo -e "${green}${action_text}成功${reset}"
                 else
                     echo -e "${red}${action_text}失败${reset}"
@@ -252,9 +252,9 @@ service_shadowsocks() {
         echo -e "${green}正在${action_text}请等待${reset}"
         sleep 1s
         case "$action" in
-            start)   rc-service shadowsocks start ;;
-            stop)    rc-service shadowsocks stop ;;
-            restart) rc-service shadowsocks restart ;;
+            start)   rc-service ssserver start ;;
+            stop)    rc-service ssserver stop ;;
+            restart) rc-service ssserver restart ;;
         esac
         if [ $? -eq 0 ]; then
             echo -e "${green}${action_text}成功${reset}"
@@ -265,14 +265,14 @@ service_shadowsocks() {
         return
     fi
     if [ "$action" == "enable" ] || [ "$action" == "disable" ]; then
-        local is_enabled=$(systemctl is-enabled --quiet shadowsocks && echo "enabled" || echo "disabled")
+        local is_enabled=$(systemctl is-enabled --quiet ssserver && echo "enabled" || echo "disabled")
         if { [ "$action" == "enable" ] && [ "$is_enabled" == "enabled" ]; } || \
            { [ "$action" == "disable" ] && [ "$is_enabled" == "disabled" ]; }; then
             echo -e "${yellow}已${action_text}，无需重复操作${reset}"
         else
             echo -e "${green}正在${action_text}请等待${reset}"
             sleep 1s
-            if systemctl "$action" shadowsocks; then
+            if systemctl "$action" ssserver; then
                 echo -e "${green}${action_text}成功${reset}"
             else
                 echo -e "${red}${action_text}失败${reset}"
@@ -286,7 +286,7 @@ service_shadowsocks() {
         journalctl -u shadowsocks -o cat -f
         return
     fi
-    local service_status=$(systemctl is-active --quiet shadowsocks && echo "active" || echo "inactive")
+    local service_status=$(systemctl is-active --quiet ssserver && echo "active" || echo "inactive")
     if { [ "$action" == "start" ] && [ "$service_status" == "active" ]; } || \
        { [ "$action" == "stop" ] && [ "$service_status" == "inactive" ]; }; then
         echo -e "${yellow}已${action_text}，无需重复操作${reset}"
@@ -295,7 +295,7 @@ service_shadowsocks() {
     fi
     echo -e "${green}正在${action_text}请等待${reset}"
     sleep 1s
-    if systemctl "$action" shadowsocks; then
+    if systemctl "$action" ssserver; then
         echo -e "${green}${action_text}成功${reset}"
     else
         echo -e "${red}${action_text}失败${reset}"
@@ -318,8 +318,8 @@ uninstall_shadowsocks() {
     check_installation || { start_menu; return; }
     local folders="/root/shadowsocks"
     local shell_file="/usr/bin/shadowsocks"
-    local service_file="/etc/init.d/shadowsocks"
-    local system_file="/etc/systemd/system/shadowsocks.service"
+    local service_file="/etc/init.d/ssserver"
+    local system_file="/etc/systemd/system/ssserver.service"
     read -p "$(echo -e "${red}警告：卸载后将删除当前配置和文件！\n${yellow}确认卸载 shadowsocks 吗？${reset} (y/n): ")" input
     case "$input" in
         [Yy]* )
@@ -339,12 +339,12 @@ uninstall_shadowsocks() {
     sleep 2s
     echo -e "${green}shadowsocks 卸载命令已发出${reset}"
     if [ "$distro" = "alpine" ]; then
-        rc-service shadowsocks stop 2>/dev/null || { echo -e "${red}停止 shadowsocks 服务失败${reset}"; exit 1; }
-        rc-update del shadowsocks 2>/dev/null || { echo -e "${red}取消开机自启失败${reset}"; exit 1; }
+        rc-service ssserver stop 2>/dev/null || { echo -e "${red}停止 shadowsocks 服务失败${reset}"; exit 1; }
+        rc-update del ssserver 2>/dev/null || { echo -e "${red}取消开机自启失败${reset}"; exit 1; }
         rm -f "$service_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
     else
-        systemctl stop shadowsocks.service 2>/dev/null || { echo -e "${red}停止 shadowsocks 服务失败${reset}"; exit 1; }
-        systemctl disable shadowsocks.service 2>/dev/null || { echo -e "${red}禁用 shadowsocks 服务失败${reset}"; exit 1; }
+        systemctl stop ssserver.service 2>/dev/null || { echo -e "${red}停止 shadowsocks 服务失败${reset}"; exit 1; }
+        systemctl disable ssserver.service 2>/dev/null || { echo -e "${red}禁用 shadowsocks 服务失败${reset}"; exit 1; }
         rm -f "$system_file" || { echo -e "${red}删除服务文件失败${reset}"; exit 1; }
     fi
     rm -rf "$folders" || { echo -e "${red}删除相关文件夹失败${reset}"; exit 1; }
@@ -366,8 +366,8 @@ uninstall_shadowsocks() {
 install_shadowsocks() {
     check_network
     local folders="/root/shadowsocks"
-    local service_file="/etc/init.d/shadowsocks"
-    local system_file="/etc/systemd/system/shadowsocks.service"
+    local service_file="/etc/init.d/ssserver"
+    local system_file="/etc/systemd/system/ssserver.service"
     local install_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/shadowsocks/install.sh"
     if [ -d "$folders" ]; then
         echo -e "${yellow}检测到 shadowsocks 已经安装在 ${folders} 目录下${reset}"
@@ -449,13 +449,13 @@ download_shadowsocks() {
         echo -e "${red}shadowsocks 解压失败${reset}"
         exit 1
     }
-    chmod +x shadowsocks
+    chmod +x ssserver
     echo "$version" > "$version_file"
 }
 
 update_shadowsocks() {
     check_installation || { start_menu; return; }
-    local folders="/root/shadowsocks"
+    local folders="/root/ssserver"
     local version_file="/root/shadowsocks/version.txt"
     echo -e "${green}开始检查软件是否有更新${reset}"
     cd "$folders" || exit
@@ -509,7 +509,7 @@ update_shadowsocks() {
 #############################
 update_shell() {
     check_network
-    local shell_file="/usr/bin/shadowsocks"
+    local shell_file="/usr/bin/ss"
     local sh_ver_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/shadowsocks/shadowsocks.sh"
     local sh_new_ver=$(curl -sSL "$(get_url "$sh_ver_url")" | grep 'sh_ver="' | awk -F "=" '{print $NF}' | sed 's/\"//g' | head -1)
     echo -e "${green}开始检查脚本是否有更新${reset}"

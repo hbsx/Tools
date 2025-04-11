@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = ss 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-05 16:24:43
+#!date = 2025-04-11 19:21:33
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -152,7 +152,7 @@ download_version() {
         exit 1;
     }
 }
-https://github.com/shadowsocks/shadowsocks-rust/releases/download/v1.23.0/shadowsocks-v1.23.0.x86_64-unknown-linux-gnu.tar.xz
+
 #############################
 #     shadowsocks 下载函数      #
 #############################

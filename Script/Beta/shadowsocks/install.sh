@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = ss 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-11 19:21:33
+#!date = 2025-04-11 19:32:38
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -205,22 +205,10 @@ download_service() {
 }
 
 #############################
-#     管理面板文件下载      #
-#############################
-download_wbeui() {
-    local wbe_file="/root/shadowsocks/ui"
-    local wbe_url="https://github.com/metacubex/metacubexd.git"
-    git clone "$wbe_url" -b gh-pages "$wbe_file" || {
-        echo -e "${red}管理面板下载失败，请检查网络后重试${reset}"
-        exit 1
-    }
-}
-
-#############################
 #    管理脚本下载函数      #
 #############################
 download_shell() {
-    local shell_file="/usr/bin/shadowsocks"
+    local shell_file="/usr/bin/ss"
     local sh_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/Beta/shadowsocks/shadowsocks.sh"
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_url")" || {
@@ -234,7 +222,160 @@ download_shell() {
 #############################
 #       配置文件生成函数     #
 #############################
+config_shadowsocks() {
+    local config_file="/root/shadowsocks/config.json"
+    local config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/shadowsocks.json"
+    wget -t 3 -T 30 -q -O "$config_file" "$(get_url "$config_url")" || { 
+        echo -e "${red}配置文件下载失败${reset}"
+        exit 1
+    }
+    echo -e "${green}开始配置 Shadowsocks ${reset}"
+    
+    read -rp "是否快速生成配置文件？(y/n 默认[y]): " quick_confirm
+    quick_confirm=${quick_confirm:-y}
+    
+    if [[ "$quick_confirm" == [Yy] ]]; then
+        # 自动随机生成端口
+        PORT=$(shuf -i 10000-65000 -n 1)
+        
+        echo -e "请选择协议类型："
+        echo -e "${green}1${reset}、标准协议"
+        echo -e "${green}2${reset}、最新 2022 协议"
+        read -rp "输入数字选择协议类型 (1-2 默认[1]): " protocol_type
+        protocol_type=${protocol_type:-1}
+        
+        if [[ "$protocol_type" == "1" ]]; then
+            echo -e "请选择加密方式："
+            echo -e "${green}1${reset}、aes-128-gcm"
+            echo -e "${green}2${reset}、chacha20-ietf-poly1305"
+            echo -e "${green}3${reset}、aes-256-gcm"
+            read -rp "输入数字选择加密方式 (1-3 默认[1]): " method_choice
+            method_choice=${method_choice:-1}
+            case $method_choice in
+                1) METHOD="aes-128-gcm" ;;
+                2) METHOD="chacha20-ietf-poly1305" ;;
+                3) METHOD="aes-256-gcm" ;;
+                *) METHOD="aes-128-gcm" ;;
+            esac
+        else
+            echo -e "请选择 2022 加密方式："
+            echo -e "${green}1${reset}、2022-blake3-aes-128-gcm"
+            echo -e "${green}2${reset}、2022-blake3-chacha20-ietf-poly1305"
+            echo -e "${green}3${reset}、2022-blake3-aes-256-gcm"
+            read -rp "输入数字选择加密方式 (1-3 默认[1]): " method_choice
+            method_choice=${method_choice:-1}
+            case $method_choice in
+                1) METHOD="2022-blake3-aes-128-gcm" ;;
+                2) METHOD="2022-blake3-chacha20-ietf-poly1305" ;;
+                3) METHOD="2022-blake3-aes-256-gcm" ;;
+                *) METHOD="2022-blake3-aes-128-gcm" ;;
+            esac
+        fi
+        
+        echo -e "请选择认证模式："
+        echo -e "${green}1${reset}、自定义密码"
+        echo -e "${green}2${reset}、自动生成 UUID 当作密码"
+        read -rp "输入数字选择认证模式 (1-2 默认[1]): " auth_choice
+        auth_choice=${auth_choice:-1}
+        if [[ "$auth_choice" == "1" ]]; then
+            read -rp "请输入 Shadowsocks 密码 (留空则自动生成 UUID): " PASSWORD
+            if [[ -z "$PASSWORD" ]]; then
+                PASSWORD=$(cat /proc/sys/kernel/random/uuid)
+            fi
+        else
+            PASSWORD=$(cat /proc/sys/kernel/random/uuid)
+        fi
+    else
+        # 手动模式：用户输入参数
+        read -p "请输入监听端口 (留空以随机生成端口): " PORT
+        if [[ -z "$PORT" ]]; then
+            PORT=$(shuf -i 10000-65000 -n 1)
+        elif [[ "$PORT" -lt 10000 || "$PORT" -gt 65000 ]]; then
+            echo -e "${red}端口号必须在10000到65000之间。${reset}"
+            exit 1
+        fi
 
+        echo -e "请选择协议类型："
+        echo -e "${green}1${reset}、标准协议"
+        echo -e "${green}2${reset}、最新 2022 协议"
+        read -rp "输入数字选择协议类型 (1-2 默认[1]): " protocol_type
+        protocol_type=${protocol_type:-1}
+        if [[ "$protocol_type" == "1" ]]; then
+            echo -e "请选择加密方式："
+            echo -e "${green}1${reset}、aes-128-gcm"
+            echo -e "${green}2${reset}、chacha20-ietf-poly1305"
+            echo -e "${green}3${reset}、aes-256-gcm"
+            read -rp "输入数字选择加密方式 (1-3 默认[1]): " method_choice
+            method_choice=${method_choice:-1}
+            case $method_choice in
+                1) METHOD="aes-128-gcm" ;;
+                2) METHOD="chacha20-ietf-poly1305" ;;
+                3) METHOD="aes-256-gcm" ;;
+                *) METHOD="aes-128-gcm" ;;
+            esac
+        else
+            echo -e "请选择 2022 加密方式："
+            echo -e "${green}1${reset}、2022-blake3-aes-128-gcm"
+            echo -e "${green}2${reset}、2022-blake3-chacha20-ietf-poly1305"
+            echo -e "${green}3${reset}、2022-blake3-aes-256-gcm"
+            read -rp "输入数字选择加密方式 (1-3 默认[1]): " method_choice
+            method_choice=${method_choice:-1}
+            case $method_choice in
+                1) METHOD="2022-blake3-aes-128-gcm" ;;
+                2) METHOD="2022-blake3-chacha20-ietf-poly1305" ;;
+                3) METHOD="2022-blake3-aes-256-gcm" ;;
+                *) METHOD="2022-blake3-aes-128-gcm" ;;
+            esac
+        fi
+        
+        echo -e "请选择认证模式："
+        echo -e "${green}1${reset}、自定义密码"
+        echo -e "${green}2${reset}、自动生成 UUID 当作密码"
+        read -rp "输入数字选择认证模式 (1-2 默认[1]): " auth_choice
+        auth_choice=${auth_choice:-1}
+        if [[ "$auth_choice" == "1" ]]; then
+            read -rp "请输入 Shadowsocks 密码 (留空则自动生成 UUID): " PASSWORD
+            if [[ -z "$PASSWORD" ]]; then
+                PASSWORD=$(cat /proc/sys/kernel/random/uuid)
+            fi
+        else
+            PASSWORD=$(cat /proc/sys/kernel/random/uuid)
+        fi
+    fi
+
+    echo -e "${green}生成的配置参数如下：${reset}"
+    echo -e "  - 端口: ${green}$PORT${reset}"
+    echo -e "  - 加密方式: ${green}$METHOD${reset}"
+    echo -e "  - 密码: ${green}$PASSWORD${reset}"
+
+    echo -e "${green}读取配置文件模板${reset}"
+    config=$(cat "$config_file")
+    
+    echo -e "${green}修改配置文件${reset}"
+    config=$(echo "$config" | jq --arg port "$PORT" --arg password "$PASSWORD" --arg method "$METHOD" '
+        .server_port = ($port | tonumber) |
+        .password = $password |
+        .method = $method
+    ')
+    
+    echo -e "${green}写入配置文件${reset}"
+    echo "$config" > "$config_file"
+    
+    echo -e "${green}验证修改后的配置文件格式${reset}"
+    if ! jq . "$config_file" >/dev/null 2>&1; then
+        echo -e "${red}修改后的配置文件格式无效，请检查文件${reset}"
+        exit 1
+    fi
+    
+    service_restart
+    echo -e "${green}Shadowsocks 配置已完成并保存到 ${config_file} 文件${reset}"
+    echo -e "${green}Shadowsocks 配置完成，正在启动中${reset}"
+    echo -e "${red}管理命令${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}命令: ss 进入管理菜单${reset}"
+    echo -e "${cyan}=========================${reset}"
+    echo -e "${green}Shadowsocks 已成功启动并设置为开机自启${reset}"
+}
 
 #############################
 #       安装主流程函数      #
@@ -251,7 +392,6 @@ install_shadowsocks() {
     echo -e "${yellow}当前软件版本：${reset}[ ${green}${version}${reset} ]"
     download_shadowsocks
     download_service
-    download_wbeui
     download_shell
     echo -e "${green}恭喜你! shadowsocks 已经安装完成${reset}"
     echo -e "${red}输入 y/Y 下载默认配置${reset}"

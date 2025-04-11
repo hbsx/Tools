@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = ss 一键管理脚本 Beta
 #!desc = 管理 & 面板
-#!date = 2025-04-11 19:49:05
+#!date = 2025-04-11 19:57:30
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -576,9 +576,9 @@ config_shadowsocks() {
         echo -e "${green}1${reset}、aes-128-gcm"
         echo -e "${green}2${reset}、aes-256-gcm"
         echo -e "${green}3${reset}、chacha20-ietf-poly1305"
-        echo -e "${green}4${reset}、aes-128-gcm"
-        echo -e "${green}5${reset}、aes-256-gcm"
-        echo -e "${green}6${reset}、chacha20-ietf-poly1305"
+        echo -e "${green}4${reset}、2022-blake3-aes-128-gcm"
+        echo -e "${green}5${reset}、2022-blake3-aes-256-gcm"
+        echo -e "${green}6${reset}、2022-blake3-chacha20-ietf-poly1305"
         read -rp "输入数字选择加密方式 (1-6 默认[1]): " method_choice
         method_choice=${method_choice:-1}
         case $method_choice in
@@ -619,9 +619,9 @@ config_shadowsocks() {
         echo -e "${green}1${reset}、aes-128-gcm"
         echo -e "${green}2${reset}、aes-256-gcm"
         echo -e "${green}3${reset}、chacha20-ietf-poly1305"
-        echo -e "${green}4${reset}、aes-128-gcm"
-        echo -e "${green}5${reset}、aes-256-gcm"
-        echo -e "${green}6${reset}、chacha20-ietf-poly1305"
+        echo -e "${green}4${reset}、2022-blake3-aes-128-gcm"
+        echo -e "${green}5${reset}、2022-blake3-aes-256-gcm"
+        echo -e "${green}6${reset}、2022-blake3-chacha20-ietf-poly1305"
         read -rp "输入数字选择加密方式 (1-6 默认[1]): " method_choice
         method_choice=${method_choice:-1}
         case $method_choice in

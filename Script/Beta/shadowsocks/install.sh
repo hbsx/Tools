@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = ss 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-11 19:49:05
+#!date = 2025-04-11 19:57:30
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -226,12 +226,16 @@ download_shell() {
 enable_systfo() {
     kernel_major=$(uname -r | cut -d. -f1)
     if [ "$kernel_major" -ge 3 ]; then
+        # 开启 TCP Fast Open（若文件存在则设置值为 3）
         if [ -f /proc/sys/net/ipv4/tcp_fastopen ]; then
             echo 3 > /proc/sys/net/ipv4/tcp_fastopen
         fi
 
-        local_conf="/etc/sysctl.d/99-systfo.conf"
-        cat <<EOF > "$local_conf"
+        # 定义 sysctl 配置文件路径
+        SYSCTL_CONF="/etc/sysctl.d/99-systfo.conf"
+        # 如果配置文件不存在，则写入网络优化参数
+        if [ ! -f "$SYSCTL_CONF" ]; then
+            cat <<EOF > "$SYSCTL_CONF"
 fs.file-max = 51200
 net.core.rmem_max = 67108864
 net.core.wmem_max = 67108864
@@ -241,7 +245,6 @@ net.core.netdev_max_backlog = 4096
 net.core.somaxconn = 4096
 net.ipv4.tcp_syncookies = 1
 net.ipv4.tcp_tw_reuse = 1
-net.ipv4.tcp_tw_recycle = 0
 net.ipv4.tcp_fin_timeout = 30
 net.ipv4.tcp_keepalive_time = 1200
 net.ipv4.ip_local_port_range = 10000 65000
@@ -255,11 +258,12 @@ net.ipv4.tcp_ecn = 1
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 EOF
-
-        sysctl --system > /dev/null 2>&1
-        echo "$(date): TCP Fast Open configuration applied." >> /var/log/systfo.log
+            # 应用配置
+            sysctl --system >/dev/null 2>&1
+        fi
+        echo -e "${Green_font_prefix}TCP Fast Open 已启用并应用网络优化参数${Font_color_suffix}"
     else
-        echo -e "系统内核版本过低，无法支持 TCP Fast Open！"
+        echo -e "${Red_font_prefix}系统内核版本过低，无法支持 TCP Fast Open！${Font_color_suffix}"
     fi
 }
 
@@ -285,9 +289,9 @@ config_shadowsocks() {
         echo -e "${green}1${reset}、aes-128-gcm"
         echo -e "${green}2${reset}、aes-256-gcm"
         echo -e "${green}3${reset}、chacha20-ietf-poly1305"
-        echo -e "${green}4${reset}、aes-128-gcm"
-        echo -e "${green}5${reset}、aes-256-gcm"
-        echo -e "${green}6${reset}、chacha20-ietf-poly1305"
+        echo -e "${green}4${reset}、2022-blake3-aes-128-gcm"
+        echo -e "${green}5${reset}、2022-blake3-aes-256-gcm"
+        echo -e "${green}6${reset}、2022-blake3-chacha20-ietf-poly1305"
         read -rp "输入数字选择加密方式 (1-6 默认[1]): " method_choice
         method_choice=${method_choice:-1}
         case $method_choice in
@@ -328,9 +332,9 @@ config_shadowsocks() {
         echo -e "${green}1${reset}、aes-128-gcm"
         echo -e "${green}2${reset}、aes-256-gcm"
         echo -e "${green}3${reset}、chacha20-ietf-poly1305"
-        echo -e "${green}4${reset}、aes-128-gcm"
-        echo -e "${green}5${reset}、aes-256-gcm"
-        echo -e "${green}6${reset}、chacha20-ietf-poly1305"
+        echo -e "${green}4${reset}、2022-blake3-aes-128-gcm"
+        echo -e "${green}5${reset}、2022-blake3-aes-256-gcm"
+        echo -e "${green}6${reset}、2022-blake3-chacha20-ietf-poly1305"
         read -rp "输入数字选择加密方式 (1-6 默认[1]): " method_choice
         method_choice=${method_choice:-1}
         case $method_choice in

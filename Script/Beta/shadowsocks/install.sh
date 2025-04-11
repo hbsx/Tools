@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = ss 一键安装脚本 Beta
 #!desc = 安装 & 配置
-#!date = 2025-04-11 19:57:30
+#!date = 2025-04-11 20:01:09
 #!author = ChatGPT
 
 # 终止脚本执行遇到错误时退出，并启用管道错误检测
@@ -296,8 +296,8 @@ config_shadowsocks() {
         method_choice=${method_choice:-1}
         case $method_choice in
             1) METHOD="aes-128-gcm" ;;
-            3) METHOD="aes-256-gcm" ;;
-            2) METHOD="chacha20-ietf-poly1305" ;;
+            2) METHOD="aes-256-gcm" ;;
+            3) METHOD="chacha20-ietf-poly1305" ;;
             4) METHOD="2022-blake3-aes-128-gcm" ;;
             5) METHOD="2022-blake3-aes-256-gcm" ;;
             6) METHOD="2022-blake3-chacha20-ietf-poly1305" ;;         
@@ -339,8 +339,8 @@ config_shadowsocks() {
         method_choice=${method_choice:-1}
         case $method_choice in
             1) METHOD="aes-128-gcm" ;;
-            3) METHOD="aes-256-gcm" ;;
-            2) METHOD="chacha20-ietf-poly1305" ;;
+            2) METHOD="aes-256-gcm" ;;
+            3) METHOD="chacha20-ietf-poly1305" ;;
             4) METHOD="2022-blake3-aes-128-gcm" ;;
             5) METHOD="2022-blake3-aes-256-gcm" ;;
             6) METHOD="2022-blake3-chacha20-ietf-poly1305" ;;         

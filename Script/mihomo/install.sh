@@ -211,7 +211,7 @@ download_mihomo() {
 download_service() {
     if [ "$distro" = "alpine" ]; then
         local service_file="/etc/init.d/mihomo"
-        local service_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.openrc"
+        local service_url="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Service/mihomo.openrc"
         wget -t 3 -T 30 -O "$service_file" "$(get_url "$service_url")" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
@@ -220,7 +220,7 @@ download_service() {
         service_enable
     else
         local service_file="/etc/systemd/system/mihomo.service"
-        local service_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/mihomo.service"
+        local service_url="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Service/mihomo.service"
         wget -t 3 -T 30 -O "$service_file" "$(get_url "$service_url")" || {
             echo -e "${red}系统服务下载失败，请检查网络后重试${reset}"
             exit 1
@@ -247,7 +247,7 @@ download_wbeui() {
 #############################
 download_shell() {
     local shell_file="/usr/bin/mihomo"
-    local sh_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/mihomo/mihomo.sh"
+    local sh_url="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Script/mihomo/mihomo.sh"
     [ -f "$shell_file" ] && rm -f "$shell_file"
     wget -t 3 -T 30 -O "$shell_file" "$(get_url "$sh_url")" || {
         echo -e "${red}管理脚本下载失败，请检查网络后重试${reset}"
@@ -263,8 +263,8 @@ download_shell() {
 config_mihomo() {
     local folders="/root/mihomo"
     local config_file="/root/mihomo/config.yaml"
-    local tun_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomo.yaml"
-    local tproxy_config_url="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/mihomotp.yaml"
+    local tun_config_url="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Config/mihomo.yaml"
+    local tproxy_config_url="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Config/mihomotp.yaml"
     local iface ipv4 ipv6 config_url
     iface=$(ip route | awk '/default/ {print $5}')
     ipv4=$(ip addr show "$iface" | awk '/inet / {print $2}' | cut -d/ -f1)

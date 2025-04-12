@@ -1,7 +1,7 @@
 #!/bin/bash
 #!name = mihomo 一键安装脚本
 #!desc = 安装 & 配置
-#!date = 2025-04-12 13:23:44
+#!date = 2025-04-12 13:26:27
 #!author = ChatGPT
 
 # 当遇到错误或管道错误时立即退出
@@ -333,6 +333,7 @@ install_mihomo() {
     local folders="/root/mihomo"
     rm -rf "$folders"
     mkdir -p "$folders" && cd "$folders"
+    check_ip_forward
     check_distro
     echo -e "${yellow}当前系统版本：${reset}[ ${green}${distro}${reset} ]"
     get_schema

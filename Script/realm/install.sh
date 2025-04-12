@@ -5,7 +5,7 @@
 #!date = 2024-11-04 18:50
 #!author = ChatGPT
 
-# bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Script/realm/install.sh)
+# bash <(wget -qO- --no-check-certificate https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Script/realm/install.sh)
 
 set -e -o pipefail
 
@@ -40,10 +40,10 @@ wget -t 3 -T 30 "${DOWNLOAD_URL}" -O "${FILENAME}" || { echo -e "${Red}下载失
 tar -xzvf "$FILENAME" && rm -f "$FILENAME" || { echo -e "${Red}解压失败${Reset}"; exit 1; }
 chmod +x realm
 
-CONFIG_URL="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Config/realm.toml"
+CONFIG_URL="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Config/realm.toml"
 wget -O "/root/realm/config.toml" "$CONFIG_URL" || { echo -e "${Red}下载配置文件失败${Reset}"; exit 1; }
 
-SERVICE_URL="https://raw.githubusercontent.com/Abcd789JK/Tools/refs/heads/main/Service/realm.service"
+SERVICE_URL="https://raw.githubusercontent.com/hbsx/Tools/refs/heads/main/Service/realm.service"
 wget -O "/etc/systemd/system/realm.service" "$SERVICE_URL" && chmod +x "/etc/systemd/system/realm.service"
 
 systemctl daemon-reload
